@@ -2160,9 +2160,12 @@ void PFAlgo::processBlock( const reco::PFBlockRef& blockref,
 		       <<" to ECAL energy, and locking"<<endl;
 	active[is->second.first] = false;
         double clusterEnergy=sqrt(is->second.second.Mag2());
-        ecalClusters.push_back(is->second);
-        sumEcalClusters+=clusterEnergy;
-	continue;
+        if(clusterEnergy>50.0)
+        {
+          ecalClusters.push_back(is->second);
+          sumEcalClusters+=clusterEnergy;
+	}
+        continue;
       }
 
       // Otherwise, do not consider the last cluster examined and exit.
