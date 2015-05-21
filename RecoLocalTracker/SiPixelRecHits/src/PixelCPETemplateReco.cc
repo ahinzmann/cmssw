@@ -444,8 +444,10 @@ PixelCPETemplateReco::localPosition(DetParam const & theDetParam, ClusterParam &
     
   // Save probabilities and qBin in the quantities given to us by the base class
   // (for which there are also inline getters).  &&& templProbX_ etc. should be retired...
-  theClusterParam.probabilityX_  = theClusterParam.templProbX_;
-  theClusterParam.probabilityY_  = theClusterParam.templProbY_;
+  if ( theClusterParam.templProbX_ !=0 && theClusterParam.templProbX_ !=0 ) 
+     theClusterParam.probabilityXY_ = theClusterParam.templProbX_ * theClusterParam.templProbY_ * (1.f - std::log(theClusterParam.templProbX_ * theClusterParam.templProbY_) ) ;
+  else 
+     theClusterParam.probabilityXY_ = 0;      
   theClusterParam.probabilityQ_  = theClusterParam.templProbQ_;
   theClusterParam.qBin_          = theClusterParam.templQbin_;
   
@@ -500,14 +502,15 @@ PixelCPETemplateReco::localError(DetParam const & theDetParam,  ClusterParam & t
       //--- Are we near either of the edges?
       bool edgex = ( theDetParam.theRecTopol->isItEdgePixelInX( minPixelRow ) || theDetParam.theRecTopol->isItEdgePixelInX( maxPixelRow ) );
       bool edgey = ( theDetParam.theRecTopol->isItEdgePixelInY( minPixelCol ) || theDetParam.theRecTopol->isItEdgePixelInY( maxPixelCol ) );
-      
-      if ( theClusterParam.ierr !=0 ) 
+
+      if ( theClusterParam.probabilityXY_<1e-3 )
 	{
-	  // If reconstruction fails the hit position is calculated from cluster center of gravity 
-	  // corrected in x by average Lorentz drift. Assign huge errors.
-	  //xerr = 10.0 * (float)theClusterParam.theCluster->sizeX() * xerr;
-	  //yerr = 10.0 * (float)theClusterParam.theCluster->sizeX() * yerr;
-	  
+	  // Assign huge errors.
+	  xerr = 10.0 * (float)theClusterParam.theCluster->sizeX() * xerr;
+	  yerr = 10.0 * (float)theClusterParam.theCluster->sizeY() * yerr;
+	}  
+      else if ( theClusterParam.ierr !=0 )
+	{
 	  // Assign better errors based on the residuals for failed template cases
 	  if ( theDetParam.thePart == GeomDetEnumerators::PixelBarrel )
 	    {

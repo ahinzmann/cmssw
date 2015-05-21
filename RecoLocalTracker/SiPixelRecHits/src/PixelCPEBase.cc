@@ -586,12 +586,7 @@ SiPixelRecHitQuality::QualWordType
 PixelCPEBase::rawQualityWord(ClusterParam & theClusterParam) const
 {
   SiPixelRecHitQuality::QualWordType qualWord(0);
-  float probabilityXY;
-  if ( theClusterParam.probabilityX_ !=0 && theClusterParam.probabilityY_ !=0 ) 
-     probabilityXY = theClusterParam.probabilityX_ * theClusterParam.probabilityY_ * (1.f - std::log(theClusterParam.probabilityX_ * theClusterParam.probabilityY_) ) ;
-  else 
-     probabilityXY = 0;
-  SiPixelRecHitQuality::thePacking.setProbabilityXY ( probabilityXY ,
+  SiPixelRecHitQuality::thePacking.setProbabilityXY ( theClusterParam.probabilityXY_ ,
                                                       qualWord );
   
   SiPixelRecHitQuality::thePacking.setProbabilityQ  ( theClusterParam.probabilityQ_ , 

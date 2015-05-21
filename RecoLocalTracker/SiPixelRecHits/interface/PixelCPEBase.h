@@ -85,7 +85,7 @@ class PixelCPEBase : public PixelClusterParameterEstimator
   struct ClusterParam
   {
     ClusterParam(const SiPixelCluster & cl) : theCluster(&cl), loc_trk_pred(0.0,0.0,0.0,0.0),
-      probabilityX_(0.0), probabilityY_(0.0), probabilityQ_(0.0), qBin_(0.0),
+      probabilityXY_(0.0), probabilityQ_(0.0), qBin_(0.0),
       isOnEdge_(false), hasBadPixels_(false), spansTwoROCs_(false), hasFilledProb_(false) {}
     const SiPixelCluster * theCluster;
 
@@ -107,8 +107,7 @@ class PixelCPEBase : public PixelClusterParameterEstimator
     bool with_track_angle; 
 
     //--- Probability
-    float probabilityX_ ; 
-    float probabilityY_ ; 
+    float probabilityXY_ ; 
     float probabilityQ_ ; 
     float qBin_ ;
     bool  isOnEdge_ ;
