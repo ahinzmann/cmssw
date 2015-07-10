@@ -319,15 +319,20 @@ bool reco::makeSpecific(vector<reco::CandidatePtr> const & particles,
 	break;
 
       case 1: // PFCandidate::h_HF :    // hadron in HF
-	HFHadronEnergy += pfCand->energy();
-	HFHadronMultiplicity++;
+        if (pfCandCast) { 
+          HFHadronEnergy += pfCandCast->hcalEnergy();
+	  HFEMEnergy += pfCandCast->ecalEnergy();
+	}
+        HFHadronMultiplicity++;
 	neutralHadronEnergy += pfCand->energy();
 	neutralMultiplicity++;
 	break;
 
       case 2: //PFCandidate::egamma_HF :    // electromagnetic in HF
-	HFEMEnergy += pfCand->energy();
-	HFEMMultiplicity++;
+        if (pfCandCast) { 
+	  HFEMEnergy += pfCandCast->ecalEnergy();
+	}
+   	HFEMMultiplicity++;
 	neutralEmEnergy += pfCand->energy();
 	neutralMultiplicity++;
 	break;
