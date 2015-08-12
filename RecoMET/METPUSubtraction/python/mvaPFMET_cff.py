@@ -17,39 +17,8 @@ calibratedAK4PFJetsForPFMVAMEt = cms.EDProducer('PFJetCorrectionProducer',
 
 from RecoJets.JetProducers.PileupJetID_cfi import pileupJetIdEvaluator
 from RecoJets.JetProducers.PileupJetIDParams_cfi import JetIdParams
-puJetIdForPFMVAMEt = pileupJetIdEvaluator.clone(
-    algos = cms.VPSet(
-        cms.PSet(
-        tmvaVariables = cms.vstring(
-            "nvtx",
-            "jetPt",
-            "jetEta",
-            "jetPhi",
-            "dZ",
-            "beta",
-            "betaStar",
-            "nCharged",
-            "nNeutrals",
-            "dR2Mean",
-            "ptD",
-            "frac01",
-            "frac02",
-            "frac03",
-            "frac04",
-            "frac05"
-            ),
-        tmvaWeights = cms.string("RecoJets/JetProducers/data/TMVAClassificationCategory_JetID_MET_53X_Dec2012.weights.xml.gz"),
-        tmvaMethod = cms.string("JetID"),
-        tmvaSpectators = cms.vstring(),
-        JetIdParams = JetIdParams,                  
-        impactParTkThreshold = cms.double(0.),
-        version = cms.int32(-1),
-        cutBased = cms.bool(False), 
-        label = cms.string("full")
-        )
-        ),
-    produceJetIds = cms.bool(True),
-    runMvas = cms.bool(True),
+puJetIdForPFMVAMEt = pileupJetId.clone(
+    algos = cms.VPSet(chsPUjetIDalgos),
     jets = cms.InputTag("calibratedAK4PFJetsForPFMVAMEt"),#calibratedAK4PFJetsForPFMVAMEt
     applyJec = cms.bool(True),
     inputIsCorrected = cms.bool(True),

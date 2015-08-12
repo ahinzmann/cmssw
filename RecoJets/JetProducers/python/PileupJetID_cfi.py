@@ -9,7 +9,8 @@ _stdalgos_5x = cms.VPSet(full_5x,cutbased,PhilV1)
 _chsalgos_5x = cms.VPSet(full_5x_chs,cutbased)
 _chsalgos_7x = cms.VPSet(full_74x_chs,cutbased)
 
-_stdalgos    = _chsalgos_7x
+stdPUjetIDalgos    = _chsalgos_7x
+chsPUjetIDalgos    = _chsalgos_7x
 
 # Calculate+store variables and run MVAs
 pileupJetId = cms.EDProducer('PileupJetIdProducer',
@@ -18,7 +19,7 @@ pileupJetId = cms.EDProducer('PileupJetIdProducer',
      runMvas = cms.bool(True),
      jets = cms.InputTag("ak4PFJetsCHS"),
      vertexes = cms.InputTag("offlinePrimaryVertices"),
-     algos = cms.VPSet(_stdalgos),
+     algos = cms.VPSet(stdPUjetIDalgos),
      rho     = cms.InputTag("fixedGridRhoFastjetAll"),
      jec     = cms.string("AK4PFchs"),
      applyJec = cms.bool(True),

@@ -15,10 +15,7 @@ pfNoPUchsMEtSequence += ak4PFJetSequenceForPFNoPUchsMEt
 
 from RecoJets.JetProducers.PileupJetID_cfi import *
 puJetIdForPFNoPUchsMEt = pileupJetId.clone(
-    algos = cms.VPSet(
-        full_53x_chs,
-        cutbased
-        ),
+    algos = cms.VPSet(chsPUjetIDalgos),
     label = cms.string("fullId"),
     produceJetIds = cms.bool(True),
     runMvas = cms.bool(True),
