@@ -18,7 +18,7 @@ calibratedAK4PFJetsForPFMVAMEt = cms.EDProducer('PFJetCorrectionProducer',
 from RecoJets.JetProducers.PileupJetID_cfi import pileupJetIdEvaluator
 from RecoJets.JetProducers.PileupJetIDParams_cfi import JetIdParams
 puJetIdForPFMVAMEt = pileupJetId.clone(
-    algos = cms.VPSet(chsPUjetIDalgos),
+    algos = cms.VPSet(stdPUjetIDalgos),
     jets = cms.InputTag("calibratedAK4PFJetsForPFMVAMEt"),#calibratedAK4PFJetsForPFMVAMEt
     applyJec = cms.bool(True),
     inputIsCorrected = cms.bool(True),

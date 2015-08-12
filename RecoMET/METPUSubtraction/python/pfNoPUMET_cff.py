@@ -13,7 +13,6 @@ pfNoPUMEtSequence += ak4PFJetSequenceForPFNoPUMEt
 from RecoJets.JetProducers.PileupJetID_cfi import *
 puJetIdForPFNoPUMEt = pileupJetId.clone(
     algos = cms.VPSet(stdPUjetIDalgos),
-    label = cms.string("fullId"), #MM does not work for weird reasons, cannot be cloned properly
     produceJetIds = cms.bool(True),
     runMvas = cms.bool(True),
     jets = cms.InputTag("calibratedAK4PFJetsForPFNoPUMEt"),
