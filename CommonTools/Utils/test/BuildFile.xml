@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 <bin   name="testCommonToolsUtil" file="testSelectors.cc,testSelectIterator.cc,testComparators.cc,testCutParser.cc,testExpressionParser.cc,testRunner.cpp">
+=======
+<bin   name="testCommonToolsUtil" file="testSelectors.cc,testSelectIterator.cc,testComparators.cc,testCutParser.cc,testExpressionParser.cc,testAssociationMapFilterValues.cc,testFormulaEvaluator.cc,testRunner.cpp">
+>>>>>>> 61a724b... Added a formula evaluator to replace TFormula calls
   <use   name="Geometry/CommonDetUnit"/>
   <use   name="DataFormats/TrackReco"/>
   <use   name="DataFormats/TrackerRecHit2D"/>
