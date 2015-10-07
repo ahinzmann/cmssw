@@ -127,25 +127,6 @@ unsigned SimpleJetCorrector::findInvertVar()
 //------------------------------------------------------------------------
 //--- inversion ----------------------------------------------------------
 //------------------------------------------------------------------------
-<<<<<<< HEAD
-float SimpleJetCorrector::invert(const std::vector<float>& fX, TFormula& tFunc) const
-{
-  unsigned nMax = 50;
-  unsigned N = fX.size();
-  float precision = 0.0001;
-  float rsp = 1.0;
-  float e = 1.0;
-  float x[4] = {0.0,0.0,0.0,0.0};
-  for(unsigned i=0;i<N;i++)
-    x[i] = fX[i];
-  unsigned nLoop=0;
-  while(e > precision && nLoop < nMax)
-    {
-      rsp = tFunc.Eval(x[0],x[1],x[2],x[3]);
-      float tmp = x[mInvertVar] * rsp;
-      e = fabs(tmp - fX[mInvertVar])/fX[mInvertVar];
-      x[mInvertVar] = fX[mInvertVar]/rsp;
-=======
 float SimpleJetCorrector::invert(const double *args, const double *params) const
 {
   unsigned nMax = 50;
@@ -164,19 +145,7 @@ float SimpleJetCorrector::invert(const double *args, const double *params) const
       float tmp = x[mInvertVar] * rsp;
       e = fabs(tmp - args[mInvertVar])/args[mInvertVar];
       x[mInvertVar] = args[mInvertVar]/rsp;
->>>>>>> 83aa621... Replace TFormula with FormulaEvaluator in SimpleJectCorrector
       nLoop++;
     }
   return 1./rsp;
 }
-<<<<<<< HEAD
-
-
-
-
-
-
-
-
-=======
->>>>>>> 83aa621... Replace TFormula with FormulaEvaluator in SimpleJectCorrector
