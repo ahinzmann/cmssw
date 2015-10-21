@@ -86,7 +86,9 @@ process.pileupJetIdEvaluator.rho = cms.InputTag("fixedGridRhoFastjetAll")
 
 patJetsAK4.userData.userFloats.src += ['pileupJetIdEvaluator:fullDiscriminant']
 patJetsAK4.userData.userInts.src += ['pileupJetIdEvaluator:cutbasedId','pileupJetIdEvaluator:fullId']
-process.out.outputCommands += ['keep *_pileupJetIdEvaluator_*_*']
+process.out.outputCommands += ['keep *_pileupJetIdEvaluator_*_*',
+'keep *_pileupJetIdCalculator_*_*',
+]
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #QGTagger
