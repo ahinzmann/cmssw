@@ -62,7 +62,9 @@ patJetsAK4 = process.patJetsAK4PFCHS
 patJetsCA8 = process.patJetsCA8PFCHS
 patJetsAK8 = process.patJetsAK8PFCHS
 
-process.out.outputCommands += ['keep *_ak4PFJetsCHS_*_*',
+process.out.outputCommands += ['keep *_ak4PFJets_*_*',
+                               'keep *_patJets_*_*',
+                               'keep *_ak4PFJetsCHS_*_*',
                                'keep *_patJetsAK4PFCHS_*_*',
                                'keep *_ca8PFJetsCHS_*_*',
                                'keep *_patJetsCA8PFCHS_*_*',
@@ -84,10 +86,20 @@ process.pileupJetIdEvaluator.jets = cms.InputTag("ak4PFJetsCHS")
 process.pileupJetIdCalculator.rho = cms.InputTag("fixedGridRhoFastjetAll")
 process.pileupJetIdEvaluator.rho = cms.InputTag("fixedGridRhoFastjetAll")
 
+
 patJetsAK4.userData.userFloats.src += ['pileupJetIdEvaluator:fullDiscriminant']
 patJetsAK4.userData.userInts.src += ['pileupJetIdEvaluator:cutbasedId','pileupJetIdEvaluator:fullId']
 process.out.outputCommands += ['keep *_pileupJetIdEvaluator_*_*',
 'keep *_pileupJetIdCalculator_*_*',
+]
+
+process.pileupJetIdCalculatorNoCHS = process.pileupJetIdCalculator.clone( jets = cms.InputTag("ak4PFJets") )
+process.pileupJetIdEvaluatorNoCHS = process.pileupJetIdEvaluator.clone( jets = cms.InputTag("ak4PFJets"),
+  jetids = cms.InputTag("pileupJetIdCalculatorNoCHS") )
+process.patJets.userData.userFloats.src += ['pileupJetIdEvaluatorNoCHS:fullDiscriminant']
+process.patJets.userData.userInts.src += ['pileupJetIdEvaluatorNoCHS:cutbasedId','pileupJetIdEvaluatorNoCHS:fullId']
+process.out.outputCommands += ['keep *_pileupJetIdEvaluatorNoCHS_*_*',
+'keep *_pileupJetIdCalculatorNoCHS_*_*',
 ]
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
