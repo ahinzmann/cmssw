@@ -100,6 +100,31 @@ def miniAOD_customizeCommon(process):
                      metSource = "caloMetM"
                      )
 
+    ######Start: Boosted Subjets taus######
+    from PhysicsTools.PatAlgos.tools.helpers import cloneProcessingSnippet
+    from PhysicsTools.PatAlgos.tools.helpers import massSearchReplaceAnyInputTag
+    process.load("RecoTauTag.Configuration.RecoPFTauTag_cff")
+  
+    process.ptau = cms.Path( process.PFTau )
+    process.PATTauSequence = cms.Sequence(process.PFTau+process.makePatTaus+process.selectedPatTaus)
+    process.load("RecoTauTag.Configuration.boostedHPSPFTaus_cff")
+    process.boostedTauSeeds.pfCandidateSrc = cms.InputTag('pfNoPileUpForBoostedTaus')
+    process.PATTauSequenceBoosted = cloneProcessingSnippet(process,process.PATTauSequence, "Boosted")
+    process.load("FWCore.MessageLogger.MessageLogger_cfi")
+    process.printEventContent =cms.EDAnalyzer("EventContentAnalizer")
+    process.recoTauAK4PFJets08RegionBoosted.src = cms.InputTag('boostedTauSeeds')
+    process.recoTauAK4PFJets08RegionBoosted.pfCandSrc = cms.InputTag('pfNoPileUpForBoostedTaus')
+    process.recoTauAK4PFJets08RegionBoosted.pfCandAssocMapSrc = cms.InputTag('boostedTauSeeds', 'pfCandAssocMapForIsolation')
+    process.ak4PFJetsLegacyHPSPiZerosBoosted.jetSrc = cms.InputTag('boostedTauSeeds')
+    process.ak4PFJetsRecoTauChargedHadronsBoosted.jetSrc = cms.InputTag('boostedTauSeeds')
+    process.ak4PFJetsRecoTauChargedHadronsBoosted.builders[1].dRcone = cms.double(0.3)
+    process.ak4PFJetsRecoTauChargedHadronsBoosted.builders[1].dRconeLimitedToJetArea = cms.bool(True)
+    process.combinatoricRecoTausBoosted.jetSrc = cms.InputTag('boostedTauSeeds')
+    process.combinatoricRecoTausBoosted.modifiers.remove(process.combinatoricRecoTausBoosted.modifiers[3])
+    massSearchReplaceAnyInputTag(process.PATTauSequenceBoosted,cms.InputTag("ak4PFJets"),cms.InputTag("boostedTauSeeds"))
+
+    process.slimmedTausBoosted = process.slimmedTaus.clone(src = cms.InputTag("selectedPatTausBoosted"))
+
     #noHF pfMET =========
     process.noHFCands = cms.EDFilter("GenericPFCandidateSelector",
                                      src=cms.InputTag("particleFlow"),
@@ -158,9 +183,9 @@ def miniAOD_customizeCommon(process):
     process.patJets.userData.userFloats.src += [ cms.InputTag("caloJetMap:pt"), cms.InputTag("caloJetMap:emEnergyFraction") ]
 
     #EGM object modifications
-    from RecoEgamma.EgammaTools.egammaObjectModificationsInMiniAOD_cff import egamma_modifications
-    process.slimmedElectrons.modifierConfig.modifications = egamma_modifications
-    process.slimmedPhotons.modifierConfig.modifications   = egamma_modifications
+    #from RecoEgamma.EgammaTools.egammaObjectModificationsInMiniAOD_cff import egamma_modifications
+    #process.slimmedElectrons.modifierConfig.modifications = egamma_modifications
+    #process.slimmedPhotons.modifierConfig.modifications   = egamma_modifications
 
     #VID Electron IDs
     electron_ids = ['RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_PHYS14_PU20bx25_V2_cff',

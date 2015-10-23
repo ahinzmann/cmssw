@@ -9,12 +9,12 @@ Sequences for reconstructing boosted taus using the HPS algorithm
 
 import CommonTools.ParticleFlow.pfNoPileUp_cff as boostedTaus
 pfPileUpForBoostedTaus = boostedTaus.pfPileUp.clone(
-    PFCandidates = cms.InputTag('particleFlow'),
+    PFCandidates = cms.InputTag('particleFlowPtrs'),
     checkClosestZVertex = cms.bool(False)
 )
 pfNoPileUpForBoostedTaus = boostedTaus.pfNoPileUp.clone(
     topCollection = cms.InputTag('pfPileUpForBoostedTaus'),
-    bottomCollection = cms.InputTag('particleFlow')
+    bottomCollection = cms.InputTag('particleFlowPtrs')
 )
 
 ##import RecoJets.JetProducers.ak4PFJetsPruned_cfi as boostedTaus2
@@ -35,35 +35,33 @@ ca8PFJetsCHSprunedForBoostedTaus = boostedTaus2.ak4PFJets.clone(
 
 boostedTauSeeds = cms.EDProducer("BoostedTauSeedsProducer",
     subjetSrc = cms.InputTag('ca8PFJetsCHSprunedForBoostedTaus', 'subJetsForSeedingBoostedTaus'),
-    pfCandidateSrc = cms.InputTag('particleFlow'),
+    pfCandidateSrc = cms.InputTag('pfNoPileUpForBoostedTaus'),
     verbosity = cms.int32(0)
 )
 
-from RecoTauTag.Configuration.RecoPFTauTag_cff import *
-recoTauAK4PFJets08Region.src = cms.InputTag('boostedTauSeeds')
-recoTauAK4PFJets08Region.pfCandSrc = cms.InputTag('pfNoPileUpForBoostedTaus')
-recoTauAK4PFJets08Region.pfCandAssocMapSrc = cms.InputTag('boostedTauSeeds', 'pfCandAssocMapForIsolation')
-
-ak4PFJetsLegacyHPSPiZeros.jetSrc = cms.InputTag('boostedTauSeeds')
-
-ak4PFJetsRecoTauChargedHadrons.jetSrc = cms.InputTag('boostedTauSeeds')
-ak4PFJetsRecoTauChargedHadrons.builders[1].dRcone = cms.double(0.3)
-ak4PFJetsRecoTauChargedHadrons.builders[1].dRconeLimitedToJetArea = cms.bool(True)
-
-combinatoricRecoTaus.jetSrc = cms.InputTag('boostedTauSeeds')
-combinatoricRecoTaus.builders[0].pfCandSrc = cms.InputTag('pfNoPileUpForBoostedTaus')
-combinatoricRecoTaus.modifiers.remove(combinatoricRecoTaus.modifiers[3])
-
-hpsPFTauDiscriminationByLooseMuonRejection3.dRmuonMatch = cms.double(0.3)
-hpsPFTauDiscriminationByLooseMuonRejection3.dRmuonMatchLimitedToJetArea = cms.bool(True)
-hpsPFTauDiscriminationByTightMuonRejection3.dRmuonMatch = cms.double(0.3)
-hpsPFTauDiscriminationByTightMuonRejection3.dRmuonMatchLimitedToJetArea = cms.bool(True)
-
-produceAndDiscriminateBoostedHPSPFTaus = cms.Sequence(
-    pfPileUpForBoostedTaus*
-    pfNoPileUpForBoostedTaus*
-    ca8PFJetsCHSprunedForBoostedTaus*
-    boostedTauSeeds*
-    PFTau
-)    
-
+#from RecoTauTag.Configuration.RecoPFTauTag_cff import *
+#recoTauAK4PFJets08Region.src = cms.InputTag('boostedTauSeeds')
+#recoTauAK4PFJets08Region.pfCandSrc = cms.InputTag('pfNoPileUpForBoostedTaus')
+#recoTauAK4PFJets08Region.pfCandAssocMapSrc = cms.InputTag('boostedTauSeeds', 'pfCandAssocMapForIsolation')
+#
+#ak4PFJetsLegacyHPSPiZeros.jetSrc = cms.InputTag('boostedTauSeeds')
+#
+#ak4PFJetsRecoTauChargedHadrons.jetSrc = cms.InputTag('boostedTauSeeds')
+#ak4PFJetsRecoTauChargedHadrons.builders[1].dRcone = cms.double(0.3)
+#ak4PFJetsRecoTauChargedHadrons.builders[1].dRconeLimitedToJetArea = cms.bool(True)
+#
+#combinatoricRecoTaus.jetSrc = cms.InputTag('boostedTauSeeds')
+#combinatoricRecoTaus.modifiers.remove(combinatoricRecoTaus.modifiers[3])
+#
+#hpsPFTauDiscriminationByLooseMuonRejection3.dRmuonMatch = cms.double(0.3)
+#hpsPFTauDiscriminationByLooseMuonRejection3.dRmuonMatchLimitedToJetArea = cms.bool(True)
+#hpsPFTauDiscriminationByTightMuonRejection3.dRmuonMatch = cms.double(0.3)
+#hpsPFTauDiscriminationByTightMuonRejection3.dRmuonMatchLimitedToJetArea = cms.bool(True)
+#
+#produceAndDiscriminateBoostedHPSPFTaus = cms.Sequence(
+#    pfPileUpForBoostedTaus*
+#    pfNoPileUpForBoostedTaus*
+#    ca8PFJetsCHSprunedForBoostedTaus*
+#    boostedTauSeeds*
+#    PFTau
+#)    

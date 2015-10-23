@@ -53,7 +53,7 @@ class RecoTauConstructor {
 
     /// Constructor with PFCandidate Handle
     RecoTauConstructor(const PFJetRef& jetRef,
-        const edm::Handle<PFCandidateCollection>& pfCands,
+        const std::vector<edm::Ptr<reco::PFCandidate> >& pfCands,
 	bool copyGammasFromPiZeros = false,
 	const StringObjectFunction<reco::PFTau>* signalConeSize = 0,
 	double minAbsPhotonSumPt_insideSignalCone = 2.5, double minRelPhotonSumPt_insideSignalCone = 0.,
@@ -156,7 +156,7 @@ class RecoTauConstructor {
     PFCandidatePtr convertToPtr(const CandidatePtr& candPtr) const;
     PFCandidatePtr convertToPtr(const PFCandidateRef& pfRef) const;
 
-    const edm::Handle<PFCandidateCollection>& pfCands_;
+    const std::vector<edm::Ptr<reco::PFCandidate> >& pfCands_;
     std::auto_ptr<reco::PFTau> tau_;
     CollectionMap collections_;
 

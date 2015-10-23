@@ -46,7 +46,8 @@ class RecoTauJetRegionProducer : public edm::stream::EDProducer<>
   edm::InputTag pfCandSrc_;
   edm::InputTag pfCandAssocMapSrc_;
 
-  edm::EDGetTokenT<reco::PFCandidateCollection> pf_token;
+  edm::EDGetTokenT<edm::View < reco::PFCandidate > > pf_token;
+  edm::EDGetTokenT<std::vector<edm::FwdPtr<reco::PFCandidate> > > pfPtr_token;
   edm::EDGetTokenT<reco::CandidateView> Jets_token;
   edm::EDGetTokenT<JetToPFCandidateAssociation> pfCandAssocMap_token;
 
@@ -62,7 +63,8 @@ RecoTauJetRegionProducer::RecoTauJetRegionProducer(const edm::ParameterSet& cfg)
   pfCandSrc_ = cfg.getParameter<edm::InputTag>("pfCandSrc");
   pfCandAssocMapSrc_ = cfg.getParameter<edm::InputTag>("pfCandAssocMapSrc");
 
-  pf_token = consumes<reco::PFCandidateCollection>(pfCandSrc_); 
+  pf_token = consumes< edm::View < reco::PFCandidate > >(pfCandSrc_);
+  pfPtr_token = consumes<std::vector<edm::FwdPtr<reco::PFCandidate> > >(pfCandSrc_);
   Jets_token = consumes<reco::CandidateView>(inputJets_);
   pfCandAssocMap_token =  consumes<JetToPFCandidateAssociation>(pfCandAssocMapSrc_);
   
@@ -85,15 +87,30 @@ void RecoTauJetRegionProducer::produce(edm::Event& evt, const edm::EventSetup& e
     std::cout << " pfCandAssocMapSrc_ = " << pfCandAssocMapSrc_ << std::endl;
   }
 
-  edm::Handle<reco::PFCandidateCollection> pfCandsHandle;
-  evt.getByToken(pf_token, pfCandsHandle);
+  edm::Handle<edm::View<reco::PFCandidate> > pfCandsHandle;
+  edm::Handle<std::vector<edm::FwdPtr<reco::PFCandidate> > > pfPtrCandsHandle;
+  bool isPtr = evt.getByToken(pfPtr_token, pfPtrCandsHandle); //As in RecoJets/JetProducers/plugins/VirtualJetProducer.cc
+  if (!isPtr) evt.getByToken(pf_token, pfCandsHandle);
 
   // Build Ptrs for all the PFCandidates
   typedef edm::Ptr<reco::PFCandidate> PFCandPtr;
   std::vector<PFCandPtr> pfCands;
-  pfCands.reserve(pfCandsHandle->size());
-  for ( size_t icand = 0; icand < pfCandsHandle->size(); ++icand ) {
-    pfCands.push_back(PFCandPtr(pfCandsHandle, icand));
+  if(!isPtr)
+  {
+    pfCands.reserve(pfCandsHandle->size());
+    for ( size_t icand = 0; icand < pfCandsHandle->size(); ++icand ) {
+      pfCands.push_back(PFCandPtr(pfCandsHandle,icand));
+    }
+  } else {
+    pfCands.reserve(pfPtrCandsHandle->size());
+    for ( size_t icand = 0; icand < pfPtrCandsHandle->size(); ++icand ) {
+     if ( (*pfPtrCandsHandle)[icand].ptr().isAvailable() ) {
+       pfCands.push_back( (*pfPtrCandsHandle)[icand].ptr() );
+     }
+     else if ( (*pfPtrCandsHandle)[icand].backPtr().isAvailable() ) {
+       pfCands.push_back( (*pfPtrCandsHandle)[icand].backPtr() );
+     }
+    }
   }
 
   // Get the jets

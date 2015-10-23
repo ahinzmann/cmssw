@@ -56,7 +56,8 @@ class BoostedTauSeedsProducer : public edm::EDProducer
 
   typedef edm::View<reco::Jet> JetView;
   edm::EDGetTokenT<JetView> srcSubjets_;
-  edm::EDGetTokenT<reco::PFCandidateCollection> srcPFCandidates_;
+  edm::EDGetTokenT<edm::View < reco::PFCandidate > > pf_token;
+  edm::EDGetTokenT<std::vector<edm::FwdPtr<reco::PFCandidate> > > pfPtr_token;
 
   int verbosity_;
 };
@@ -65,7 +66,8 @@ BoostedTauSeedsProducer::BoostedTauSeedsProducer(const edm::ParameterSet& cfg)
   : moduleLabel_(cfg.getParameter<std::string>("@module_label"))
 {
   srcSubjets_ = consumes<JetView>(cfg.getParameter<edm::InputTag>("subjetSrc"));
-  srcPFCandidates_ = consumes<reco::PFCandidateCollection>(cfg.getParameter<edm::InputTag>("pfCandidateSrc"));
+  pf_token = consumes< edm::View < reco::PFCandidate > >(cfg.getParameter<edm::InputTag>("pfCandidateSrc"));
+  pfPtr_token = consumes<std::vector<edm::FwdPtr<reco::PFCandidate> > >(cfg.getParameter<edm::InputTag>("pfCandidateSrc"));
 
   verbosity_ = ( cfg.exists("verbosity") ) ?
     cfg.getParameter<int>("verbosity") : 0;
@@ -159,12 +161,12 @@ namespace
     }
   }
 
-  std::vector<reco::PFCandidateRef> getPFCandidates_exclJetConstituents(const edm::Handle<reco::PFCandidateCollection>& pfCandidates, const reco::Jet::Constituents& jetConstituents, double dRmatch, bool invert)
+  std::vector<reco::PFCandidateRef> getPFCandidates_exclJetConstituents(const std::vector<edm::Ptr<reco::PFCandidate> > & pfCandidates, const reco::Jet::Constituents& jetConstituents, double dRmatch, bool invert)
   {
     std::vector<reco::PFCandidateRef> pfCandidates_exclJetConstituents;
-    size_t numPFCandidates = pfCandidates->size();
+    size_t numPFCandidates = pfCandidates.size();
     for ( size_t pfCandidateIdx = 0; pfCandidateIdx < numPFCandidates; ++pfCandidateIdx ) {
-      reco::PFCandidateRef pfCandidate(pfCandidates, pfCandidateIdx);
+      reco::PFCandidateRef pfCandidate(pfCandidates[pfCandidateIdx].refCore(),pfCandidates[pfCandidateIdx].key());
       bool isJetConstituent = false;
       for ( reco::Jet::Constituents::const_iterator jetConstituent = jetConstituents.begin();
 	    jetConstituent != jetConstituents.end(); ++jetConstituent ) {
@@ -206,10 +208,33 @@ void BoostedTauSeedsProducer::produce(edm::Event& evt, const edm::EventSetup& es
   }
   assert((subjets->size() % 2) == 0); // CV: ensure that subjets come in pairs
   
-  edm::Handle<reco::PFCandidateCollection> pfCandidates;
-  evt.getByToken(srcPFCandidates_, pfCandidates);
+  edm::Handle<edm::View<reco::PFCandidate> > pfCandsHandle;
+  edm::Handle<std::vector<edm::FwdPtr<reco::PFCandidate> > > pfPtrCandsHandle;
+  bool isPtr = evt.getByToken(pfPtr_token, pfPtrCandsHandle); //As in RecoJets/JetProducers/plugins/VirtualJetProducer.cc
+  if (!isPtr) evt.getByToken(pf_token, pfCandsHandle);
+
+  // Build Ptrs for all the PFCandidates
+  typedef edm::Ptr<reco::PFCandidate> PFCandPtr;
+  std::vector<PFCandPtr> pfCandidates;
+  if(!isPtr)
+  {
+    pfCandidates.reserve(pfCandsHandle->size());
+    for ( size_t icand = 0; icand < pfCandsHandle->size(); ++icand ) {
+      pfCandidates.push_back(PFCandPtr(pfCandsHandle,icand));
+    }
+  } else {
+    pfCandidates.reserve(pfPtrCandsHandle->size());
+    for ( size_t icand = 0; icand < pfPtrCandsHandle->size(); ++icand ) {
+     if ( (*pfPtrCandsHandle)[icand].ptr().isAvailable() ) {
+       pfCandidates.push_back( (*pfPtrCandsHandle)[icand].ptr() );
+     }
+     else if ( (*pfPtrCandsHandle)[icand].backPtr().isAvailable() ) {
+       pfCandidates.push_back( (*pfPtrCandsHandle)[icand].backPtr() );
+     }
+    }
+  }
   if ( verbosity_ >= 1 ) {
-    std::cout << "#pfCandidates = " << pfCandidates->size() << std::endl;
+    std::cout << "#pfCandidates = " << pfCandidates.size() << std::endl;
   }
   
   std::auto_ptr<reco::PFJetCollection> selectedSubjets(new reco::PFJetCollection());

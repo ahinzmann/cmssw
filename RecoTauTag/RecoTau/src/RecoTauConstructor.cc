@@ -12,7 +12,7 @@
 
 namespace reco { namespace tau {
 
-RecoTauConstructor::RecoTauConstructor(const PFJetRef& jet, const edm::Handle<PFCandidateCollection>& pfCands, 
+RecoTauConstructor::RecoTauConstructor(const PFJetRef& jet, const std::vector<edm::Ptr<reco::PFCandidate> >& pfCands, 
 				       bool copyGammasFromPiZeros,
 				       const StringObjectFunction<reco::PFTau>* signalConeSize,
 				       double minAbsPhotonSumPt_insideSignalCone, double minRelPhotonSumPt_insideSignalCone,
@@ -254,8 +254,14 @@ void checkMatchedProductIds(const T1& t1, const T2& t2) {
 PFCandidatePtr RecoTauConstructor::convertToPtr(
     const PFCandidateRef& pfRef) const {
   if(pfRef.isNonnull()) {
-    checkMatchedProductIds(pfRef, pfCands_);
-    return PFCandidatePtr(pfCands_, pfRef.key());
+    if (pfCands_.size()>pfRef.key())
+      checkMatchedProductIds(pfRef, pfCands_[0]);
+    else
+      throw cms::Exception("MismatchedPFCandSrc") << "Error: the input tag"
+          << " for the PF candidate collection provided to the RecoTauBuilder "
+          << " does not match the one that was used to build the source jets."
+          << " Please update the pfCandSrc paramters for the PFTau builders.";
+    return pfCands_[pfRef.key()];
   } else return PFCandidatePtr();
 }
 
@@ -263,8 +269,14 @@ PFCandidatePtr RecoTauConstructor::convertToPtr(
 PFCandidatePtr RecoTauConstructor::convertToPtr(
     const CandidatePtr& candPtr) const {
   if(candPtr.isNonnull()) {
-    checkMatchedProductIds(candPtr, pfCands_);
-    return PFCandidatePtr(pfCands_, candPtr.key());
+    if (pfCands_.size()>candPtr.key())
+      checkMatchedProductIds(candPtr, pfCands_[0]);
+    else
+      throw cms::Exception("MismatchedPFCandSrc") << "Error: the input tag"
+          << " for the PF candidate collection provided to the RecoTauBuilder "
+          << " does not match the one that was used to build the source jets."
+          << " Please update the pfCandSrc paramters for the PFTau builders.";
+    return pfCands_[candPtr.key()];
   } else return PFCandidatePtr();
 }
 
