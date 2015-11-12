@@ -494,12 +494,21 @@ PileupJetIdentifier PileupJetIdAlgo::computeIdVariables(const reco::Jet * jet, f
 	if ( lLeadEm == nullptr )   { lLeadEm   = lTrail; }
 	if ( lLeadCh == nullptr )   { lLeadCh   = lTrail; }
 	
-	internalId_.nCharged_    = pfjet->chargedMultiplicity();
-	internalId_.nNeutrals_   = pfjet->neutralMultiplicity();
-	internalId_.chgEMfrac_   = pfjet->chargedEmEnergy()    /jet->energy();
-	internalId_.neuEMfrac_   = pfjet->neutralEmEnergy()    /jet->energy();
-	internalId_.chgHadrfrac_ = pfjet->chargedHadronEnergy()/jet->energy();
-	internalId_.neuHadrfrac_ = pfjet->neutralHadronEnergy()/jet->energy();
+	if( patjet != nullptr ) {
+	  internalId_.nCharged_    = patjet->chargedMultiplicity();
+	  internalId_.nNeutrals_   = patjet->neutralMultiplicity();
+	  internalId_.chgEMfrac_   = patjet->chargedEmEnergyFraction();
+	  internalId_.neuEMfrac_   = patjet->neutralEmEnergyFraction();
+	  internalId_.chgHadrfrac_ = patjet->chargedHadronEnergyFraction();
+	  internalId_.neuHadrfrac_ = patjet->neutralHadronEnergyFraction();
+        } else {
+	  internalId_.nCharged_    = pfjet->chargedMultiplicity();
+	  internalId_.nNeutrals_   = pfjet->neutralMultiplicity();
+	  internalId_.chgEMfrac_   = pfjet->chargedEmEnergyFraction();
+	  internalId_.neuEMfrac_   = pfjet->neutralEmEnergyFraction();
+	  internalId_.chgHadrfrac_ = pfjet->chargedHadronEnergyFraction();
+	  internalId_.neuHadrfrac_ = pfjet->neutralHadronEnergyFraction();
+        }
 	internalId_.nParticles_ = jet->numberOfDaughters();
 
 
