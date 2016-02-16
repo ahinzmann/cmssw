@@ -494,17 +494,25 @@ PileupJetIdentifier PileupJetIdAlgo::computeIdVariables(const reco::Jet * jet, f
 	if ( lLeadEm == nullptr )   { lLeadEm   = lTrail; }
 	if ( lLeadCh == nullptr )   { lLeadCh   = lTrail; }
 	
-	internalId_.nCharged_    = pfjet->chargedMultiplicity();
-	internalId_.nNeutrals_   = pfjet->neutralMultiplicity();
-	internalId_.chgEMfrac_   = pfjet->chargedEmEnergy()    /jet->energy();
-	internalId_.neuEMfrac_   = pfjet->neutralEmEnergy()    /jet->energy();
-	internalId_.chgHadrfrac_ = pfjet->chargedHadronEnergy()/jet->energy();
-	internalId_.neuHadrfrac_ = pfjet->neutralHadronEnergy()/jet->energy();
+	if( patjet != nullptr ) { // to enable running on MiniAOD slimmedJets
+	 internalId_.nCharged_    = patjet->chargedMultiplicity();
+	 internalId_.nNeutrals_   = patjet->neutralMultiplicity();
+	 internalId_.chgEMfrac_   = patjet->chargedEmEnergy()    /jet->energy();
+	 internalId_.neuEMfrac_   = patjet->neutralEmEnergy()    /jet->energy();
+	 internalId_.chgHadrfrac_ = patjet->chargedHadronEnergy()/jet->energy();
+	 internalId_.neuHadrfrac_ = patjet->neutralHadronEnergy()/jet->energy();
+	} else {
+	 internalId_.nCharged_    = pfjet->chargedMultiplicity();
+	 internalId_.nNeutrals_   = pfjet->neutralMultiplicity();
+	 internalId_.chgEMfrac_   = pfjet->chargedEmEnergy()    /jet->energy();
+	 internalId_.neuEMfrac_   = pfjet->neutralEmEnergy()    /jet->energy();
+	 internalId_.chgHadrfrac_ = pfjet->chargedHadronEnergy()/jet->energy();
+	 internalId_.neuHadrfrac_ = pfjet->neutralHadronEnergy()/jet->energy();
+	}
 	internalId_.nParticles_ = jet->numberOfDaughters();
 
-
 	///////////////////////pull variable///////////////////////////////////
-	float sumW(0.0), sumW2(0.0);
+	float sumW2(0.0);
 	float sum_deta(0.0),sum_dphi(0.0);
 	float ave_deta(0.0), ave_dphi(0.0);
 	for (size_t j = 0; j < jet->numberOfDaughters(); j++) {
@@ -520,7 +528,7 @@ PileupJetIdentifier PileupJetIdAlgo::computeIdVariables(const reco::Jet * jet, f
 	  float dphi = reco::deltaPhi(*part, *jet);
 	  sum_deta     += deta*weight2;
 	  sum_dphi     += dphi*weight2;
-	  if (sumW > 0) {
+	  if (sumW2 > 0) {
 	    ave_deta = sum_deta/sumW2;
 	    ave_dphi = sum_dphi/sumW2;
 	  }
