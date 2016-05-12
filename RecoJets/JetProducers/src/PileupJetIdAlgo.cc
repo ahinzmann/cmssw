@@ -618,7 +618,7 @@ PileupJetIdentifier PileupJetIdAlgo::computeIdVariables(const reco::Jet * jet, f
 	internalId_.sumNePt_ = sumPtNe;
 
 	internalId_.jetR_    = lLead->pt()/sumPt;
-	internalId_.jetRchg_ = lLeadEm->pt()/sumPt;
+	internalId_.jetRchg_ = lLeadCh->pt()/sumPt;
 	internalId_.dRMatch_ = dRmin;
 
 	if( sumTkPt != 0. ) {
