@@ -2,9 +2,9 @@ import FWCore.ParameterSet.Config as cms
 from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
 
 puppiPhoton = cms.EDProducer("PuppiPhoton",
-                             candName       = cms.InputTag('packedPFCandidates'),
+                             candName       = cms.InputTag('particleFlow'),
                              puppiCandName  = cms.InputTag('puppi'),
-                             photonName     = cms.InputTag('slimmedPhotons'),
+                             photonName     = cms.InputTag("reducedEgamma","reducedGedPhotons"),
                              photonId       = cms.InputTag("egmPhotonIDs:cutBasedPhotonID-Spring15-25ns-V1-standalone-loose"), 
                              pt             = cms.double(10),
                              eta            = cms.double(2.5),

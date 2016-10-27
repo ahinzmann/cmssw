@@ -41,7 +41,7 @@ PuppiPhoton::PuppiPhoton(const edm::ParameterSet& iConfig) {
   useValueMap_           = iConfig.getParameter<bool>("useValueMap");
   tokenWeights_          = consumes<edm::ValueMap<float> >(iConfig.getParameter<edm::InputTag>("weightsName"));
 
-  usePhotonId_  = (iConfig.getParameter<edm::InputTag>("photonId")).label().size() == 0;
+  usePhotonId_  = (iConfig.getParameter<edm::InputTag>("photonId")).label().size() != 0;
   produces<PFOutputCollection>();
   produces< edm::ValueMap<reco::CandidatePtr> >(); 
 }
@@ -74,8 +74,6 @@ void PuppiPhoton::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     if(itPho->isPhoton() && usePhotonId_)   passObject =  (*photonId)  [phoCol->ptrAt(iC)];
     if(itPho->pt() < pt_) continue;
     if(!passObject && usePhotonId_) continue;
-    //if(!usePFRef_ && fabs(itPho->eta()) < eta_) phoCands.push_back(&(*itPho)); ===> should add a flag useAODRef_ in place of usePFRef_ 
-    //if(!usePFRef_) continue;
     const pat::Photon *pPho = dynamic_cast<const pat::Photon*>(&(*itPho));
     if(pPho != 0) {
       for( const edm::Ref<pat::PackedCandidateCollection> & ref : pPho->associatedPackedPFCandidates() ) {
@@ -84,15 +82,18 @@ void PuppiPhoton::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	  phoCands.push_back(&(*(pfCol->ptrAt(ref.key()))));
 	}
       }
-      continue;
-    }
-    const pat::Electron *pElectron = dynamic_cast<const pat::Electron*>(&(*itPho));
-    if(pElectron != 0) {
+    } else {
+     const pat::Electron *pElectron = dynamic_cast<const pat::Electron*>(&(*itPho));
+     if(pElectron != 0) {
       for( const edm::Ref<pat::PackedCandidateCollection> & ref : pElectron->associatedPackedPFCandidates() ) 
 	if(fabs(pfCol->ptrAt(ref.key())->eta()) < eta_ )  {
 	  phoIndx.push_back(ref.key());
 	  phoCands.push_back(&(*(pfCol->ptrAt(ref.key()))));
 	}
+     } else {
+      // if not running on MINIAOD
+      if(fabs(itPho->eta()) < eta_) phoCands.push_back(&(*itPho));
+     }
     }
   }
   //Get Weights
