@@ -32,7 +32,7 @@ private:
 	virtual void produce(edm::Event&, const edm::EventSetup&);
 	bool matchPFCandidate(const reco::Candidate *iPF,const reco::Candidate *iPho);
 	edm::EDGetTokenT< CandidateView >        tokenPFCandidates_;
-	edm::EDGetTokenT< CandidateView >        tokenPuppiCandidates_;
+	edm::EDGetTokenT< edm::View<reco::CandidateBaseRef> >        tokenPuppiCandidates_;
 	edm::EDGetTokenT< CandidateView >        tokenPhotonCandidates_;
         edm::EDGetTokenT< edm::ValueMap<std::vector<reco::PFCandidateRef> > > reco2pf_;
 	edm::EDGetTokenT< edm::ValueMap<float> > tokenWeights_; 

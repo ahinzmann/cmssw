@@ -1,9 +1,11 @@
 import FWCore.ParameterSet.Config as cms
 from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
 
+puppiRefs = cms.EDProducer("CandViewRefMerger",src = cms.VInputTag( 'puppi'))
+
 puppiPhoton = cms.EDProducer("PuppiPhoton",
                              candName       = cms.InputTag('particleFlow'),
-                             puppiCandName  = cms.InputTag('puppi'),
+                             puppiCandName  = cms.InputTag('puppiRefs'),
                              photonName     = cms.InputTag('reducedEgamma','reducedGedPhotons'),
 			     recoToPFMap    = cms.InputTag("reducedEgamma","reducedPhotonPfCandMap"),
                              photonId       = cms.InputTag("egmPhotonIDs:cutBasedPhotonID-Spring15-25ns-V1-standalone-loose"), 
