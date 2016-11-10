@@ -42,9 +42,7 @@ def makePuppiesFromMiniAOD( process, createScheduledSequence=False ):
     process.puppiForMET.photonName = cms.InputTag('slimmedPhotons')
     process.puppiForMET.runOnMiniAOD = cms.bool(True)
     setupPuppiPhotonMiniAOD(process)
-    #Line below doesn't work because of an issue with references in MiniAOD without setting useRefs=>False and using delta R
     process.puppiForMET.puppiCandName    = 'puppiMerged'
-    process.puppiForMET.useRefs          = False
 
     #making a sequence for people running the MET tool in scheduled mode
     if createScheduledSequence:
