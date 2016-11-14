@@ -21,9 +21,10 @@ def makePuppies( process ):
     process.puppiMerged = cms.EDProducer("CandViewMerger",src = cms.VInputTag( 'puppiNoLep','pfLeptonsPUPPET'))
     process.load('CommonTools.PileupAlgos.PhotonPuppi_cff')
     process.puppiForMET = process.puppiPhoton.clone()
-    #Line below points puppi MET to puppi no lepton which increases the response and doesn't work because of an issue with references in MiniAOD without setting useRefs=>False and using delta R
-    process.puppiForMET.puppiCandName = 'puppiMerged'
-    process.puppiForMET.useRefs = False
+    #Line below replaces reference linking wiht delta R matching because the puppi references after merging are not consistent with those of the original PF collection
+    process.puppiForMET.useRefs          = False
+    #Line below points puppi MET to puppi no lepton which increases the response
+    process.puppiForMET.puppiCandName    = 'puppiMerged'
 
 
 def makePuppiesFromMiniAOD( process, createScheduledSequence=False ):
@@ -43,9 +44,10 @@ def makePuppiesFromMiniAOD( process, createScheduledSequence=False ):
     process.puppiForMET.photonName = cms.InputTag('slimmedPhotons')
     process.puppiForMET.runOnMiniAOD = cms.bool(True)
     setupPuppiPhotonMiniAOD(process)
-    #Line below points puppi MET to puppi no lepton which increases the response and doesn't work because of an issue with references in MiniAOD without setting useRefs=>False and using delta R
-    process.puppiForMET.puppiCandName = 'puppiMerged'
-    process.puppiForMET.useRefs = False
+    #Line below replaces reference linking wiht delta R matching because the puppi references after merging are not consistent with those of the original packed candidate collection
+    process.puppiForMET.useRefs          = False
+    #Line below points puppi MET to puppi no lepton which increases the response
+    process.puppiForMET.puppiCandName    = 'puppiMerged'
     #Avoid recomputing the weights available in MiniAOD
     process.puppi.useExistingWeights = True
     process.puppiNoLep.useExistingWeights = True
