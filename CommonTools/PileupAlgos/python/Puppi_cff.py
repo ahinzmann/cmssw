@@ -39,6 +39,7 @@ puppi = cms.EDProducer("PuppiProducer",#cms.PSet(#"PuppiProducer",
                        MinPuppiWeight = cms.double(0.01),
                        useExistingWeights = cms.bool(False),
                        useWeightsNoLep    = cms.bool(False),
+                       noLepPdgIds    = cms.vint32(),
                        clonePackedCands   = cms.bool(False), # should only be set to True for MiniAOD
                        vtxNdofCut     = cms.int32(4),
                        vtxZCut        = cms.double(24),

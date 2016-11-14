@@ -53,6 +53,7 @@ private:
 	float           fDZCut;
 	bool fUseExistingWeights;
 	bool fUseWeightsNoLep;
+	std::vector<int> fNoLepPdgIds;
 	bool fClonePackedCands;
 	int fVtxNdofCut;
 	double fVtxZCut;

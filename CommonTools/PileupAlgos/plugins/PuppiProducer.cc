@@ -35,6 +35,7 @@ PuppiProducer::PuppiProducer(const edm::ParameterSet& iConfig) {
   fDZCut     = iConfig.getParameter<double>("DeltaZCut");
   fUseExistingWeights     = iConfig.getParameter<bool>("useExistingWeights");
   fUseWeightsNoLep        = iConfig.getParameter<bool>("useWeightsNoLep");
+  fNoLepPdgIds            = iConfig.getParameter<std::vector<int> >("noLepPdgIds");
   fClonePackedCands       = iConfig.getParameter<bool>("clonePackedCands");
   fVtxNdofCut = iConfig.getParameter<int>("vtxNdofCut");
   fVtxZCut = iConfig.getParameter<double>("vtxZCut");
@@ -101,6 +102,8 @@ void PuppiProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     double pDZ    = -9999; 
     double pD0    = -9999; 
     int    pVtxId = -9999; 
+    for(unsigned int i = 0; i < fNoLepPdgIds.size(); i++)
+      if(std::abs(itPF->pdgId()) == fNoLepPdgIds[i]) continue;
     bool lFirst = true;
     const pat::PackedCandidate *lPack = dynamic_cast<const pat::PackedCandidate*>(&(*itPF));
     if(lPack == 0 ) {
@@ -256,7 +259,15 @@ void PuppiProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     if ( puppiMatched != lCandidates.end() ) {
       pVec.SetPxPyPzE(puppiMatched->px(),puppiMatched->py(),puppiMatched->pz(),puppiMatched->E());
     } else {
-      pVec.SetPxPyPzE( 0, 0, 0, 0);
+      bool isLepton=false;
+      for(unsigned int i = 0; i < fNoLepPdgIds.size(); i++) {
+        if(std::abs(i0->pdgId()) == fNoLepPdgIds[i]) {
+          isLepton=true;
+          break;
+        }
+      }
+      if(!isLepton)
+        pVec.SetPxPyPzE( 0, 0, 0, 0);
     }
     puppiP4s.push_back( pVec );
 
