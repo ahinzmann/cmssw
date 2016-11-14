@@ -18,11 +18,11 @@ def makePuppies( process ):
 
     process.puppiNoLep = process.puppi.clone()
     process.puppiNoLep.candName = cms.InputTag('pfNoLepPUPPI') 
-    process.puppiMerged = cms.EDProducer("CandViewRefMerger",src = cms.VInputTag( 'puppiNoLep','pfLeptonsPUPPET'))
+    process.puppiMerged = cms.EDProducer("CandViewMerger",src = cms.VInputTag( 'puppiNoLep','pfLeptonsPUPPET'))
     process.load('CommonTools.PileupAlgos.PhotonPuppi_cff')
     process.puppiForMET = process.puppiPhoton.clone()
-    #Line below points puppi MET to puppi no lepton which increases the response
-    process.puppiForMET.puppiCandName    = 'puppiMerged'
+    #Line below points puppi MET to puppi no lepton which increases the response and doesn't work because of an issue with references in MiniAOD without setting useRefs=>False and using delta R
+    process.puppiForMET.puppiCandName = 'puppiMerged'
     process.puppiForMET.useRefs = True
 
 
@@ -31,22 +31,22 @@ def makePuppiesFromMiniAOD( process, createScheduledSequence=False ):
     process.puppi.candName = cms.InputTag('packedPFCandidates')
     process.puppi.clonePackedCands = cms.bool(True)
     process.puppi.vertexName = cms.InputTag('offlineSlimmedPrimaryVertices')
-    process.pfNoLepPUPPI = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedPFCandidates"), cut =  cms.string("abs(pdgId) != 13 && abs(pdgId) != 11"))
-    process.pfLeptonsPUPPET   = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedPFCandidates"), cut = cms.string("abs(pdgId) == 13 || abs(pdgId) == 11"))
+    process.pfNoLepPUPPI = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedPFCandidates"), cut =  cms.string("abs(pdgId) != 13 && abs(pdgId) != 11 && abs(pdgId) != 15"))
+    process.pfLeptonsPUPPET   = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedPFCandidates"), cut = cms.string("abs(pdgId) == 13 || abs(pdgId) == 11 || abs(pdgId) == 15"))
     process.puppiNoLep = process.puppi.clone()
     process.puppiNoLep.candName = cms.InputTag('pfNoLepPUPPI') 
     process.puppiNoLep.useWeightsNoLep = cms.bool(True)
-    process.puppiMerged = cms.EDProducer("CandViewRefMerger",src = cms.VInputTag('puppiNoLep','pfLeptonsPUPPET'))
+    process.puppiMerged = cms.EDProducer("CandViewMerger",src = cms.VInputTag( 'puppiNoLep','pfLeptonsPUPPET'))
     process.load('CommonTools.PileupAlgos.PhotonPuppi_cff')
     process.puppiForMET = process.puppiPhoton.clone()
     process.puppiForMET.candName = cms.InputTag('packedPFCandidates')
     process.puppiForMET.photonName = cms.InputTag('slimmedPhotons')
     process.puppiForMET.runOnMiniAOD = cms.bool(True)
     setupPuppiPhotonMiniAOD(process)
-    #Line below points puppi MET to puppi no lepton which increases the response
-    process.puppiForMET.puppiCandName  = 'puppiMerged'
+    #Line below points puppi MET to puppi no lepton which increases the response and doesn't work because of an issue with references in MiniAOD without setting useRefs=>False and using delta R
+    process.puppiForMET.puppiCandName = 'puppiMerged'
     process.puppiForMET.useRefs = True
-    #Avoid recomputing the weights
+    #Avoid recomputing the weights available in MiniAOD
     process.puppi.useExistingWeights = True
     process.puppiNoLep.useExistingWeights = True
 
