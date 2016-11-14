@@ -102,8 +102,14 @@ void PuppiProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     double pDZ    = -9999; 
     double pD0    = -9999; 
     int    pVtxId = -9999; 
-    for(unsigned int i = 0; i < fNoLepPdgIds.size(); i++)
-      if(std::abs(itPF->pdgId()) == fNoLepPdgIds[i]) continue;
+    bool isLepton=false;
+    for(unsigned int i = 0; i < fNoLepPdgIds.size(); i++) {
+      if(std::abs(itPF->pdgId()) == fNoLepPdgIds[i]) {
+    	isLepton=true;
+    	break;
+      }
+    }
+    if(isLepton) continue;
     bool lFirst = true;
     const pat::PackedCandidate *lPack = dynamic_cast<const pat::PackedCandidate*>(&(*itPF));
     if(lPack == 0 ) {
