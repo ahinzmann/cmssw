@@ -109,7 +109,6 @@ void PuppiProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     	break;
       }
     }
-    if(isLepton) continue;
     bool lFirst = true;
     const pat::PackedCandidate *lPack = dynamic_cast<const pat::PackedCandidate*>(&(*itPF));
     if(lPack == 0 ) {
@@ -150,8 +149,8 @@ void PuppiProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       pReco.dZ      = pDZ;
       pReco.d0      = pD0;
       pReco.id = 0; 
-      if (fabs(pReco.charge) == 0){ pReco.id = 0; }
-      else{
+      if ((fabs(pReco.charge) == 0)||(isLepton)){ pReco.id = 0; }
+      else {
         if (tmpFromPV == 0){ pReco.id = 2; } // 0 is associated to PU vertex
         if (tmpFromPV == 3){ pReco.id = 1; }
         if (tmpFromPV == 1 || tmpFromPV == 2){ 
@@ -171,8 +170,8 @@ void PuppiProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       pReco.d0      = pD0;
   
       pReco.id = 0; 
-      if (fabs(pReco.charge) == 0){ pReco.id = 0; }
-      if (fabs(pReco.charge) > 0){
+      if ((fabs(pReco.charge) == 0)||(isLepton)){ pReco.id = 0; }
+      else {
         if (lPack->fromPV() == 0){ pReco.id = 2; } // 0 is associated to PU vertex
         if (lPack->fromPV() == (pat::PackedCandidate::PVUsedInFit)){ pReco.id = 1; }
         if (lPack->fromPV() == (pat::PackedCandidate::PVTight) || lPack->fromPV() == (pat::PackedCandidate::PVLoose)){ 
@@ -221,12 +220,6 @@ void PuppiProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     }
   }
 
-  //Fill it into the event
-  std::auto_ptr<edm::ValueMap<float> > lPupOut(new edm::ValueMap<float>());
-  edm::ValueMap<float>::Filler  lPupFiller(*lPupOut);
-  lPupFiller.insert(hPFProduct,lWeights.begin(),lWeights.end());
-  lPupFiller.fill();
-
   // This is a dummy to access the "translate" method which is a
   // non-static member function even though it doesn't need to be. 
   // Will fix in the future. 
@@ -263,8 +256,6 @@ void PuppiProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     // Find the Puppi particle matched to the input collection using the "user_index" of the object. 
     auto puppiMatched = find_if( lCandidates.begin(), lCandidates.end(), [&val]( fastjet::PseudoJet const & i ){ return i.user_index() == val; } );
     if ( puppiMatched != lCandidates.end() ) {
-      pVec.SetPxPyPzE(puppiMatched->px(),puppiMatched->py(),puppiMatched->pz(),puppiMatched->E());
-    } else {
       bool isLepton=false;
       for(unsigned int i = 0; i < fNoLepPdgIds.size(); i++) {
         if(std::abs(i0->pdgId()) == fNoLepPdgIds[i]) {
@@ -272,7 +263,11 @@ void PuppiProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
           break;
         }
       }
-      if(!isLepton)
+      if((!fUseExistingWeights)&&(isLepton))
+        lWeights[puppiMatched-lCandidates.begin()]=1.0;
+      else
+        pVec.SetPxPyPzE(puppiMatched->px(),puppiMatched->py(),puppiMatched->pz(),puppiMatched->E());
+    } else {
         pVec.SetPxPyPzE( 0, 0, 0, 0);
     }
     puppiP4s.push_back( pVec );
@@ -287,6 +282,12 @@ void PuppiProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       fPuppiCandidates->push_back(*pfCand);
     }
   }
+
+  //Fill it into the event
+  std::auto_ptr<edm::ValueMap<float> > lPupOut(new edm::ValueMap<float>());
+  edm::ValueMap<float>::Filler  lPupFiller(*lPupOut);
+  lPupFiller.insert(hPFProduct,lWeights.begin(),lWeights.end());
+  lPupFiller.fill();
 
   //Compute the modified p4s
   edm::ValueMap<LorentzVector>::Filler  p4PupFiller(*p4PupOut);
