@@ -23,7 +23,7 @@ def makePuppies( process ):
     process.puppiForMET = process.puppiPhoton.clone()
     #Line below points puppi MET to puppi no lepton which increases the response and doesn't work because of an issue with references in MiniAOD without setting useRefs=>False and using delta R
     process.puppiForMET.puppiCandName = 'puppiMerged'
-    process.puppiForMET.useRefs = True
+    process.puppiForMET.useRefs = False
 
 
 def makePuppiesFromMiniAOD( process, createScheduledSequence=False ):
@@ -45,7 +45,7 @@ def makePuppiesFromMiniAOD( process, createScheduledSequence=False ):
     setupPuppiPhotonMiniAOD(process)
     #Line below points puppi MET to puppi no lepton which increases the response and doesn't work because of an issue with references in MiniAOD without setting useRefs=>False and using delta R
     process.puppiForMET.puppiCandName = 'puppiMerged'
-    process.puppiForMET.useRefs = True
+    process.puppiForMET.useRefs = False
     #Avoid recomputing the weights available in MiniAOD
     process.puppi.useExistingWeights = True
     process.puppiNoLep.useExistingWeights = True
