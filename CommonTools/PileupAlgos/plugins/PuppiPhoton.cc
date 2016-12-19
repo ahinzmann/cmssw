@@ -139,7 +139,7 @@ void PuppiPhoton::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       int iPho = -1;
       for(std::vector<uint16_t>::const_iterator itPho = phoIndx.begin(); itPho!=phoIndx.end(); itPho++) {
         iPho++;
-        if(pupCol->refAt(iPF).key() != *itPho) continue;
+        if((pupCol->refAt(iPF).key() != *itPho)||(foundPhoIndex.count(iPho)!=0)) continue;
         pWeight = weight_;
         if(!useValueMap_ && itPF->pt() != 0) pWeight = pWeight*(phoCands[iPho]->pt()/itPF->pt());
 	if(!useValueMap_ && itPF->pt() == 0) pVec.SetPxPyPzE(phoCands[iPho]->px()*pWeight,phoCands[iPho]->py()*pWeight,phoCands[iPho]->pz()*pWeight,phoCands[iPho]->energy()*pWeight);

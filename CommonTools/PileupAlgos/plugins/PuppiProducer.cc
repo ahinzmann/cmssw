@@ -149,7 +149,7 @@ void PuppiProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       pReco.dZ      = pDZ;
       pReco.d0      = pD0;
       pReco.id = 0; 
-      if ((fabs(pReco.charge) == 0)||(isLepton)){ pReco.id = 0; }
+      if ((std::abs(pReco.charge) == 0)||(isLepton)){ pReco.id = 0; }
       else {
         if (tmpFromPV == 0){ pReco.id = 2; } // 0 is associated to PU vertex
         if (tmpFromPV == 3){ pReco.id = 1; }
@@ -169,7 +169,7 @@ void PuppiProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       pReco.d0      = pD0;
   
       pReco.id = 0; 
-      if ((fabs(pReco.charge) == 0)||(isLepton)){ pReco.id = 0; }
+      if ((std::abs(pReco.charge) == 0)||(isLepton)){ pReco.id = 0; }
       else {
         if (lPack->fromPV() == 0){ pReco.id = 2; } // 0 is associated to PU vertex
         if (lPack->fromPV() == (pat::PackedCandidate::PVUsedInFit)){ pReco.id = 1; }
@@ -283,7 +283,7 @@ void PuppiProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   }
 
   //Fill it into the event
-  std::auto_ptr<edm::ValueMap<float> > lPupOut(new edm::ValueMap<float>());
+  std::unique_ptr<edm::ValueMap<float> > lPupOut(new edm::ValueMap<float>());
   edm::ValueMap<float>::Filler  lPupFiller(*lPupOut);
   lPupFiller.insert(hPFProduct,lWeights.begin(),lWeights.end());
   lPupFiller.fill();
