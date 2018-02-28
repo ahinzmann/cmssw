@@ -295,6 +295,8 @@ void SimPFProducer::produce(edm::StreamID, edm::Event& evt, const edm::EventSetu
     
     if (useTiming_) candidate.setTime( (*trackTimeH)[tkRef], (*trackTimeErrH)[tkRef] );
     
+    double cluster_energy_raw=0;
+    double cluster_energy_corr=0;
     // bind to cluster if there is one and try to gather conversions, etc
     for( const auto& match : matches ) {      
       uint64_t hash = hashSimInfo(*(match.first));
@@ -309,27 +311,9 @@ void SimPFProducer::produce(edm::StreamID, edm::Event& evt, const edm::EventSetu
 	    edm::Ref<reco::PFBlockCollection> blockRef(blocksHandle,block);
 	    candidate.addElementInBlock(blockRef,blockIdx);
 	    usedSimCluster[simcHash] = true;
-/*            edm::Ref<std::vector<reco::PFCluster> > clusterRef(SimClustersH,simCluster2Block.find(simcHash)->first);
-            double charged_hadron_energy=clusterRef->correctedEnergy();
-std::cerr << "pdg " << absPdgId << ", track E " << energy << ", simCluster E " << clusterRef->energy() << ", simCluster corrE " << clusterRef->correctedEnergy() << std::endl;
-            // Attach particles from supercluster if track momentum significantly larger than calorimeter energy
-	    auto supercluster_index = caloParticle2SuperCluster[ block ];
-	    if( supercluster_index != -1 ) {
-	      edm::Ref<reco::PFBlockCollection> blockRef(blocksHandle,block);
-	      for( const auto& elem : blockRef->elements() ) {
-		const auto& ref = elem.clusterRef();
-		if( !usedSimCluster[ref.key()] ) {
-                  if ((charged_hadron_energy/energy<0.5)&&(charged_hadron_energy+ref->correctedEnergy()<energy))
-                  {
-std::cerr << "add " << ref->correctedEnergy() << std::endl;
-                    charged_hadron_energy+=ref->correctedEnergy();
-		    candidate.addElementInBlock(blockRef,elem.index());
-		    usedSimCluster[ref.key()] = true;
-                  }
-		}
-	      }
-	    }
-*/
+            edm::Ref<std::vector<reco::PFCluster> > clusterRef(SimClustersH,simCluster2Block.find(simcHash)->first);
+            cluster_energy_raw+=clusterRef->energy();
+            cluster_energy_corr+=clusterRef->correctedEnergy();
 	  }
 	}
 	if( absPdgId == 11 ) { // collect brems/conv. brems
@@ -343,6 +327,8 @@ std::cerr << "add " << ref->correctedEnergy() << std::endl;
 		if( !usedSimCluster[ref.key()] ) {
 		  candidate.addElementInBlock(blockRef,elem.index());
 		  usedSimCluster[ref.key()] = true;
+                  cluster_energy_raw+=ref->energy();
+                  cluster_energy_corr+=ref->correctedEnergy();
 		}
 	      }
 	      
@@ -354,6 +340,7 @@ std::cerr << "add " << ref->correctedEnergy() << std::endl;
       }
     }
     usedTrack[tkRef.key()] = true;    
+    candidate.setHcalEnergy(cluster_energy_raw, cluster_energy_corr);
     // remove tracks already used by muons
     if( MuonTrackToGeneralTrack.count(itk) || absPdgId == 13)
       candidates->pop_back();
