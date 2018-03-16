@@ -14,6 +14,7 @@
 #include "DataFormats/Candidate/interface/Candidate.h"
 #include "DataFormats/Candidate/interface/CandidateFwd.h"
 #include "DataFormats/PatCandidates/interface/PackedCandidate.h"
+#include "DataFormats/PatCandidates/interface/Photon.h"
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidateFwd.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
@@ -44,7 +45,15 @@ PuppiProducer::PuppiProducer(const edm::ParameterSet& iConfig) {
     = consumes<CandidateView>(iConfig.getParameter<edm::InputTag>("candName"));
   tokenVertices_
     = consumes<VertexCollection>(iConfig.getParameter<edm::InputTag>("vertexName"));
- 
+  tokenPhotonCandidates_ = mayConsume<CandidateView>(iConfig.getParameter<edm::InputTag>("photonName"));
+  usePhotons_  = (iConfig.getParameter<edm::InputTag>("photonName")).label().size() != 0;
+  reco2pf_               = mayConsume<edm::ValueMap<std::vector<reco::PFCandidateRef> > >(iConfig.getParameter<edm::InputTag>("photonRecoToPFMap"));
+  usePhotonRecoToPFMap_ = (iConfig.getParameter<edm::InputTag>("photonRecoToPFMap")).label().size() != 0;
+  tokenPhotonId_         = mayConsume<edm::ValueMap<bool>  >(iConfig.getParameter<edm::InputTag>("photonId"));
+  usePhotonId_ = (iConfig.getParameter<edm::InputTag>("photonId")).label().size() != 0;
+  ptPhoton_              = iConfig.getParameter<double>("ptPhoton");
+  etaPhoton_             = iConfig.getParameter<double>("etaPhoton");
+  dRMatchPhoton_         = iConfig.getParameter<double> ("dRMatchPhoton");
 
   produces<edm::ValueMap<float> > ();
   produces<edm::ValueMap<LorentzVector> > ();
@@ -85,6 +94,39 @@ void PuppiProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       if (!vtxIter->isFake() && vtxIter->ndof()>=fVtxNdofCut && fabs(vtxIter->z())<=fVtxZCut)
          npv++;
    }
+
+  edm::Handle<CandidateView> hPhoProduct;
+  edm::Handle<edm::ValueMap<std::vector<reco::PFCandidateRef>>> reco2pf;
+  edm::Handle<edm::ValueMap<bool> > photonId;
+  std::vector<const reco::Candidate*> phoCands;
+  std::set<int> foundPhoIndex;
+  if(usePhotons_) {
+    iEvent.getByToken(tokenPhotonCandidates_,hPhoProduct);
+    const CandidateView *phoCol = hPhoProduct.product();
+    if(usePhotonRecoToPFMap_) iEvent.getByToken(reco2pf_, reco2pf);
+    if(usePhotonId_)
+      iEvent.getByToken(tokenPhotonId_,photonId);
+    int iC = -1;
+    for(CandidateView::const_iterator itPho = phoCol->begin(); itPho!=phoCol->end(); itPho++) {
+      iC++;
+      bool passObject = false;
+      if(itPho->pt() < ptPhoton_) continue;
+      if(itPho->isPhoton() && usePhotonId_) passObject = (*photonId)  [phoCol->ptrAt(iC)];
+      if(!passObject && usePhotonId_) continue;
+      const pat::Photon *pPho = dynamic_cast<const pat::Photon*>(&(*itPho));
+      if(pPho != 0) {
+        for( const edm::Ref<pat::PackedCandidateCollection> & ref : pPho->associatedPackedPFCandidates() ) {
+	  if(fabs(pfCol->ptrAt(ref.key())->eta()) < etaPhoton_ )
+	    phoCands.push_back(&(*(pfCol->ptrAt(ref.key()))));
+        }
+      } else {
+        for( const edm::Ref<std::vector<reco::PFCandidate> > & ref : (*reco2pf)[phoCol->ptrAt(iC)] ) {
+	  if(fabs(pfCol->ptrAt(ref.key())->eta()) < etaPhoton_ )
+	    phoCands.push_back(&(*(pfCol->ptrAt(ref.key()))));
+        }
+      }
+    }
+  }
 
   //Fill the reco objects
   fRecoObjCollection.clear();
@@ -173,6 +215,17 @@ void PuppiProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
           if (fPuppiForLeptons && lPack->fromPV() == (pat::PackedCandidate::PVLoose)) pReco.id = 2;
           if (fPuppiForLeptons && lPack->fromPV() == (pat::PackedCandidate::PVTight)) pReco.id = 1;
         }
+      }
+    }
+
+    if(usePhotons_) {
+      int iPho = -1;
+      for(std::vector<const reco::Candidate*>::iterator itPho = phoCands.begin(); itPho!=phoCands.end(); itPho++) {
+        iPho++;
+        double lDR = deltaR(itPF->eta(),itPF->phi(),(*itPho)->eta(),(*itPho)->phi());
+        if ((!(std::abs(itPF->pdgId()) == 22 && lDR < dRMatchPhoton_))||(foundPhoIndex.count(iPho)!=0)) continue;
+        pReco.id=1;
+        foundPhoIndex.insert(iPho);
       }
     }
 

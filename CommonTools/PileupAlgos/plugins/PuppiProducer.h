@@ -44,6 +44,15 @@ private:
 
 	edm::EDGetTokenT< CandidateView > tokenPFCandidates_;
 	edm::EDGetTokenT< VertexCollection > tokenVertices_;
+	edm::EDGetTokenT< CandidateView >        tokenPhotonCandidates_;
+	edm::EDGetTokenT< edm::ValueMap<std::vector<reco::PFCandidateRef> > > reco2pf_;
+	edm::EDGetTokenT< edm::ValueMap<bool>  > tokenPhotonId_;
+	bool   usePhotons_;
+	bool   usePhotonRecoToPFMap_;
+	bool   usePhotonId_;
+	double  dRMatchPhoton_;
+	double  etaPhoton_;
+	double  ptPhoton_;
 	std::string     fPuppiName;
 	std::string     fPFName;	
 	std::string     fPVName;
