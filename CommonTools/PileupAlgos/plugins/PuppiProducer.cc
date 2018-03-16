@@ -225,6 +225,7 @@ void PuppiProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         double lDR = deltaR(itPF->eta(),itPF->phi(),(*itPho)->eta(),(*itPho)->phi());
         if ((!(std::abs(itPF->pdgId()) == 22 && lDR < dRMatchPhoton_))||(foundPhoIndex.count(iPho)!=0)) continue;
         pReco.id=1;
+        pReco.charge=1e-10; // Asign charge!=0 such that photon is treated as coming from PV in Puppi algorithm
         foundPhoIndex.insert(iPho);
       }
     }
