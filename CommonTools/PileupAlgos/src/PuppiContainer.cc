@@ -134,12 +134,10 @@ double PuppiContainer::var_within_R(int iId,
   }
   if (iId == 1)
     var += centre.pt();  //Sum in a cone
-  else if (iId == 0 && var != 0)
+  else if ((iId == 0 || (iId == 3) || (iId == 5)) && var != 0)
     var = log(var);
-  else if (iId == 3 && var != 0)
-    var = log(var);
-  else if (iId == 5 && var != 0)
-    var = log(var);
+  else if ((iId == 0 || (iId == 3) || (iId == 5)) && var == 0)
+    var = -99.;
   return var;
 }
 //In fact takes the median not the average
