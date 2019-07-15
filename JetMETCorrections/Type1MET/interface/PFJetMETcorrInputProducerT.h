@@ -98,6 +98,7 @@ class PFJetMETcorrInputProducerT : public edm::stream::EDProducer<>
 
     type1JetPtThreshold_ = cfg.getParameter<double>("type1JetPtThreshold");
 
+    useWrongSmearedEM_ = cfg.getParameter<bool>("useWrongSmearedEM");
     skipEM_ = cfg.getParameter<bool>("skipEM");
     if ( skipEM_ ) {
       skipEMfractionThreshold_ = cfg.getParameter<double>("skipEMfractionThreshold");
@@ -145,6 +146,7 @@ class PFJetMETcorrInputProducerT : public edm::stream::EDProducer<>
     desc.add<edm::InputTag>("jetCorrLabelRes",edm::InputTag("ak4PFCHSL1FastL2L3ResidualCorrector"));
     desc.add<double>("jetCorrEtaMax",9.9);
     desc.add<double>("type1JetPtThreshold",15);
+    desc.add<bool>("useWrongSmearedEM",false);
     desc.add<bool>("skipEM",true);
     desc.add<double>("skipEMfractionThreshold",0.90);
     desc.add<bool>("skipMuons",true);
@@ -186,6 +188,10 @@ class PFJetMETcorrInputProducerT : public edm::stream::EDProducer<>
       checkInputType(jet);
 
       double emEnergyFraction = jet.chargedEmEnergyFraction() + jet.neutralEmEnergyFraction();
+      if ( (useWrongSmearedEM_) && (std::is_same<T, pat::Jet>::value) ) {
+        const pat::Jet& pjet=static_cast<const pat::Jet&>(jet);
+        emEnergyFraction*=pjet.jecFactor("Uncorrected")/pjet.jecFactor(0);
+      }
       if ( skipEM_ && emEnergyFraction > skipEMfractionThreshold_ ) continue;
 
       const static PFJetMETcorrInputProducer_namespace::RawJetExtractorT<T> rawJetExtractor {};
@@ -279,6 +285,7 @@ class PFJetMETcorrInputProducerT : public edm::stream::EDProducer<>
                                // and jets entering "unclustered energy" sum
                                // NOTE: threshold is applied on **corrected** jet energy (recommended default = 10 GeV)
 
+  bool useWrongSmearedEM_; // flag to use EM fraction smeared by JER factor. This is wrong and only included for backward compatibility.
   bool skipEM_; // flag to exclude jets with large fraction of electromagnetic energy (electrons/photons)
                 // from Type 1 + 2 MET corrections
   double skipEMfractionThreshold_;
