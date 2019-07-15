@@ -1443,6 +1443,7 @@ class RunMETCorrectionsAndUncertainties(ConfigToolBase):
                                          jetCorrLabel = cms.InputTag("L3Absolute"),
                                          jetCorrLabelRes = cms.InputTag("L2L3Residual"),
                                          offsetCorrLabel = cms.InputTag("L1FastJet"),
+					 useWrongSmearedEM = cms.bool(True), # This need to be set to False. Only for backwards compatibility.
                                          skipEM = cms.bool(True),
                                          skipEMfractionThreshold = cms.double(0.9),
                                          skipMuonSelection = cms.string('isGlobalMuon | isStandAloneMuon'),
