@@ -28,11 +28,11 @@ puppi = cms.EDProducer("PuppiProducer",#cms.PSet(#"PuppiProducer",
                        puppiDiagnostics = cms.bool(False),
                        puppiForLeptons = cms.bool(False),
 		       UseFromPVLooseTight = cms.bool(False),
-                       UseDeltaZCut   = cms.bool(True),
+                       UseDeltaZCut   = cms.bool(False),
                        DeltaZCut      = cms.double(0.3),
-		       PtMaxCharged   = cms.double(0.),
+		       PtMaxCharged   = cms.double(20.),
 		       PtMaxNeutrals  = cms.double(200.),
-		       PtMaxNeutralsStartSlope = cms.double(0.),
+		       PtMaxNeutralsStartSlope = cms.double(20.),
                        candName       = cms.InputTag('particleFlow'),
                        vertexName     = cms.InputTag('offlinePrimaryVertices'),
                        #candName      = cms.string('packedPFCandidates'),
@@ -84,7 +84,7 @@ puppi = cms.EDProducer("PuppiProducer",#cms.PSet(#"PuppiProducer",
                        # )
                       )
 )
-                        
+
 from Configuration.Eras.Modifier_phase2_common_cff import phase2_common
 phase2_common.toModify(
     puppi,
