@@ -29,6 +29,7 @@ PuppiProducer::PuppiProducer(const edm::ParameterSet& iConfig) {
   fUseDZ     = iConfig.getParameter<bool>("UseDeltaZCut");
   fDZCut     = iConfig.getParameter<double>("DeltaZCut");
   fPtMaxCharged = iConfig.getParameter<double>("PtMaxCharged");
+  fEtaMaxCharged = iConfig.getParameter<double>("EtaMaxCharged");
   fPtMax     = iConfig.getParameter<double>("PtMaxNeutrals");
   fPtMaxNeutralsStartSlope = iConfig.getParameter<double>("PtMaxNeutralsStartSlope");
   fUseExistingWeights     = iConfig.getParameter<bool>("useExistingWeights");
@@ -147,6 +148,8 @@ void PuppiProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
           pReco.id = 0;
             if ((fPtMaxCharged > 0) and (pReco.pt > fPtMaxCharged))
               pReco.id = 1;
+            else if ((fEtaMaxCharged > 0) and (std::abs(pReco.eta) > fEtaMaxCharged))
+              pReco.id = 1;
             else if (fUseDZ && (std::abs(pDZ) < fDZCut))
               pReco.id = 1;
             else if (fUseDZ && (std::abs(pDZ) > fDZCut))
@@ -172,6 +175,8 @@ void PuppiProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
         if (lPack->fromPV() == (pat::PackedCandidate::PVTight) || lPack->fromPV() == (pat::PackedCandidate::PVLoose)){ 
           pReco.id = 0;
             if ((fPtMaxCharged > 0) and (pReco.pt > fPtMaxCharged))
+              pReco.id = 1;
+            else if ((fEtaMaxCharged > 0) and (std::abs(pReco.eta) > fEtaMaxCharged))
               pReco.id = 1;
             else if (fUseDZ && (std::abs(pDZ) < fDZCut))
               pReco.id = 1;
