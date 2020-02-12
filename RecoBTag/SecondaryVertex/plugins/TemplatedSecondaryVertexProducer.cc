@@ -22,6 +22,10 @@
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "FWCore/Utilities/interface/Exception.h"
 
+#include "FWCore/ParameterSet/interface/Registry.h"
+#include "FWCore/Common/interface/Provenance.h"
+#include "DataFormats/Provenance/interface/ProductProvenance.h"
+
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
@@ -159,9 +163,11 @@ private:
   double ghostRescaling;
   double relPtTolerance;
   bool useFatJets;
+  bool useWeights;
   bool useGroomedFatJets;
   edm::EDGetTokenT<edm::View<reco::Jet> > token_fatJets;
   edm::EDGetTokenT<edm::View<reco::Jet> > token_groomedFatJets;
+  edm::EDGetTokenT<edm::ValueMap<float> > token_weights;
 
   ClusterSequencePtr fjClusterSeq;
   JetDefPtr fjJetDefinition;
@@ -261,6 +267,7 @@ TemplatedSecondaryVertexProducer<IPTI, VTX>::TemplatedSecondaryVertexProducer(co
   }
   useSVClustering = (params.existsAs<bool>("useSVClustering") ? params.getParameter<bool>("useSVClustering") : false);
   useSVMomentum = (params.existsAs<bool>("useSVMomentum") ? params.getParameter<bool>("useSVMomentum") : false);
+  useWeights = false;
   useFatJets = (useExternalSV && params.exists("fatJets"));
   useGroomedFatJets = (useExternalSV && params.exists("groomedFatJets"));
   if (useSVClustering) {
@@ -286,10 +293,18 @@ TemplatedSecondaryVertexProducer<IPTI, VTX>::TemplatedSecondaryVertexProducer(co
       throw cms::Exception("InvalidJetAlgorithm") << "Jet clustering algorithm is invalid: " << jetAlgorithm
                                                   << ", use CambridgeAachen | Kt | AntiKt" << std::endl;
   }
-  if (useFatJets)
+  if (useFatJets) {
     token_fatJets = consumes<edm::View<reco::Jet> >(params.getParameter<edm::InputTag>("fatJets"));
-  if (useGroomedFatJets)
+    std::string label = params.getParameter<edm::InputTag>("fatJets").label();
+    if (label.find("Puppi") != std::string::npos) {
+      useWeights = true;
+    }
+  }
+  if (useWeights)
+    token_weights = consumes<edm::ValueMap<float> >(params.getParameter<edm::InputTag>("weights"));
+  if (useGroomedFatJets) {
     token_groomedFatJets = consumes<edm::View<reco::Jet> >(params.getParameter<edm::InputTag>("groomedFatJets"));
+  }
   if (useFatJets && !useSVClustering)
     rParam = params.getParameter<double>("rParam");  // will be used later as a dR cut
 
@@ -310,6 +325,19 @@ void TemplatedSecondaryVertexProducer<IPTI, VTX>::produce(edm::Event &event, con
 
   edm::Handle<std::vector<IPTI> > trackIPTagInfos;
   event.getByToken(token_trackIPTagInfo, trackIPTagInfos);
+  if (!useFatJets) {
+    if constexpr (std::is_same_v<IPTI, CandIPTagInfo>) {
+      const edm::Provenance *prov = trackIPTagInfos.provenance();
+      const edm::ParameterSet &psetFromProvenance = edm::parameterSet(*prov, event.processHistory());
+      std::string label;
+      label = psetFromProvenance.getParameter<edm::InputTag>("jets").label();
+      if (label.find("Puppi") != std::string::npos) {
+        useWeights = true;
+      }
+    } else {
+      useWeights = false;
+    }
+  }
 
   // External Sec Vertex collection (e.g. for IVF usage)
   edm::Handle<edm::View<VTX> > extSecVertex;
@@ -320,7 +348,6 @@ void TemplatedSecondaryVertexProducer<IPTI, VTX>::produce(edm::Event &event, con
   edm::Handle<edm::View<reco::Jet> > groomedFatJetsHandle;
   if (useFatJets) {
     event.getByToken(token_fatJets, fatJetsHandle);
-
     if (useGroomedFatJets) {
       event.getByToken(token_groomedFatJets, groomedFatJetsHandle);
 
@@ -330,6 +357,9 @@ void TemplatedSecondaryVertexProducer<IPTI, VTX>::produce(edm::Event &event, con
             << fatJetsHandle->size() << "). Please check that the two jet collections belong to each other.";
     }
   }
+  edm::Handle<edm::ValueMap<float> > weightsHandle;
+  if (useWeights)
+    event.getByToken(token_weights, weightsHandle);
 
   edm::Handle<BeamSpot> beamSpot;
   unsigned int bsCovSrc[7] = {
@@ -380,7 +410,15 @@ void TemplatedSecondaryVertexProducer<IPTI, VTX>::produce(edm::Event &event, con
             edm::LogWarning("NullTransverseMomentum") << "dropping input candidate with pt=0";
             continue;
           }
-          fjInputs.push_back(fastjet::PseudoJet(constit->px(), constit->py(), constit->pz(), constit->energy()));
+          if (useWeights) {
+            const reco::PFCandidate *pf_constit = dynamic_cast<const reco::PFCandidate *>(&*constit);
+            auto w = (*weightsHandle)[constit];
+            double E_w = std::sqrt(pf_constit->p() * w * pf_constit->p() * w + pf_constit->mass() * pf_constit->mass());
+            fjInputs.push_back(
+                fastjet::PseudoJet(pf_constit->px() * w, pf_constit->py() * w, pf_constit->pz() * w, E_w));
+          } else {
+            fjInputs.push_back(fastjet::PseudoJet(constit->px(), constit->py(), constit->pz(), constit->energy()));
+          }
         }
       }
     } else {
@@ -394,7 +432,15 @@ void TemplatedSecondaryVertexProducer<IPTI, VTX>::produce(edm::Event &event, con
             edm::LogWarning("NullTransverseMomentum") << "dropping input candidate with pt=0";
             continue;
           }
-          fjInputs.push_back(fastjet::PseudoJet(constit->px(), constit->py(), constit->pz(), constit->energy()));
+          if (useWeights) {
+            const auto *pf_constit = dynamic_cast<const reco::PFCandidate *>(&*constit);
+            auto w = (*weightsHandle)[constit];
+            double E_w = std::sqrt(pf_constit->p() * w * pf_constit->p() * w + pf_constit->mass() * pf_constit->mass());
+            fjInputs.push_back(
+                fastjet::PseudoJet(pf_constit->px() * w, pf_constit->py() * w, pf_constit->pz() * w, E_w));
+          } else {
+            fjInputs.push_back(fastjet::PseudoJet(constit->px(), constit->py(), constit->pz(), constit->energy()));
+          }
         }
       }
     }

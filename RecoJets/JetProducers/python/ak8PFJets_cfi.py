@@ -16,7 +16,9 @@ ak8PFJets = ak4PFJets.clone(
 # AK8 jets with various pileup subtraction schemes
 ##############################################################################
 ak8PFJetsPuppi = ak8PFJets.clone(
-    src = cms.InputTag("puppi")
+    src = cms.InputTag("particleFlow"),
+    srcWeights = cms.InputTag("puppi"),
+    applyPuppiWeight = True
     )
 
 ak8PFJetsCHS = ak8PFJets.clone(

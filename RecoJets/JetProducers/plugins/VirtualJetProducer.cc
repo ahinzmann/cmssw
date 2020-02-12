@@ -114,6 +114,7 @@ VirtualJetProducer::VirtualJetProducer(const edm::ParameterSet& iConfig) {
   moduleLabel_ = iConfig.getParameter<string>("@module_label");
   src_ = iConfig.getParameter<edm::InputTag>("src");
   srcPVs_ = iConfig.getParameter<edm::InputTag>("srcPVs");
+  srcWeights_ = iConfig.getParameter<edm::InputTag>("srcWeights");
   jetType_ = iConfig.getParameter<string>("jetType");
   jetAlgorithm_ = iConfig.getParameter<string>("jetAlgorithm");
   rParam_ = iConfig.getParameter<double>("rParam");
@@ -148,10 +149,13 @@ VirtualJetProducer::VirtualJetProducer(const edm::ParameterSet& iConfig) {
   useDeterministicSeed_ = iConfig.getParameter<bool>("useDeterministicSeed");
   minSeed_ = iConfig.getParameter<unsigned int>("minSeed");
   verbosity_ = iConfig.getParameter<int>("verbosity");
+  applyPuppiWeight_ = iConfig.getParameter<bool>("applyPuppiWeight");
 
   anomalousTowerDef_ = unique_ptr<AnomalousTower>(new AnomalousTower(iConfig));
 
   input_vertex_token_ = consumes<reco::VertexCollection>(srcPVs_);
+  if (applyPuppiWeight_)
+    input_weights_token_ = consumes<edm::ValueMap<float>>(srcWeights_);
   input_candidateview_token_ = consumes<reco::CandidateView>(src_);
   input_candidatefwdptr_token_ =
       consumes<vector<edm::FwdPtr<reco::PFCandidate>>>(iConfig.getParameter<edm::InputTag>("src"));
@@ -278,6 +282,10 @@ void VirtualJetProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
     if (!pvCollection->empty())
       vertex_ = pvCollection->begin()->position();
   }
+
+  // Get Weights Collection
+  if (applyPuppiWeight_)
+    iEvent.getByToken(input_weights_token_, weights_);
 
   // For Pileup subtraction using offset correction:
   // set up geometry map
@@ -448,6 +456,7 @@ void VirtualJetProducer::inputTowers() {
       const CaloTower& tower = dynamic_cast<const CaloTower&>(input);
       auto const& ct = tower.p4(vertex_);  // very expensive as computed in eta/phi
       fjInputs_.emplace_back(ct.px(), ct.py(), ct.pz(), ct.energy());
+      fjInputs_.back().set_user_index(i - inBegin);
       //std::cout << "tower:" << *tower << '\n';
     } else {
       /*
@@ -456,9 +465,26 @@ void VirtualJetProducer::inputTowers() {
 	std::cout << "PF cand:" << pfc << '\n';
       }
       */
-      fjInputs_.emplace_back(input.px(), input.py(), input.pz(), input.energy());
+      if (!applyPuppiWeight_) {
+        fjInputs_.emplace_back(input.px(), input.py(), input.pz(), input.energy());
+        fjInputs_.back().set_user_index(i - inBegin);
+      } else {
+        // To apply puppi weight, first check if this is a PFCandidate.
+        // If not, then check if it is a PackedCandidate
+        reco::PFCandidate const* pPF = dynamic_cast<reco::PFCandidate const*>(i->get());
+        auto w = pPF ? (*weights_)[*i] : 0.0;
+
+        if (!pPF) {
+          pat::PackedCandidate const* pPC = dynamic_cast<pat::PackedCandidate const*>(i->get());
+          w = pPC ? pPC->puppiWeight() : 0.0;
+        }
+
+        if (w > 0) {
+          fjInputs_.emplace_back(input.px() * w, input.py() * w, input.pz() * w, input.energy() * w);
+          fjInputs_.back().set_user_index(i - inBegin);
+        }
+      }
     }
-    fjInputs_.back().set_user_index(i - inBegin);
   }
 
   if (restrictInputs_ && fjInputs_.size() > maxInputs_) {
@@ -1016,4 +1042,5 @@ void VirtualJetProducer::fillDescriptionsFromVirtualJetProducer(edm::ParameterSe
   desc.add<unsigned int>("maxRecoveredHcalCells", 9999999);
   vector<double> puCentersDefault;
   desc.add<vector<double>>("puCenters", puCentersDefault);
+  desc.add<bool>("applyPuppiWeight", false);
 }
