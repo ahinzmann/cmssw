@@ -214,6 +214,7 @@ void PuppiProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     lWeights = fPuppiContainer->puppiWeights();
   } else {
     //Use the existing weights
+    int lPackCtr = 0;
     for (auto const& aPF : *pfCol) {
       const pat::PackedCandidate* lPack = dynamic_cast<const pat::PackedCandidate*>(&aPF);
       float curpupweight = -1.;
@@ -228,7 +229,12 @@ void PuppiProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
           curpupweight = lPack->puppiWeight();
         }
       }
+      // Protect high pT photons (important for gamma to hadronic recoil balance)
+      if ((fPtMaxPhotons > 0) && (lPack->pdgId() == 22) && (std::abs(lPack->eta()) < fEtaMaxPhotons) &&
+          (lPack->pt() > fPtMaxPhotons))
+        curpupweight = 1;
       lWeights.push_back(curpupweight);
+      lPackCtr++;
     }
   }
 
@@ -292,7 +298,7 @@ void PuppiProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       pCand->setSourceCandidatePtr(aCand.sourceCandidatePtr(0));
       fPackedPuppiCandidates.push_back(*pCand);
     } else {
-      pfCand->setP4(aCand.p4());
+      pfCand->setP4(puppiP4s.back());
       pfCand->setSourceCandidatePtr(aCand.sourceCandidatePtr(0));
       fPuppiCandidates.push_back(*pfCand);
     }
