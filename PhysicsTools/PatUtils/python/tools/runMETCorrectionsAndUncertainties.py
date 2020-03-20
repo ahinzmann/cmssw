@@ -612,7 +612,6 @@ class RunMETCorrectionsAndUncertainties(ConfigToolBase):
                 from RecoMET.METProducers.METSignificanceParams_cfi import METSignificanceParams_Data
                 getattr(process, "pat"+metType+"Met"+postfix).parameters = METSignificanceParams_Data
             if self._parameters["Puppi"].value:
-                getattr(process, "pat"+metType+"Met"+postfix).srcPFCands = cms.InputTag('puppiForMET')
                 getattr(process, "pat"+metType+"Met"+postfix).srcJets = cms.InputTag('cleanedPatJets'+postfix)
                 getattr(process, "pat"+metType+"Met"+postfix).srcJetSF = cms.string('AK4PFPuppi')
                 getattr(process, "pat"+metType+"Met"+postfix).srcJetResPt = cms.string('AK4PFPuppi_pt')
@@ -1406,13 +1405,17 @@ class RunMETCorrectionsAndUncertainties(ConfigToolBase):
         if not hasattr(process, "pfMet"+postfix) and self._parameters["metType"].value == "PF":
             #common to AOD/mAOD processing
             #raw MET
-            from RecoMET.METProducers.PFMET_cfi import pfMet
+            from RecoMET.METProducers.pfMet_cfi import pfMet
             addToProcessAndTask("pfMet"+postfix, pfMet.clone(), process, task)
             getattr(process, "pfMet"+postfix).src = pfCandCollection
             getattr(process, "pfMet"+postfix).calculateSignificance = False
+            if self._parameters["Puppi"].value:
+	        getattr(process, "pfMet"+postfix).applyWeight = True
+		getattr(process, "pfMet"+postfix).srcWeights = "puppiNoLep"
             patMetModuleSequence += getattr(process, "pfMet"+postfix)
 
-            #PAT METs
+        #PAT METs
+        if not hasattr(process, "patMETs"+postfix) and self._parameters["metType"].value == "PF":
             process.load("PhysicsTools.PatAlgos.producersLayer1.metProducer_cff")
             task.add(process.makePatMETsTask)
             configtools.cloneProcessingSnippet(process, getattr(process,"patMETCorrections"), postfix, addToTask = True)
@@ -1430,7 +1433,6 @@ class RunMETCorrectionsAndUncertainties(ConfigToolBase):
                     getattr(process, "patMETs"+postfix).computeMETSignificance = cms.bool(False)
 
                 if self._parameters["Puppi"].value:
-                    getattr(process, 'patMETs'+postfix).srcPFCands = cms.InputTag('puppiForMET')
                     getattr(process, 'patMETs'+postfix).srcJets = cms.InputTag('cleanedPatJets'+postfix)
                     getattr(process, 'patMETs'+postfix).srcJetSF = cms.string('AK4PFPuppi')
                     getattr(process, 'patMETs'+postfix).srcJetResPt = cms.string('AK4PFPuppi_pt')
@@ -1623,13 +1625,8 @@ class RunMETCorrectionsAndUncertainties(ConfigToolBase):
 
         pfCHS = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedPFCandidates"), cut = cms.string("fromPV(0)>0"))
         addToProcessAndTask("pfCHS", pfCHS, process, task)
-        pfMetCHS = cms.EDProducer("PFMETProducer",
-                                  src = cms.InputTag('pfCHS'),
-                                  alias = cms.string('pfMet'),
-                                  globalThreshold = cms.double(0.0),
-                                  calculateSignificance = cms.bool(False),
-                                  )            
-
+        from RecoMET.METProducers.pfMet_cfi import pfMet
+        pfMetCHS = pfMet.clone(src = cms.InputTag('pfCHS'))
         addToProcessAndTask("pfMetCHS", pfMetCHS, process, task)
 
         addMETCollection(process,
@@ -1646,13 +1643,7 @@ class RunMETCorrectionsAndUncertainties(ConfigToolBase):
 
         pfTrk = cms.EDFilter("CandPtrSelector", src = cms.InputTag("packedPFCandidates"), cut = cms.string("fromPV(0) > 0 && charge()!=0"))
         addToProcessAndTask("pfTrk", pfTrk, process, task)
-        pfMetTrk = cms.EDProducer("PFMETProducer",
-                                  src = cms.InputTag('pfTrk'),
-                                  alias = cms.string('pfMet'),
-                                  globalThreshold = cms.double(0.0),
-                                  calculateSignificance = cms.bool(False),
-                                  )            
-
+        pfMetTrk = pfMet.clone(src = cms.InputTag('pfTrk'))
         addToProcessAndTask("pfMetTrk", pfMetTrk, process, task)
 
         addMETCollection(process,
