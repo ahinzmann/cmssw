@@ -616,6 +616,7 @@ class RunMETCorrectionsAndUncertainties(ConfigToolBase):
                 getattr(process, "pat"+metType+"Met"+postfix).srcJetSF = cms.string('AK4PFPuppi')
                 getattr(process, "pat"+metType+"Met"+postfix).srcJetResPt = cms.string('AK4PFPuppi_pt')
                 getattr(process, "pat"+metType+"Met"+postfix).srcJetResPhi = cms.string('AK4PFPuppi_phi')
+                getattr(process, "pat"+metType+"Met"+postfix).srcWeights = "puppiNoLep"
 
         #MET significance bypass for the patMETs from AOD
         if not self._parameters["onMiniAOD"].value and not postfix=="NoHF":
@@ -1437,6 +1438,7 @@ class RunMETCorrectionsAndUncertainties(ConfigToolBase):
                     getattr(process, 'patMETs'+postfix).srcJetSF = cms.string('AK4PFPuppi')
                     getattr(process, 'patMETs'+postfix).srcJetResPt = cms.string('AK4PFPuppi_pt')
                     getattr(process, 'patMETs'+postfix).srcJetResPhi = cms.string('AK4PFPuppi_phi')
+                    getattr(process, "patMETs"+postfix).srcWeights = "puppiNoLep"
 
 
     def extractMET(self, process, correctionLevel, patMetModuleSequence, postfix):
