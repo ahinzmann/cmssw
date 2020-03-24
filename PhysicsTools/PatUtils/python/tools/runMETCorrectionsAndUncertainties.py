@@ -488,6 +488,8 @@ class RunMETCorrectionsAndUncertainties(ConfigToolBase):
             addToProcessAndTask('pat'+metType+'Met'+postfix,  getattr(process,'patPFMet' ).clone(), process, task)
             getattr(process, "patPFMet"+postfix).metSource = cms.InputTag("pfMet"+postfix)
             getattr(process, "patPFMet"+postfix).srcPFCands = self._parameters["pfCandCollection"].value
+            if self._parameters["Puppi"].value:
+                getattr(process, "patPFMet"+postfix).srcWeights = "puppiNoLep"
 
         if self._parameters["runOnData"].value:
             getattr(process, "patPFMet"+postfix).addGenMET  = False
@@ -595,6 +597,8 @@ class RunMETCorrectionsAndUncertainties(ConfigToolBase):
         if "Txy" in correctionLevel:
             self.tuneTxyParameters(process, corScheme, postfix)
             getattr(process, "patPFMetTxyCorr"+postfix).srcPFlow = self._parameters["pfCandCollection"].value
+            if self._parameters["Puppi"].value:
+                getattr(process, "patPFMetTxyCorr"+postfix).srcWeights = "puppiNoLep"
 
 
         #Enable MET significance if the type1 MET is computed
@@ -617,6 +621,8 @@ class RunMETCorrectionsAndUncertainties(ConfigToolBase):
         if not self._parameters["onMiniAOD"].value and not postfix=="NoHF":
             getattr(process, "patMETs"+postfix).computeMETSignificance = cms.bool(self._parameters["computeMETSignificance"].value)
             getattr(process, "patMETs"+postfix).srcPFCands=self._parameters["pfCandCollection"].value
+            if self._parameters["Puppi"].value:
+                getattr(process, "patMETs"+postfix).srcWeights = "puppiNoLep"
 
         if hasattr(process, "patCaloMet"):
             getattr(process, "patCaloMet").computeMETSignificance = cms.bool(False)
@@ -919,28 +925,32 @@ class RunMETCorrectionsAndUncertainties(ConfigToolBase):
             shiftedModuleUp = cms.EDProducer("ShiftedParticleProducer",
                                              src = objectCollection,
                                              uncertainty = cms.string('((abs(y)<1.479)?(0.006+0*x):(0.015+0*x))'),
-                                             shiftBy = cms.double(+1.*varyByNsigmas)
+                                             shiftBy = cms.double(+1.*varyByNsigmas),
+                                             srcWeights = cms.InputTag("")
                                              )
 
         if identifier == "Photon":
             shiftedModuleUp = cms.EDProducer("ShiftedParticleProducer",
                                              src = objectCollection,
                                              uncertainty = cms.string('((abs(y)<1.479)?(0.01+0*x):(0.025+0*x))'),
-                                             shiftBy = cms.double(+1.*varyByNsigmas)
+                                             shiftBy = cms.double(+1.*varyByNsigmas),
+                                             srcWeights = cms.InputTag("")
                                              )
 
         if identifier == "Muon":
             shiftedModuleUp = cms.EDProducer("ShiftedParticleProducer",
                                              src = objectCollection,
                                              uncertainty = cms.string('((x<100)?(0.002+0*y):(0.05+0*y))'),
-                                             shiftBy = cms.double(+1.*varyByNsigmas)
+                                             shiftBy = cms.double(+1.*varyByNsigmas),
+                                             srcWeights = cms.InputTag("")
                                              )
 
         if identifier == "Tau":
             shiftedModuleUp = cms.EDProducer("ShiftedParticleProducer",
                                              src = objectCollection,
                                              uncertainty = cms.string('0.03+0*x*y'),
-                                             shiftBy = cms.double(+1.*varyByNsigmas)
+                                             shiftBy = cms.double(+1.*varyByNsigmas),
+                                             srcWeights = cms.InputTag("")
                                              )
 
         if identifier == "Unclustered":        
@@ -971,7 +981,8 @@ class RunMETCorrectionsAndUncertainties(ConfigToolBase):
                         binUncertainty = cms.string('sqrt(1./x+0.0025)+0*y')
                         ),
                     ),
-                                             shiftBy = cms.double(+1.*varyByNsigmas)
+                                             shiftBy = cms.double(+1.*varyByNsigmas),
+                                             srcWeights = cms.InputTag("")
                                              )
 
         if identifier == "Jet":
@@ -1141,6 +1152,8 @@ class RunMETCorrectionsAndUncertainties(ConfigToolBase):
             #MM: FIXME MVA
             #if  "MVA" in metModName and identifier == "Jet": #dummy fix
             #    modName = "uncorrectedshiftedPat"+preId+identifier+varType+mod+postfix
+            if (identifier=="Photon" or identifier=="Unclustered") and self._parameters["Puppi"].value:
+                shiftedCollModules[mod].srcWeights = "puppiNoLep"
             if not hasattr(process, modName):
                 addToProcessAndTask(modName, shiftedCollModules[mod], process, task)
                 metUncSequence += getattr(process, modName)
@@ -1152,6 +1165,8 @@ class RunMETCorrectionsAndUncertainties(ConfigToolBase):
             if "PF" in metModName:
                 #create the MET shifts and add them to the sequence
                 shiftedMETCorrModule = self.createShiftedMETModule(process, objectCollection, modName)
+                if (identifier=="Photon" or identifier=="Unclustered") and self._parameters["Puppi"].value:
+                   shiftedMETCorrModule.srcWeights = "puppiNoLep"
                 modMETShiftName = "shiftedPatMETCorr"+preId+identifier+varType+mod+postfix
                 if not hasattr(process, modMETShiftName):
                     addToProcessAndTask(modMETShiftName, shiftedMETCorrModule, process, task)
@@ -1206,6 +1221,7 @@ class RunMETCorrectionsAndUncertainties(ConfigToolBase):
         shiftedModule = cms.EDProducer("ShiftedParticleMETcorrInputProducer",
                                        srcOriginal = originCollection,
                                        srcShifted = cms.InputTag(shiftedCollection),
+                                       srcWeights = cms.InputTag("")
                                        )
 
         return shiftedModule
