@@ -150,6 +150,9 @@ g4SimHits = cms.EDProducer("OscarMTProducer",
         FlagBERT    = cms.untracked.bool(False),
         EminFTFP    = cms.double(3.), # in GeV
         EmaxBERT    = cms.double(6.), # in GeV
+        EminQGSP    = cms.double(12.), # in GeV
+        EmaxFTFP    = cms.double(30.), # in GeV
+        EmaxBERTpi  = cms.double(12.), # in GeV
         LowEnergyGflashEcal = cms.bool(False),
         LowEnergyGflashEcalEmax = cms.double(100),
         GflashEcal    = cms.bool(False),
@@ -435,13 +438,6 @@ g4SimHits = cms.EDProducer("OscarMTProducer",
     ),
     BHMSD = cms.PSet(
          Verbosity = cms.untracked.int32(0)
-    ),
-    FastTimerSD = cms.PSet(
-        Verbosity = cms.untracked.int32(0),
-        TimeSliceUnit    = cms.double(0.001), #stepping = 1 ps (for timing)
-        IgnoreTrackID    = cms.bool(False),
-        EminHit          = cms.double(0.0),
-        CheckID          = cms.untracked.bool(True),
     ),
     MtdSD = cms.PSet(
         Verbosity = cms.untracked.int32(0),

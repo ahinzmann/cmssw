@@ -363,10 +363,8 @@ def miniAOD_customizeCommon(process):
     
     # Adding puppi jets
     process.load('CommonTools.PileupAlgos.Puppi_cff')
-    task.add(process.puppi) ## Drop this line when merging with #28936
     if not hasattr(process, 'ak4PFJetsPuppi'): #MM: avoid confilct with substructure call
       process.load('RecoJets.JetProducers.ak4PFJets_cfi')
-      task.add(process.ak4PFJetsPuppi) ## Drop this line when merging with #28936
     from Configuration.Eras.Modifier_run2_miniAOD_80XLegacy_cff import run2_miniAOD_80XLegacy
     from Configuration.Eras.Modifier_run2_miniAOD_94XFall17_cff import run2_miniAOD_94XFall17
     _rerun_puppijets_task = task.copy()
@@ -402,24 +400,9 @@ def miniAOD_customizeCommon(process):
     from PhysicsTools.PatAlgos.slimming.applyDeepBtagging_cff import applyDeepBtagging
     applyDeepBtagging( process )
 
-    addToProcessAndTask('slimmedJetsPuppiNoMultiplicities', process.slimmedJetsNoDeepFlavour.clone(), process, task)
-    process.slimmedJetsPuppiNoMultiplicities.src = cms.InputTag("selectedPatJetsPuppi")
-    process.slimmedJetsPuppiNoMultiplicities.packedPFCandidates = cms.InputTag("packedPFCandidates")
-
-    from PhysicsTools.PatAlgos.patPuppiJetSpecificProducer_cfi import patPuppiJetSpecificProducer
-    from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
-    process.patPuppiJetSpecificProducer = patPuppiJetSpecificProducer.clone(
-      src=cms.InputTag("slimmedJetsPuppiNoMultiplicities"),
-    )
-    task.add(process.patPuppiJetSpecificProducer)
-    updateJetCollection(
-       process,
-       labelName = 'PuppiJetSpecific',
-       jetSource = cms.InputTag('slimmedJetsPuppiNoMultiplicities'),
-    )
-    process.updatedPatJetsPuppiJetSpecific.userData.userFloats.src = ['patPuppiJetSpecificProducer:puppiMultiplicity', 'patPuppiJetSpecificProducer:neutralPuppiMultiplicity', 'patPuppiJetSpecificProducer:neutralHadronPuppiMultiplicity', 'patPuppiJetSpecificProducer:photonPuppiMultiplicity', 'patPuppiJetSpecificProducer:HFHadronPuppiMultiplicity', 'patPuppiJetSpecificProducer:HFEMPuppiMultiplicity' ]
-    process.slimmedJetsPuppi = process.selectedUpdatedPatJetsPuppiJetSpecific.clone()
-    delattr(process, 'selectedUpdatedPatJetsPuppiJetSpecific')
+    addToProcessAndTask('slimmedJetsPuppi', process.slimmedJetsNoDeepFlavour.clone(
+                          src = "selectedPatJetsPuppi", packedPFCandidates = "packedPFCandidates"),
+                        process, task)
 
     task.add(process.slimmedJetsPuppi)
 
@@ -519,7 +502,7 @@ def miniAOD_customizeMC(process):
     process.patJetPartonMatch.matched = "prunedGenParticles"
     process.patJetPartonMatch.mcStatus = [ 3, 23 ]
     process.patJetGenJetMatch.matched = "slimmedGenJets"
-    process.patJetGenJetMatchAK8.matched =  "slimmedGenJetsAK8"
+    process.patJetGenJetMatchAK8Puppi.matched =  "slimmedGenJetsAK8"
     process.patMuons.embedGenMatch = False
     process.patElectrons.embedGenMatch = False
     process.patPhotons.embedGenMatch = False
