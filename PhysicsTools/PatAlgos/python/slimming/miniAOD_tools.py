@@ -363,8 +363,7 @@ def miniAOD_customizeCommon(process):
     
     # Adding puppi jets
     process.load('CommonTools.PileupAlgos.Puppi_cff')
-    if not hasattr(process, 'ak4PFJetsPuppi'): #MM: avoid confilct with substructure call
-      process.load('RecoJets.JetProducers.ak4PFJets_cfi')
+    process.load('RecoJets.JetProducers.ak4PFJets_cfi')
     from Configuration.Eras.Modifier_run2_miniAOD_80XLegacy_cff import run2_miniAOD_80XLegacy
     from Configuration.Eras.Modifier_run2_miniAOD_94XFall17_cff import run2_miniAOD_94XFall17
     _rerun_puppijets_task = task.copy()
