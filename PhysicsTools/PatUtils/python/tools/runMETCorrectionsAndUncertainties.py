@@ -792,8 +792,7 @@ class RunMETCorrectionsAndUncertainties(ConfigToolBase):
                                            useDeltaRforFootprint = cms.bool(False)
                                            )
             if self._parameters["Puppi"].value:
-              from Configuration.Eras.Modifier_run2_miniAOD_devel_cff import run2_miniAOD_devel
-              run2_miniAOD_devel.toModify(pfCandsNoJets, useDeltaRforFootprint = True)
+              pfCandsNoJets.useDeltaRforFootprint = True
             addToProcessAndTask("pfCandsNoJets"+postfix, pfCandsNoJets, process, task)
             metUncSequence += getattr(process, "pfCandsNoJets"+postfix)
                 
