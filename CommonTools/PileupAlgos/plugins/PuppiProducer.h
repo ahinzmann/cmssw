@@ -60,9 +60,14 @@ private:
   std::string fPVName;
   bool fPuppiDiagnostics;
   bool fPuppiForLeptons;
+  bool fUseVertexFitAssociation;
   bool fUseFromPVLooseTight;
   bool fUseDZ;
-  float fDZCut;
+  bool fUseDZSignificance;
+  bool fUseTimeSignificance;
+  double fDZCut;
+  double fDZSignificanceCut;
+  double fTimeSignificanceCut;
   double fPtMaxCharged;
   double fEtaMaxCharged;
   double fPtMaxPhotons;

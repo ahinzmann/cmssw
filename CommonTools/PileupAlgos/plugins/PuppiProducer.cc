@@ -24,9 +24,14 @@
 PuppiProducer::PuppiProducer(const edm::ParameterSet& iConfig) {
   fPuppiDiagnostics = iConfig.getParameter<bool>("puppiDiagnostics");
   fPuppiForLeptons = iConfig.getParameter<bool>("puppiForLeptons");
+  fUseVertexFitAssociation = iConfig.getParameter<bool>("UseVertexFitAssociation");
   fUseFromPVLooseTight = iConfig.getParameter<bool>("UseFromPVLooseTight");
   fUseDZ = iConfig.getParameter<bool>("UseDeltaZCut");
+  fUseDZSignificance = iConfig.getParameter<bool>("UseDeltaZSignificanceCut");
+  fUseTimeSignificance = iConfig.getParameter<bool>("UseTimeSignifcanceCut");
   fDZCut = iConfig.getParameter<double>("DeltaZCut");
+  fDZSignificanceCut = iConfig.getParameter<double>("DeltaZSignificanceCut");
+  fTimeSignificanceCut = iConfig.getParameter<double>("TimeSignificanceCut");
   fPtMaxCharged = iConfig.getParameter<double>("PtMaxCharged");
   fEtaMaxCharged = iConfig.getParameter<double>("EtaMaxCharged");
   fPtMaxPhotons = iConfig.getParameter<double>("PtMaxPhotons");
@@ -96,9 +101,13 @@ void PuppiProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
       pReco.pdgId = aPF.pdgId();
       const reco::Vertex* closestVtx = nullptr;
       double pDZ = -9999;
+      double pDZerror = -9999;
+      double pDT = -9999;
+      double pDTerror = -9999;
       double pD0 = -9999;
       int pVtxId = -9999;
       bool lFirst = true;
+      int tmpFromPV = 0;
       const pat::PackedCandidate* lPack = dynamic_cast<const pat::PackedCandidate*>(&aPF);
       if (lPack == nullptr) {
         const reco::PFCandidate* pPF = dynamic_cast<const reco::PFCandidate*>(&aPF);
@@ -109,10 +118,16 @@ void PuppiProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
           if (lFirst) {
             if (aTrackRef.isNonnull()) {
               pDZ = aTrackRef->dz(aV.position());
+              pDZerror = aTrackRef->dzError();
               pD0 = aTrackRef->d0();
             } else if (pPF->gsfTrackRef().isNonnull()) {
               pDZ = pPF->gsfTrackRef()->dz(aV.position());
+              pDZerror = pPF->gsfTrackRef()->dzError();
               pD0 = pPF->gsfTrackRef()->d0();
+            }
+            if ((pPF->timeError() > 0) && (aV.tError() > 0)) {
+              pDT = pPF->time() - aV.t();
+              pDTerror = pPF->timeError();
             }
             lFirst = false;
             if (pDZ > -9999)
@@ -134,73 +149,53 @@ void PuppiProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
           }
           pVtxId++;
         }
-        int tmpFromPV = 0;
         // mocking the miniAOD definitions
         if (std::abs(pReco.charge) > 0) {
           if (closestVtx != nullptr && pVtxId > 0)
             tmpFromPV = 0;
           if (closestVtx != nullptr && pVtxId == 0)
-            tmpFromPV = 3;
+            tmpFromPV = pat::PackedCandidate::PVUsedInFit;
           if (closestVtx == nullptr && closestVtxForUnassociateds == 0)
-            tmpFromPV = 2;
+            tmpFromPV = pat::PackedCandidate::PVTight;
           if (closestVtx == nullptr && closestVtxForUnassociateds != 0)
-            tmpFromPV = 1;
-        }
-        pReco.dZ = pDZ;
-        pReco.d0 = pD0;
-        pReco.id = 0;
-        if (std::abs(pReco.charge) == 0) {
-          pReco.id = 0;
-        } else {
-          if (tmpFromPV == 0) {
-            pReco.id = 2;
-          }  // 0 is associated to PU vertex
-          else if (tmpFromPV == 3) {
-            pReco.id = 1;
-          } else if (tmpFromPV == 1 || tmpFromPV == 2) {
-            pReco.id = 0;
-            if ((fPtMaxCharged > 0) and (pReco.pt > fPtMaxCharged))
-              pReco.id = 1;
-            else if (std::abs(pReco.eta) > fEtaMaxCharged)
-              pReco.id = 1;
-            else if (fUseDZ)
-              pReco.id = (std::abs(pDZ) < fDZCut) ? 1 : 2;
-            else if (fUseFromPVLooseTight && tmpFromPV == 1)
-              pReco.id = 2;
-            else if (fUseFromPVLooseTight && tmpFromPV == 2)
-              pReco.id = 1;
-          }
+            tmpFromPV = pat::PackedCandidate::PVLoose;
         }
       } else if (lPack->vertexRef().isNonnull()) {
         pDZ = lPack->dz();
-        pD0 = lPack->dxy();
-        pReco.dZ = pDZ;
-        pReco.d0 = pD0;
-
-        pReco.id = 0;
-        if (std::abs(pReco.charge) == 0) {
-          pReco.id = 0;
+        pDZerror = lPack->dzError();
+        if (lPack->timeError() > 0) {
+          pDT = lPack->time();
+          pDTerror = lPack->timeError();
         }
-        if (std::abs(pReco.charge) > 0) {
-          if (lPack->fromPV() == 0) {
-            pReco.id = 2;
-          }  // 0 is associated to PU vertex
-          else if (lPack->fromPV() == (pat::PackedCandidate::PVUsedInFit)) {
+        pD0 = lPack->dxy();
+        tmpFromPV = lPack->fromPV();
+      }
+
+      pReco.dZ = pDZ;
+      pReco.d0 = pD0;
+      pReco.id = 0;
+      if (std::abs(pReco.charge) == 0) {
+        pReco.id = 0;
+      } else {
+        if ((fUseVertexFitAssociation) && (tmpFromPV == 0))
+          pReco.id = 2;
+        else if ((fUseVertexFitAssociation) && (tmpFromPV == pat::PackedCandidate::PVUsedInFit))
+          pReco.id = 1;
+        else {
+          if (fUseFromPVLooseTight && tmpFromPV == pat::PackedCandidate::PVTight)
             pReco.id = 1;
-          } else if (lPack->fromPV() == (pat::PackedCandidate::PVTight) ||
-                     lPack->fromPV() == (pat::PackedCandidate::PVLoose)) {
-            pReco.id = 0;
-            if ((fPtMaxCharged > 0) and (pReco.pt > fPtMaxCharged))
-              pReco.id = 1;
-            else if (std::abs(pReco.eta) > fEtaMaxCharged)
-              pReco.id = 1;
-            else if (fUseDZ)
-              pReco.id = (std::abs(pDZ) < fDZCut) ? 1 : 2;
-            else if (fUseFromPVLooseTight && lPack->fromPV() == (pat::PackedCandidate::PVLoose))
-              pReco.id = 2;
-            else if (fUseFromPVLooseTight && lPack->fromPV() == (pat::PackedCandidate::PVTight))
-              pReco.id = 1;
-          }
+          else if (fUseFromPVLooseTight && tmpFromPV == pat::PackedCandidate::PVLoose)
+            pReco.id = 2;
+          else if (fUseDZ)
+            pReco.id = (std::abs(pDZ) < fDZCut) ? 1 : 2;
+          if ((fUseDZSignificance) && (std::abs(pDZ) / pDZerror < fDZSignificanceCut))
+            pReco.id = 1;
+          if ((fUseTimeSignificance) && (pDTerror > 0) && (std::abs(pDT) / pDTerror > fTimeSignificanceCut))
+            pReco.id = 2;
+          if ((fPtMaxCharged > 0) and (pReco.pt > fPtMaxCharged))
+            pReco.id = 1;
+          if (std::abs(pReco.eta) > fEtaMaxCharged)
+            pReco.id = 1;
         }
       }
 
