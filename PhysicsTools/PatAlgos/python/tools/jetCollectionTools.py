@@ -310,7 +310,7 @@ class RecoJetAdder(object):
           setattr(proc, pfCand,
             pfCHS.clone()
           )
-	  self.prerequisites.append(process.packedPrimaryVertexAssociationJME)
+          self.prerequisites.append(process.packedPrimaryVertexAssociationJME)
           self.prerequisites.append(pfCand)
         #
         # PUPPI
