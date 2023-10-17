@@ -487,10 +487,10 @@ void HGCalUnpacker::parseSLinkHeaderOnly(const std::vector<uint32_t>& inputArray
     iword += 4;  // length of the S-Link trailer (128 bits)
   }
 
-  //in case an ECON was suppressed this will set the array to 0 ...
-  //channelData_.resize(channelDataSize_);
-  //commonModeSum_.resize(channelDataSize_);
-  //commonModeData_.resize(commonModeDataSize_);
+  //this needs to be resized to the final size
+  channelData_.resize(channelDataSize_);
+  commonModeSum_.resize(channelDataSize_);
+  commonModeData_.resize(commonModeDataSize_);
   return;
 }
 
