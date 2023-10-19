@@ -23,7 +23,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
 
     ALPAKA_FN_ACC void operator()(TAcc const& acc, HGCalDigiDeviceCollection::View digis, HGCalRecHitDeviceCollection::View recHits) const {
       auto ToA_to_time = [&](uint32_t ToA) { return float(ToA)*0.024414062; }; // LSB=25 ns / 2^10b
-      auto ADC_to_float = [&](uint32_t ADC, uint32_t TOT, uint8_t tctp) { return float(tctp>0 ? TOT : ADC); };
+      auto ADC_to_float = [&](uint32_t ADC, uint32_t TOT, uint8_t tctp) { return float(tctp>1 ? TOT : ADC); };
       
       // dummy digis -> rechits conversion (to be replaced by the actual formula)
       for (auto index : elements_with_stride(acc, digis.metadata().size())) {
@@ -54,7 +54,7 @@ namespace ALPAKA_ACCELERATOR_NAMESPACE {
     ALPAKA_FN_ACC void operator()(TAcc const& acc, HGCalDigiDeviceCollection::View digis, HGCalRecHitDeviceCollection::View recHits, HGCalConfigParamDeviceCollection::ConstView config) const {
       auto const& config_param = config.config();
       auto ADC_to_charge = [&](float energy, uint8_t tctp, uint8_t gain) {
-        return tctp>0 ? energy*1.953125 : energy*gain/0.078125; // fC
+        return tctp>1 ? energy*1.953125 : energy*gain*0.078125; // fC
         //                TOT / 2^12 * 8000 fC = TOT * 1.953125 fC
         // ( ADC - pedestal ) / 2^10 *   80 fC = ( ADC - pedestal ) * 0.078125 fC
       };
