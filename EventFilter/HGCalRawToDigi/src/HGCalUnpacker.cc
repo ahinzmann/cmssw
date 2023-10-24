@@ -343,9 +343,9 @@ void HGCalUnpacker::parseSLink(
   }
 
   //in case an ECON was suppressed this will set the array to 0 ...
-  //channelData_.resize(channelDataSize_);
-  //commonModeSum_.resize(channelDataSize_);
-  //commonModeData_.resize(commonModeDataSize_);
+  channelData_.resize(channelDataSize_);
+  commonModeSum_.resize(channelDataSize_);
+  commonModeData_.resize(commonModeDataSize_);
   return;
 }
 
