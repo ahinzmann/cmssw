@@ -97,6 +97,7 @@ private:
     std::vector<uint16_t> fedId(ndigis),captureBlock(ndigis),econdIdx(ndigis),econdeRx(ndigis),halfrocChannel(ndigis),roc(ndigis),half(ndigis);
     std::vector<int16_t> waferU(ndigis),waferV(ndigis),chU(ndigis),chV(ndigis),chType(ndigis);
     std::vector<float> x(ndigis),y(ndigis);
+  
     for(int32_t i = 0; i < nhits; ++i) {
       auto rh = rechits_view[i];
 
