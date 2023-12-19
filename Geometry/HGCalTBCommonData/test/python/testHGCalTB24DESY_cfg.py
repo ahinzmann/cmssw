@@ -1,0 +1,171 @@
+import FWCore.ParameterSet.Config as cms
+from Configuration.Eras.Modifier_hgcaltb_cff import hgcaltb
+
+process = cms.Process('GENSIMDIGI', hgcaltb)
+
+# import of standard configurations
+process.load("FWCore.MessageService.MessageLogger_cfi")
+process.load('Configuration.StandardSequences.Services_cff')
+process.load('SimGeneral.HepPDTESSource.pythiapdt_cfi')
+process.load('Configuration.EventContent.EventContent_cff')
+process.load('Geometry.HGCalTBCommonData.testTB24DESYXML_cfi')
+process.load('Geometry.HGCalCommonData.hgcalNumberingInitialization_cfi')
+process.load('Geometry.HGCalCommonData.hgcalParametersInitialization_cfi')
+process.load('Geometry.HcalTestBeamData.hcalTB06Parameters_cff')
+process.load('Geometry.CaloEventSetup.HGCalTopology_cfi')
+process.load('Geometry.HGCalGeometry.HGCalGeometryESProducer_cfi')
+process.load('Configuration.StandardSequences.MagneticField_0T_cff')
+process.load('Configuration.StandardSequences.Generator_cff')
+process.load('GeneratorInterface.Core.generatorSmeared_cfi')
+process.load('IOMC.EventVertexGenerators.VtxSmearedFlat_cfi')
+process.load('GeneratorInterface.Core.genFilterSummary_cff')
+process.load('Configuration.StandardSequences.SimIdeal_cff')
+process.load('Configuration.StandardSequences.EndOfProcess_cff')
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
+process.load('SimG4CMS.HGCalTestBeam.DigiHGCalTB24DESY_cff')
+process.load('SimG4CMS.HGCalTestBeam.HGCalTB23Analyzer_cfi')
+process.load('DPGAnalysis.HGCalNanoAOD.hgcRecHits_cff')
+
+process.maxEvents = cms.untracked.PSet(
+    input = cms.untracked.int32(10)
+)
+
+if 'MessageLogger' in process.__dict__:
+    process.MessageLogger.G4cerr=dict()
+    process.MessageLogger.G4cout=dict()
+    process.MessageLogger.HGCSim=dict()
+    process.MessageLogger.CaloSim=dict()
+    process.MessageLogger.FlatThetaGun=dict()
+    process.MessageLogger.FlatEvtVtx=dict()
+
+# Input source
+process.source = cms.Source("EmptySource")
+
+process.options = cms.untracked.PSet(
+)
+
+# Production Info
+process.configurationMetadata = cms.untracked.PSet(
+    annotation = cms.untracked.string('SingleMuonE200_cfi nevts:10'),
+    name = cms.untracked.string('Applications'),
+    version = cms.untracked.string('$Revision: 1.19 $')
+)
+
+# Output definition
+
+process.EDMoutput = cms.OutputModule("PoolOutputModule",
+    SelectEvents = cms.untracked.PSet(
+        SelectEvents = cms.vstring('generation_step')
+    ),
+    dataset = cms.untracked.PSet(
+        dataTier = cms.untracked.string('GEN-SIM-DIGI'),
+        filterName = cms.untracked.string('')
+    ),
+    eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
+    fileName = cms.untracked.string('file:gensimdigi.root'),
+    #outputCommands = process.EDMEventContent.outputCommands,
+    outputCommands = cms.untracked.vstring("keep *"),
+    splitLevel = cms.untracked.int32(0)
+)
+
+# Additional output definition
+process.TFileService = cms.Service("TFileService",
+                                   fileName = cms.string('TBGenSimDigi.root')
+                                   )
+
+# Other statements
+process.genstepfilter.triggerConditions=cms.vstring("generation_step")
+from Configuration.AlCa.GlobalTag import GlobalTag
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T21', '')
+
+#process.generator = cms.EDProducer("FlatRandomEThetaGunProducer",
+#    AddAntiParticle = cms.bool(False),
+#    PGunParameters = cms.PSet(
+#        MinE = cms.double(99.99),
+#        MaxE = cms.double(100.01),
+#        MinTheta = cms.double(0.0),
+#        MaxTheta = cms.double(0.0),
+#        MinPhi = cms.double(-3.14159265359),
+#        MaxPhi = cms.double(3.14159265359),
+#        PartID = cms.vint32(11)
+#    ),
+#    Verbosity = cms.untracked.int32(1),
+#    firstRun = cms.untracked.uint32(1),
+#    psethack = cms.string('single electron E 10')
+#)
+process.generator = cms.EDProducer("BeamMomentumGunProducer",
+    AddAntiParticle = cms.bool(False),
+    PGunParameters = cms.PSet(
+        FileName = cms.FileInPath('SimG4CMS/HGCalTestBeam/data/HGCTBeamProfTree_PosE100.root'),
+        MinTheta = cms.double(.012138),
+        MaxTheta = cms.double(.012138),
+        MinPhi = cms.double(3.638332),
+        MaxPhi = cms.double(3.638332),
+        XOffset = cms.double(0.0),
+        YOffset = cms.double(100.0),
+        ZPosition = cms.double(0.0),
+        PartID = cms.vint32(11)
+    ),
+    Verbosity = cms.untracked.int32(1),
+    firstRun = cms.untracked.uint32(1),
+    psethack = cms.string('single electron E 100')
+)
+process.VtxSmeared.MinZ = -100.0
+process.VtxSmeared.MaxZ = -100.0
+#process.VtxSmeared.MinX = -1.0
+#process.VtxSmeared.MaxX =  1.0
+#process.VtxSmeared.MinY = -1.0
+#process.VtxSmeared.MaxY =  1.0
+process.g4SimHits.OnlySDs = ['HGCScintillatorSensitiveDetector', 'HcalTB06BeamDetector']
+process.g4SimHits.HGCSD.Detectors = 1
+process.g4SimHits.HGCSD.RejectMouseBite = False
+process.g4SimHits.HGCSD.RotatedWafer    = False
+
+process.g4SimHits.CaloTrkProcessing.TestBeam = True
+process.g4SimHits.HCalSD.ForTBHCAL = True
+process.g4SimHits.NonBeamEvent = True
+process.g4SimHits.UseMagneticField = False
+
+process.g4SimHits.EventVerbose = 2
+process.g4SimHits.SteppingVerbosity = 2
+process.g4SimHits.StepVerboseThreshold= 0.1
+process.g4SimHits.VerboseEvents = [1]
+process.g4SimHits.VertexNumber = []
+process.g4SimHits.VerboseTracks =[]
+
+# Path and EndPath definitions
+process.generation_step = cms.Path(process.pgen)
+process.simulation_step = cms.Path(process.psim)
+process.genfiltersummary_step = cms.EndPath(process.genFilterSummary)
+#process.digitisation_step = cms.Path(process.mix)
+#process.digitisation_step = cms.Path(cms.Sequence(process.hgcRecHitsTask))
+process.user_step = cms.Path(cms.Sequence(process.hgcHEbackRecHitsTable,process.hgctbTask))
+#process.analysis_step = cms.Path(process.HGCalTB23Analyzer)
+process.endjob_step = cms.EndPath(process.endOfProcess)
+process.EDMoutput_step = cms.EndPath(process.EDMoutput)
+
+# Schedule definition
+process.schedule = cms.Schedule(process.generation_step,
+				process.genfiltersummary_step,
+				process.simulation_step,
+				#process.digitisation_step,
+			        #process.analysis_step,
+				#process.user_step,
+				process.endjob_step,
+				process.EDMoutput_step,
+				)
+# filter all path with the production filter sequence
+for path in process.paths:
+	getattr(process,path)._seq = process.generator * getattr(process,path)._seq 
+
+from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
+associatePatAlgosToolsTask(process)
+
+# Automatic addition of the customisation function from DPGAnalysis.HGCalTools.tb2023_cfi
+from DPGAnalysis.HGCalTools.tb2023_cfi import addPerformanceReports,configTBConditions_default 
+
+#call to customisation function addPerformanceReports imported from DPGAnalysis.HGCalTools.tb2023_cfi
+process = addPerformanceReports(process)
+
+#call to customisation function configTBConditions_default imported from DPGAnalysis.HGCalTools.tb2023_cfi
+process = configTBConditions_default(process)
