@@ -13,6 +13,10 @@ process.load('Geometry.HGCalCommonData.hgcalNumberingInitialization_cfi')
 process.load('Geometry.HGCalCommonData.hgcalParametersInitialization_cfi')
 process.load('Geometry.HcalTestBeamData.hcalTB06Parameters_cff')
 process.load('Geometry.CaloEventSetup.HGCalTopology_cfi')
+process.CaloGeometryBuilder = cms.ESProducer(
+   "CaloGeometryBuilder",
+   SelectedCalos = cms.vstring("HGCalHEScintillatorSensitive")
+)
 process.load('Geometry.HGCalGeometry.HGCalGeometryESProducer_cfi')
 process.load('Configuration.StandardSequences.MagneticField_0T_cff')
 process.load('Configuration.StandardSequences.Generator_cff')
@@ -20,11 +24,72 @@ process.load('GeneratorInterface.Core.generatorSmeared_cfi')
 process.load('IOMC.EventVertexGenerators.VtxSmearedFlat_cfi')
 process.load('GeneratorInterface.Core.genFilterSummary_cff')
 process.load('Configuration.StandardSequences.SimIdeal_cff')
+process.load('SimG4CMS.HGCalTestBeam.DigiHGCalTB24DESY_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
-process.load('SimG4CMS.HGCalTestBeam.DigiHGCalTB24DESY_cff')
 process.load('SimG4CMS.HGCalTestBeam.HGCalTB23Analyzer_cfi')
-process.load('DPGAnalysis.HGCalNanoAOD.hgcRecHits_cff')
+
+#process.load('DPGAnalysis.HGCalNanoAOD.hgcRecHits_cff')
+
+
+#process.load('Configuration.StandardSequences.Accelerators_cff')
+#process.load('HeterogeneousCore.AlpakaCore.ProcessAcceleratorAlpaka_cfi')
+
+#
+# TRANSLATOR TO PHASE I COLLECTION
+#
+#process.load('RecoLocalCalo.HGCalRecAlgos.hgCalRecHitsFromSoAproducer_cfi')
+
+#
+# CONDITIONS AND CONFIGURATIONS
+#
+# Configuration from YAML files
+#process.load('CalibCalorimetry.HGCalPlugins.hgCalConfigESSourceFromYAML_cfi')  # read yaml config file(s)
+#process.hgCalConfigESSourceFromYAML.filename = f"{os.environ['CMSSW_BASE']}/src/CalibCalorimetry/HGCalPlugins/test/test_hgcal_yamlmapper.yaml"
+#if options.charMode in [0, 1]:  # manually override YAML files
+#    process.hgCalConfigESSourceFromYAML.charMode = options.charMode
+#if options.gain in [1, 2, 4]:  # manually override YAML files
+#    process.hgCalConfigESSourceFromYAML.gain = options.gain
+
+# Alpaka ESProducer
+#process.hgcalCalibrationParameterESRecord = cms.ESSource('EmptyESSource',
+#                                                         recordName=cms.string('HGCalCondSerializableModuleInfoRcd'),
+#                                                         iovIsRunNotTime=cms.bool(True),
+#                                                         firstValid=cms.vuint32(1)
+#                                                         )
+
+# ESProducer to load calibration parameters from txt file, like pedestal
+#process.hgcalCalibESProducer = cms.ESProducer('hgcalrechit::HGCalCalibrationESProducer@alpaka',
+#                                              filename=cms.string(''),  # to be set up in configTBConditions
+#                                              moduleInfoSource=cms.ESInputTag('')
+#                                              )
+
+# ESProducer to load configuration parameters from YAML files, like gain
+#process.hgcalConfigESProducer = cms.ESProducer('hgcalrechit::HGCalConfigurationESProducer@alpaka',
+#                                               # gain = options.gain, # manually override gain
+#                                               configSource=cms.ESInputTag('')
+#                                               )
+
+# CONDITIONS
+# RecHit producer: pedestal txt file for DIGI -> RECO calibration
+# Logical mapping
+# process.load('CalibCalorimetry.HGCalPlugins.hgCalPedestalsESSource_cfi') # superseded by hgcalCalibESProducer
+#process.load('Geometry.HGCalMapping.hgCalModuleInfoESSource_cfi')
+#process.load('Geometry.HGCalMapping.hgCalSiModuleInfoESSource_cfi')
+
+#process.load('HeterogeneousCore.CUDACore.ProcessAcceleratorCUDA_cfi')
+#process.hgcalRecHit = cms.EDProducer('alpaka_serial_sync::HGCalRecHitProducer',
+#                                         digis=cms.InputTag('hgcalDigis', '', 'TEST'),
+#                                         calibSource=cms.ESInputTag('hgcalCalibESProducer', ''),
+#                                         configSource=cms.ESInputTag('hgcalConfigESProducer', ''),
+#                                         n_hits_scale=cms.int32(1),
+#                                         n_blocks=cms.int32(1024),
+#                                         n_threads=cms.int32(4096)
+#                                         )
+
+
+
+
 
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(10)
@@ -137,10 +202,10 @@ process.g4SimHits.VerboseTracks =[]
 process.generation_step = cms.Path(process.pgen)
 process.simulation_step = cms.Path(process.psim)
 process.genfiltersummary_step = cms.EndPath(process.genFilterSummary)
-#process.digitisation_step = cms.Path(process.mix)
-#process.digitisation_step = cms.Path(cms.Sequence(process.hgcRecHitsTask))
-process.user_step = cms.Path(cms.Sequence(process.hgcHEbackRecHitsTable,process.hgctbTask))
-#process.analysis_step = cms.Path(process.HGCalTB23Analyzer)
+process.digitisation_step = cms.Path(process.mix)
+#process.reconstruction_step = cms.Path(cms.Sequence(process.hgcalRecHit*process.hgCalRecHitsFromSoAproducer))
+#process.user_step = cms.Path(cms.Sequence(process.hgcHEbackRecHitsTable,process.hgctbTask))
+process.analysis_step = cms.Path(process.HGCalTB23Analyzer)
 process.endjob_step = cms.EndPath(process.endOfProcess)
 process.EDMoutput_step = cms.EndPath(process.EDMoutput)
 
@@ -148,9 +213,10 @@ process.EDMoutput_step = cms.EndPath(process.EDMoutput)
 process.schedule = cms.Schedule(process.generation_step,
 				process.genfiltersummary_step,
 				process.simulation_step,
-				#process.digitisation_step,
-			        #process.analysis_step,
+				process.digitisation_step,
+				#process.reconstruction_step,
 				#process.user_step,
+			        #process.analysis_step,
 				process.endjob_step,
 				process.EDMoutput_step,
 				)
@@ -165,7 +231,7 @@ associatePatAlgosToolsTask(process)
 from DPGAnalysis.HGCalTools.tb2023_cfi import addPerformanceReports,configTBConditions_default 
 
 #call to customisation function addPerformanceReports imported from DPGAnalysis.HGCalTools.tb2023_cfi
-process = addPerformanceReports(process)
+#process = addPerformanceReports(process)
 
 #call to customisation function configTBConditions_default imported from DPGAnalysis.HGCalTools.tb2023_cfi
-process = configTBConditions_default(process)
+#process = configTBConditions_default(process)
