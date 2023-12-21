@@ -76,7 +76,7 @@ def configTBConditions(process, key='default'):
 
     
     pedestals_dict = {
-        'default': '/eos/cms/store/group/dpg_hgcal/comm_hgcal/ykao/calibration_parameters_v2.txt',
+        'default': 'calibration_parameters_v2.txt',
     }
     pedestals = pedestals_dict[key] if key in pedestals_dict else pedestals_dict['default']
 

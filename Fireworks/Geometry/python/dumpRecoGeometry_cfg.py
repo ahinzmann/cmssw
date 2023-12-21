@@ -110,6 +110,24 @@ def recoGeoLoad(score):
        )
        process.load("SimG4CMS.HGCalTestBeam.HGCalTB160XML_cfi")
        
+    elif score == "HGCTB24DESYV2": ## hgcal testbeam
+       process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+       from Configuration.AlCa.autoCond import autoCond
+       process.GlobalTag.globaltag = autoCond['run2_mc']
+       process.load('Geometry.HGCalTBCommonData.testTB24DESYV2XML_cfi')
+       process.load('Geometry.HGCalCommonData.hgcalParametersInitialization_cfi')
+       process.load('Geometry.HGCalCommonData.hgcalNumberingInitialization_cfi')
+       process.load('Geometry.HcalTestBeamData.hcalTB06Parameters_cff')
+       process.load('Geometry.CaloEventSetup.HGCalTopology_cfi')
+       process.load('Geometry.CaloEventSetup.CaloTopology_cfi')
+       process.load('Geometry.CaloEventSetup.CaloGeometryBuilder_cfi')
+       process.CaloGeometryBuilder = cms.ESProducer(
+          "CaloGeometryBuilder",
+          SelectedCalos = cms.vstring("HGCalEESensitive", "HGCalHESiliconSensitive", "HGCalHEScintillatorSensitive")
+       )
+       process.load('Geometry.HGCalGeometry.HGCalGeometryESProducer_cfi')
+       options.muon=False
+       options.tracker=False
     else:
       help()
 

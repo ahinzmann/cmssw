@@ -13,6 +13,8 @@ process.load('Geometry.HGCalCommonData.hgcalNumberingInitialization_cfi')
 process.load('Geometry.HGCalCommonData.hgcalParametersInitialization_cfi')
 process.load('Geometry.HcalTestBeamData.hcalTB06Parameters_cff')
 process.load('Geometry.CaloEventSetup.HGCalTopology_cfi')
+process.load('Geometry.CaloEventSetup.CaloTopology_cfi')
+process.load('Geometry.CaloEventSetup.CaloGeometryBuilder_cfi')
 process.CaloGeometryBuilder = cms.ESProducer(
    "CaloGeometryBuilder",
    SelectedCalos = cms.vstring("HGCalHEScintillatorSensitive")
@@ -27,7 +29,7 @@ process.load('Configuration.StandardSequences.SimIdeal_cff')
 process.load('SimG4CMS.HGCalTestBeam.DigiHGCalTB24DESY_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
-process.load('SimG4CMS.HGCalTestBeam.HGCalTB23Analyzer_cfi')
+#process.load('SimG4CMS.HGCalTestBeam.HGCalTB23Analyzer_cfi')
 
 #process.load('DPGAnalysis.HGCalNanoAOD.hgcRecHits_cff')
 
@@ -205,7 +207,7 @@ process.genfiltersummary_step = cms.EndPath(process.genFilterSummary)
 process.digitisation_step = cms.Path(process.mix)
 #process.reconstruction_step = cms.Path(cms.Sequence(process.hgcalRecHit*process.hgCalRecHitsFromSoAproducer))
 #process.user_step = cms.Path(cms.Sequence(process.hgcHEbackRecHitsTable,process.hgctbTask))
-process.analysis_step = cms.Path(process.HGCalTB23Analyzer)
+#process.analysis_step = cms.Path(process.HGCalTB23Analyzer)
 process.endjob_step = cms.EndPath(process.endOfProcess)
 process.EDMoutput_step = cms.EndPath(process.EDMoutput)
 
