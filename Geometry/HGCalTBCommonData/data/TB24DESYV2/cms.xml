@@ -3,9 +3,9 @@
 
 <ConstantsSection label="cms.xml" eval="true">
  <Constant name="Rmin"         value="0.0*mm"/>
- <Constant name="Rmax"         value="1.2*m"/>
+ <Constant name="Rmax"         value="10.0*m"/>
  <Constant name="Zmin"         value="-15.0*m"/>
- <Constant name="Zmax"         value="5*m"/>
+ <Constant name="Zmax"         value="15.0*m"/>
 
  <Constant name="TrackCalorR"  value="1.233*m"/>
  <Constant name="CalorMuonR"   value="2.950*m"/>
@@ -30,6 +30,13 @@
  <Constant name="CalorBeamZ5"  value="5.245*m"/>
  <Constant name="CalorBeamR1"  value="8.00*cm"/>
  <Constant name="CalorBeamR2"  value="8.93*cm"/>
+ 
+ <Constant name="ForwdVcalZ1"  value="11.1495*m"/>
+ <Constant name="ForwdVcalR1"  value="1.595*m"/>
+ <Constant name="MuonBeamZ2"   value="10.86*m"/>
+ <Constant name="ForwdBeamR1"  value="12.495*cm"/>
+ <Constant name="ForwdBeamR2"  value="12.50*cm"/>
+ <Constant name="CMSR3" value="2.69*m"/>
 </ConstantsSection>
 
 <SolidSection label="cms.xml">

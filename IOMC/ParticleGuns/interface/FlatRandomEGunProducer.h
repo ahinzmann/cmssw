@@ -23,6 +23,10 @@ namespace edm {
 
     double fMinE;
     double fMaxE;
+
+  private:
+    double xoff_, yoff_, zpos_;
+    static constexpr double mm2cm_ = 0.1, cm2mm_ = 10.0;
   };
 }  // namespace edm
 

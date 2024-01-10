@@ -153,7 +153,7 @@
     <ZSection z="[zHGCal13]"  rMin="[rMinHGCal7]" rMax="[rMaxHGCal12S]"/>
   </Polycone>
   <Polycone name="HGCal" startPhi="0*deg" deltaPhi="360*deg">
-    <ZSection z="-15*m"   rMin="[rMinHGCal1]"   rMax="[rMaxHGCal1]"/>
+    <ZSection z="[zHGCal0]"   rMin="[rMinHGCal1]"   rMax="10*m"/>
     <ZSection z="[zHGCal3]"   rMin="[rMinHGCal1]"   rMax="[rMaxHGCal3]"/>
     <ZSection z="[zHGCal3]"   rMin="[rMinHGCal3]"   rMax="[rMaxHGCal3]"/>
     <ZSection z="[zHGCal5]"   rMin="[rMinHGCal3]"   rMax="[rMaxHGCal5]"/>
@@ -263,7 +263,7 @@
     <rParent name="hgcal:HGCal"/>
     <rChild name="hgcal:HGCalEE"/>
     <rRotation name="rotations:000D"/>
-    <Translation x="0*fm" y="0*m" z="-10*m"/>
+    <Translation x="0*fm" y="-5*m" z="0*m"/>
   </PosPart>
   <PosPart copyNumber="1">
     <rParent name="hgcal:HGCalService"/>
@@ -274,7 +274,7 @@
     <rParent name="hgcal:HGCal"/>
     <rChild name="hgcal:HGCalHEsil"/>
     <rRotation name="rotations:000D"/>
-    <Translation x="0*fm" y="0*m" z="-10*m"/>
+    <Translation x="0*fm" y="-5*m" z="0*m"/>
   </PosPart>
   <PosPart copyNumber="1">
     <rParent name="hgcal:HGCal"/>
@@ -285,31 +285,31 @@
     <rParent name="hgcal:HGCal"/>
     <rChild name="hgcal:HGCalEEsup"/>
     <rRotation name="rotations:000D"/>
-    <Translation x="0*fm" y="0*m" z="-10*m"/>
+    <Translation x="0*fm" y="-5*m" z="0*m"/>
   </PosPart>
   <PosPart copyNumber="1">
     <rParent name="hgcal:HGCal"/>
     <rChild name="hgcal:HGCalHEsup1"/>
     <rRotation name="rotations:000D"/>
-    <Translation x="0*fm" y="0*m" z="-10*m"/>
+    <Translation x="0*fm" y="-5*m" z="0*m"/>
   </PosPart>
   <PosPart copyNumber="1">
     <rParent name="hgcal:HGCal"/>
     <rChild name="hgcal:HGCalHEsup2"/>
     <rRotation name="rotations:000D"/>
-    <Translation x="0*fm" y="0*m" z="-10*m"/>
+    <Translation x="0*fm" y="-5*m" z="0*m"/>
   </PosPart>
   <PosPart copyNumber="1">
     <rParent name="hgcal:HGCal"/>
     <rChild name="hgcal:HGCalHEsup3"/>
     <rRotation name="rotations:000D"/>
-    <Translation x="0*fm" y="0*m" z="-10*m"/>
+    <Translation x="0*fm" y="-5*m" z="0*m"/>
   </PosPart>
   <PosPart copyNumber="1">
     <rParent name="hgcal:HGCal"/>
     <rChild name="hgcal:HGCalBackPlate"/>
     <rRotation name="rotations:000D"/>
-    <Translation x="0*fm" y="0*m" z="-10*m"/>
+    <Translation x="0*fm" y="-5*m" z="0*m"/>
   </PosPart>
 </PosPartSection>
 </DDDefinition>

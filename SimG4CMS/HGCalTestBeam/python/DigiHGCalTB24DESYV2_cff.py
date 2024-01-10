@@ -1,5 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 from SimCalorimetry.HGCalSimProducers.hgcalDigitizer_cfi import *
+from SimGeneral.MixingModule.caloTruthProducer_cfi import *
 
 mixSimHits = cms.PSet(
     input = cms.VInputTag(),
@@ -57,9 +58,16 @@ theMixObjects = cms.PSet(
 )
 
 theDigitizers = cms.PSet(
+    hgcalEE = cms.PSet(
+        hgceeDigitizer     
+    ),
+    hgcalHEfront = cms.PSet(
+        hgchefrontDigitizer     
+    ),
     hgcalHEback = cms.PSet(
         hgchebackDigitizer     
-    )
+    ),
+    calotruth = cms.PSet( caloParticles )
 )
 
 mix = cms.EDProducer("MixingModule",

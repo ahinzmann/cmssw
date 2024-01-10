@@ -29,6 +29,10 @@ FlatRandomEGunProducer::FlatRandomEGunProducer(const ParameterSet& pset) : BaseF
   fMinE = pgun_params.getParameter<double>("MinE");
   fMaxE = pgun_params.getParameter<double>("MaxE");
 
+  xoff_ = pgun_params.getParameter<double>("XOffset");
+  yoff_ = pgun_params.getParameter<double>("YOffset");
+  zpos_ = pgun_params.getParameter<double>("ZPosition");
+
   produces<HepMCProduct>("unsmeared");
   produces<GenEventInfoProduct>();
 
@@ -61,7 +65,7 @@ void FlatRandomEGunProducer::produce(Event& e, const EventSetup& es) {
 
   // 1st, primary vertex
   //
-  HepMC::GenVertex* Vtx = new HepMC::GenVertex(HepMC::FourVector(0., 0., 0.));
+  HepMC::GenVertex* Vtx = new HepMC::GenVertex(HepMC::FourVector(xoff_ * cm2mm_, yoff_ * cm2mm_, zpos_ * cm2mm_));
 
   // loop over particles
   //

@@ -17,6 +17,14 @@ XMLIdealGeometryESSource = cms.ESSource("XMLIdealGeometryESSource",
                                'Geometry/HGCalCommonData/data/hgcalConsData/v17/hgcalConsData.xml',
                                'Geometry/HGCalSimData/data/hgcsensv15.xml',
                                'Geometry/HGCalTBCommonData/data/TB230/hgcProdCuts.xml',
+                               # for HF nose
+                               'Geometry/HGCalTBCommonData/data/TB24DESYV2/hfnose.xml',
+                               'Geometry/ForwardCommonData/data/hfnoseCell/v1/hfnoseCell.xml',
+                               'Geometry/ForwardCommonData/data/hfnoseWafer/v1/hfnoseWafer.xml',
+                               'Geometry/ForwardCommonData/data/hfnoseCons/v1/hfnoseCons.xml',
+                               'Geometry/ForwardCommonData/data/hfnoseDummy.xml',
+                               'Geometry/ForwardSimData/data/hfnosesens.xml',
+                               'Geometry/ForwardSimData/data/hfnoseProdCuts.xml',
                                ),
     rootNodeName = cms.string('cms:OCMS')
 )

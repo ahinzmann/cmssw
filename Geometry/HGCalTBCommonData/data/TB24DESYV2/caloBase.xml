@@ -181,7 +181,7 @@
     <rParent name="caloBase:CALO"/>
     <rChild name="caloBase:CALOEC"/>
     <rRotation name="rotations:180D"/>
-    <Translation x="0*fm" y="0*m" z="-10*m"/>
+    <Translation x="0*fm" y="-5*m" z="0*m"/>
   </PosPart>
   <PosPart copyNumber="1">
     <rParent name="caloBase:CALOEC"/>
