@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 from Configuration.Eras.Modifier_hgcaltb_cff import hgcaltb
 
-process = cms.Process('GENSIMDIGI', hgcaltb)
+process = cms.Process('GENSIMDIGIRECO', hgcaltb)
 
 # import of standard configurations
 process.load("FWCore.MessageService.MessageLogger_cfi")
@@ -34,23 +34,16 @@ process.load('GeneratorInterface.Core.genFilterSummary_cff')
 process.load('Configuration.StandardSequences.SimIdeal_cff')
 process.load('SimG4CMS.HGCalTestBeam.DigiHGCalTB24DESYV2_cff')
 process.load('RecoLocalCalo.Configuration.hgcalLocalReco_cff')
-process.load('Configuration.StandardSequences.RawToDigi_cff')
-process.load('Configuration.StandardSequences.DigiToRaw_cff')
 process.load('Configuration.StandardSequences.Validation_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
-#process.load('SimG4CMS.HGCalTestBeam.HGCalTB23Analyzer_cfi')
+process.load('SimG4CMS.HGCalTestBeam.HGCalTB23Analyzer_cfi')
 
 process.load('DPGAnalysis.HGCalNanoAOD.hgcRecHits_cff')
 
 
 #process.load('Configuration.StandardSequences.Accelerators_cff')
 #process.load('HeterogeneousCore.AlpakaCore.ProcessAcceleratorAlpaka_cfi')
-
-#
-# TRANSLATOR TO PHASE I COLLECTION
-#
-#process.load('RecoLocalCalo.HGCalRecAlgos.hgCalRecHitsFromSoAproducer_cfi')
 
 #
 # CONDITIONS AND CONFIGURATIONS
@@ -64,11 +57,11 @@ process.load('DPGAnalysis.HGCalNanoAOD.hgcRecHits_cff')
 #    process.hgCalConfigESSourceFromYAML.gain = options.gain
 
 # Alpaka ESProducer
-#process.hgcalCalibrationParameterESRecord = cms.ESSource('EmptyESSource',
-#                                                         recordName=cms.string('HGCalCondSerializableModuleInfoRcd'),
-#                                                         iovIsRunNotTime=cms.bool(True),
-#                                                         firstValid=cms.vuint32(1)
-#                                                         )
+process.hgcalCalibrationParameterESRecord = cms.ESSource('EmptyESSource',
+                                                         recordName=cms.string('HGCalCondSerializableModuleInfoRcd'),
+                                                         iovIsRunNotTime=cms.bool(True),
+                                                         firstValid=cms.vuint32(1)
+                                                         )
 
 # ESProducer to load calibration parameters from txt file, like pedestal
 #process.hgcalCalibESProducer = cms.ESProducer('hgcalrechit::HGCalCalibrationESProducer@alpaka',
@@ -135,21 +128,21 @@ process.EDMoutput = cms.OutputModule("PoolOutputModule",
         SelectEvents = cms.vstring('generation_step')
     ),
     dataset = cms.untracked.PSet(
-        dataTier = cms.untracked.string('GEN-SIM-DIGI-RAW'),
+        dataTier = cms.untracked.string('GEN-SIM-DIGI-RECO'),
         filterName = cms.untracked.string('')
     ),
     eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
-    fileName = cms.untracked.string('file:gensimdigi.root'),
+    fileName = cms.untracked.string('file:gensimdigireco.root'),
     #outputCommands = process.EDMEventContent.outputCommands,
     #outputCommands = process.FEVTDEBUGHLTEventContent.outputCommands,
     outputCommands = cms.untracked.vstring("keep *"),
     splitLevel = cms.untracked.int32(0)
 )
 
-# Additional output definition
-process.TFileService = cms.Service("TFileService",
-                                   fileName = cms.string('TBGenSimDigi.root')
-                                   )
+# Additional output definition for TBAnalyser
+#process.TFileService = cms.Service("TFileService",
+#                                   fileName = cms.string('TBGenSim.root')
+#                                   )
 
 process.NANOAODoutput = cms.OutputModule("NanoAODOutputModule",
     compressionAlgorithm = cms.untracked.string('LZMA'),
@@ -197,6 +190,7 @@ process.generator = cms.EDProducer("FlatRandomEGunProducer",
     firstRun = cms.untracked.uint32(1),
     psethack = cms.string('single electron E 100')
 )
+
 #process.generator = cms.EDProducer("FlatRandomEThetaGunProducer",
 #    AddAntiParticle = cms.bool(False),
 #    PGunParameters = cms.PSet(
@@ -212,6 +206,7 @@ process.generator = cms.EDProducer("FlatRandomEGunProducer",
 #    firstRun = cms.untracked.uint32(1),
 #    psethack = cms.string('single electron E 10')
 #)
+
 #process.generator = cms.EDProducer("BeamMomentumGunProducer",
 #    AddAntiParticle = cms.bool(False),
 #    PGunParameters = cms.PSet(
@@ -252,17 +247,42 @@ process.g4SimHits.VerboseEvents = [1]
 process.g4SimHits.VertexNumber = []
 process.g4SimHits.VerboseTracks =[]
 
+# Skip the alias simHGCalUnsupressedDigis and the hgcalDigis from HGCalRawToDigiFake producer
+process.HGCalUncalibRecHit.HGCEEdigiCollection = cms.InputTag("mix","HGCDigisEE")
+process.HGCalUncalibRecHit.HGCHEBdigiCollection = cms.InputTag("mix","HGCDigisHEback")
+process.HGCalUncalibRecHit.HGCHEFdigiCollection = cms.InputTag("mix","HGCDigisHEfront")
+
+from PhysicsTools.NanoAOD.common_cff import Var
+process.hgcDigiHEbackTable = cms.EDProducer("SimpleHGCDigiFlatTableProducer",
+     src = cms.InputTag("mix","HGCDigisHEback"),
+     cut = cms.string(""), 
+     name = cms.string("HGCDigisHEback"),
+     doc  = cms.string("HGCAL hadronic scintillator digis"),
+     singleton = cms.bool(False), # the number of entries is variable
+     extension = cms.bool(False),
+     variables = cms.PSet(
+         rawId = Var('id().rawId()', 'uint', precision=-1, doc='raw id'),
+         raw = Var('sample(2).raw()', 'uint', doc='raw'),
+         threshold = Var('sample(2).threshold()', 'bool', doc='threshold'),
+         mode = Var('sample(2).mode()', 'bool', doc='mode'),
+         gain = Var('sample(2).gain()', 'uint16', doc='gain'),
+         toa = Var('sample(2).toa()', 'uint16', doc='toa'),
+         data = Var('sample(2).data()', 'uint16', doc='data'),
+         getToAValid = Var('sample(2).getToAValid()', 'bool', doc='getToAValid'),
+     )
+)
+process.hgcDigiHEfrontTable=process.hgcDigiHEbackTable.clone(src = cms.InputTag("mix","HGCDigisHEfront"))
+
 # Path and EndPath definitions
 process.generation_step = cms.Path(process.pgen)
 process.simulation_step = cms.Path(process.psim)
 process.genfiltersummary_step = cms.EndPath(process.genFilterSummary)
 process.digitisation_step = cms.Path(process.mix)
-process.raw2digi_step = cms.Path(process.hgcalDigis)
-process.reconstruction_step = cms.Path(cms.Sequence(process.HGCalUncalibRecHit*process.HGCalRecHit*process.hgcalRecHitMapProducer*process.hgcalLayerClustersEE*process.hgcalLayerClustersHSi*process.hgcalLayerClustersHSci*process.hgcalMergeLayerClusters))
-process.hgcalnano_step = cms.Path(cms.Sequence(process.hgcRecHitsTask))
+process.reconstruction_step = cms.Path(cms.Sequence(process.HGCalUncalibRecHit*process.HGCalRecHit*process.hgcalRecHitMapProducer*process.hgcalLayerClustersEE*process.hgcalLayerClustersHSi*process.hgcalLayerClustersHSci*process.hgcalMergeLayerClusters*process.hgcalMultiClusters))
+process.hgcalnano_step = cms.Path(cms.Sequence(process.hgcDigiHEbackTable*process.hgcHEbackRecHitsTable))#*cms.Sequence(process.hgcRecHitsTask))#*cms.Sequence(process.hgcCMDigiTable*process.unpackerFlagsTable))#*cms.Sequence(process.hgcSoaDigiTable))
 #process.analysis_step = cms.Path(process.HGCalTB23Analyzer)
-process.prevalidation_step7 = cms.Path(process.globalPrevalidationHGCal)
-#process.validation_step9 = cms.EndPath(process.globalValidationHGCal)
+#process.prevalidation_step7 = cms.Path(process.globalPrevalidationHGCal)
+#process.validation_step9 = cms.EndPath(process.hgcalSimHitValidationHEB+process.hgcalDigiValidationHEB+process.hgcalRecHitValidationHEB)#process.globalValidationHGCal)
 process.endjob_step = cms.EndPath(process.endOfProcess)
 process.EDMoutput_step = cms.EndPath(process.EDMoutput)
 process.NANOAODoutput_step = cms.EndPath(process.NANOAODoutput)
@@ -273,11 +293,10 @@ process.schedule = cms.Schedule(process.generation_step,
 				process.genfiltersummary_step,
 				process.simulation_step,
 				process.digitisation_step,
-                                process.raw2digi_step,
 				process.reconstruction_step,
 				process.hgcalnano_step,
 			        #process.analysis_step,
-                                process.prevalidation_step7,
+                                #process.prevalidation_step7,
                                 #process.validation_step9,
 				process.endjob_step,
 				process.EDMoutput_step,
