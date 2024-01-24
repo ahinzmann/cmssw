@@ -163,7 +163,7 @@
   </LogicalPart>
   <LogicalPart name="CALOECTSRear" category="unspecified">
     <rSolid name="CALOECTSRear"/>
-    <rMaterial name="caloBase:CEThermalScreen"/>
+    <rMaterial name="materials:Air"/>
   </LogicalPart>
   <LogicalPart name="CALOECRear" category="unspecified">
     <rSolid name="CALOECRear"/>

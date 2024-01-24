@@ -175,14 +175,14 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T21', ''
 process.generator = cms.EDProducer("FlatRandomEGunProducer",
     AddAntiParticle = cms.bool(False),
     PGunParameters = cms.PSet(
-        MinE = cms.double(100),
-        MaxE = cms.double(100),
+        MinE = cms.double(5), # GeV
+        MaxE = cms.double(5),
         MinEta = cms.double(1e10),
         MaxEta = cms.double(1e10),
         MinPhi = cms.double(0),
         MaxPhi = cms.double(0),
         XOffset = cms.double(1.0), # 1cm away from middle
-        YOffset = cms.double(150.0), # somewwhere in the middle of HGCAL
+        YOffset = cms.double(160.0), # somewwhere in the middle of HGCAL
         ZPosition = cms.double(0.0),
         PartID = cms.vint32(11) # 11 for electrons, 2212 for protons
     ),
@@ -224,12 +224,14 @@ process.generator = cms.EDProducer("FlatRandomEGunProducer",
 #    firstRun = cms.untracked.uint32(1),
 #    psethack = cms.string('single electron E 100')
 #)
-process.VtxSmeared.MinZ = -0.1
-process.VtxSmeared.MaxZ = 0.1
-#process.VtxSmeared.MinX = -1.0
-#process.VtxSmeared.MaxX =  1.0
-#process.VtxSmeared.MinY = -1.0
-#process.VtxSmeared.MaxY =  1.0
+process.VtxSmeared.MinZ =  0.0
+process.VtxSmeared.MaxZ =  0.0
+process.VtxSmeared.MinX =  0.0
+process.VtxSmeared.MaxX =  0.0
+process.VtxSmeared.MinY =  0.0
+process.VtxSmeared.MaxY =  0.0
+process.VtxSmeared.MinT =  0.0
+process.VtxSmeared.MaxT =  0.0
 process.g4SimHits.OnlySDs = ['HGCalSensitiveDetector','HGCScintillatorSensitiveDetector', 'HcalTB06BeamDetector','HFNoseSensitiveDetector']
 process.g4SimHits.HGCSD.Detectors = 1
 process.g4SimHits.HGCSD.RejectMouseBite = False
@@ -318,3 +320,12 @@ associatePatAlgosToolsTask(process)
 
 #call to customisation function configTBConditions_default imported from DPGAnalysis.HGCalTools.tb2023_cfi
 #process = configTBConditions_default(process)
+
+# attempt to calculate the dEdx correction for electromagnetic stack with steel absorbers
+#radiation length: FromChrisdEdx['StainlessSteel'] = 1.14 in MeV/mm from https://github.com/cms-sw/cmssw/blob/master/SimTracker/TrackerMaterialAnalysis/test/dEdxWeights.ipynb
+# time layer thickness 16mm
+# --> dE=18.24 MeV
+print(len(process.hgcalLayerClustersHSci.plugin.dEdXweights))
+process.hgcalLayerClustersHSci.plugin.dEdXweights = cms.vdouble([1e-10 for i in range(51-15)]+[18.24 for i in range(15)]) # last 14 layers in HB
+print(len(process.hgcalLayerClustersHSci.plugin.dEdXweights))
+process.HGCalRecHit.layerWeights = process.hgcalLayerClustersHSci.plugin.dEdXweights
