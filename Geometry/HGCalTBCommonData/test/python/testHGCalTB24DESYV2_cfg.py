@@ -1,3 +1,5 @@
+particleEnergy=2
+
 import FWCore.ParameterSet.Config as cms
 from Configuration.Eras.Modifier_hgcaltb_cff import hgcaltb
 
@@ -97,7 +99,7 @@ process.hgcalCalibrationParameterESRecord = cms.ESSource('EmptyESSource',
 
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(10)
+    input = cms.untracked.int32(50)
 )
 
 if 'MessageLogger' in process.__dict__:
@@ -132,7 +134,7 @@ process.EDMoutput = cms.OutputModule("PoolOutputModule",
         filterName = cms.untracked.string('')
     ),
     eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
-    fileName = cms.untracked.string('file:gensimdigireco.root'),
+    fileName = cms.untracked.string('file:gensimdigireco_'+str(particleEnergy)+'.root'),
     #outputCommands = process.EDMEventContent.outputCommands,
     #outputCommands = process.FEVTDEBUGHLTEventContent.outputCommands,
     outputCommands = cms.untracked.vstring("keep *"),
@@ -175,8 +177,8 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T21', ''
 process.generator = cms.EDProducer("FlatRandomEGunProducer",
     AddAntiParticle = cms.bool(False),
     PGunParameters = cms.PSet(
-        MinE = cms.double(5), # GeV
-        MaxE = cms.double(5),
+        MinE = cms.double(particleEnergy), # GeV
+        MaxE = cms.double(particleEnergy),
         MinEta = cms.double(1e10),
         MaxEta = cms.double(1e10),
         MinPhi = cms.double(0),
