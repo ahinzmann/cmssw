@@ -1,4 +1,5 @@
-particleEnergy=2
+particle=""
+particleEnergy=5
 
 import FWCore.ParameterSet.Config as cms
 from Configuration.Eras.Modifier_hgcaltb_cff import hgcaltb
@@ -134,7 +135,7 @@ process.EDMoutput = cms.OutputModule("PoolOutputModule",
         filterName = cms.untracked.string('')
     ),
     eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
-    fileName = cms.untracked.string('file:gensimdigireco_'+str(particleEnergy)+'.root'),
+    fileName = cms.untracked.string('file:gensimdigireco_'+particle+str(particleEnergy)+'.root'),
     #outputCommands = process.EDMEventContent.outputCommands,
     #outputCommands = process.FEVTDEBUGHLTEventContent.outputCommands,
     outputCommands = cms.untracked.vstring("keep *"),
@@ -186,7 +187,7 @@ process.generator = cms.EDProducer("FlatRandomEGunProducer",
         XOffset = cms.double(1.0), # 1cm away from middle
         YOffset = cms.double(160.0), # somewwhere in the middle of HGCAL
         ZPosition = cms.double(0.0),
-        PartID = cms.vint32(11) # 11 for electrons, 2212 for protons
+        PartID = cms.vint32((13 if particle=="muon" else 11)) # 11 for electrons, 13 for muons, 22 for photons, 2212 for protons
     ),
     Verbosity = cms.untracked.int32(1),
     firstRun = cms.untracked.uint32(1),

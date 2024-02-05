@@ -191,7 +191,7 @@ void FWGeometry::loadMap(const char* iFileName) {
   }
 
   TNamed* ttopology = static_cast<TNamed*>(file->Get("TrackerTopology"));
-  if (ttopology) {
+  if ((ttopology) && (std::string(m_versionInfo.productionTag->GetTitle()).rfind("HGCTB24DESY", 0) != 0)) {
     std::string xml = ttopology->GetTitle();
     m_trackerTopology =
         std::make_unique<TrackerTopology>(StandaloneTrackerTopology::fromTrackerParametersXMLString(xml));
