@@ -40,7 +40,7 @@ process.load('RecoLocalCalo.Configuration.hgcalLocalReco_cff')
 process.load('Configuration.StandardSequences.Validation_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
-process.load('SimG4CMS.HGCalTestBeam.HGCalTB23Analyzer_cfi')
+#process.load('SimG4CMS.HGCalTestBeam.HGCalTB23Analyzer_cfi')
 
 process.load('DPGAnalysis.HGCalNanoAOD.hgcRecHits_cff')
 
