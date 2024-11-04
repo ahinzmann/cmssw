@@ -42,8 +42,10 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 #process.load('SimG4CMS.HGCalTestBeam.HGCalTB23Analyzer_cfi')
 
-process.load('DPGAnalysis.HGCalNanoAOD.hgcRecHits_cff')
+#from RecoHGCal.TICL.ticl_iterations import *
+#TICL_iterations(process)
 
+process.load('DPGAnalysis.HGCalNanoAOD.hgcRecHits_cff')
 
 #process.load('Configuration.StandardSequences.Accelerators_cff')
 #process.load('HeterogeneousCore.AlpakaCore.ProcessAcceleratorAlpaka_cfi')
@@ -283,7 +285,21 @@ process.generation_step = cms.Path(process.pgen)
 process.simulation_step = cms.Path(process.psim)
 process.genfiltersummary_step = cms.EndPath(process.genFilterSummary)
 process.digitisation_step = cms.Path(process.mix)
-process.reconstruction_step = cms.Path(cms.Sequence(process.HGCalUncalibRecHit*process.HGCalRecHit*process.hgcalRecHitMapProducer*process.hgcalLayerClustersEE*process.hgcalLayerClustersHSi*process.hgcalLayerClustersHSci*process.hgcalMergeLayerClusters*process.hgcalMultiClusters))
+process.reconstruction_step = cms.Path(cms.Sequence(process.HGCalUncalibRecHit*
+      process.HGCalRecHit*
+      process.hgcalRecHitMapProducer*
+      process.hgcalLayerClustersEE*
+      process.hgcalLayerClustersHSi*
+      process.hgcalLayerClustersHSci*
+      process.hgcalMergeLayerClusters*
+      process.hgcalMultiClusters
+      #process.filteredLayerClustersMIP*
+      #process.ticlLayerTileProducer*
+      #process.ticlSeedingGlobal*
+      #process.trackstersMIP*
+      #process.filteredLayerClusters*
+      #process.tracksters
+      ))
 process.hgcalnano_step = cms.Path(cms.Sequence(process.hgcDigiHEbackTable*process.hgcHEbackRecHitsTable))#*cms.Sequence(process.hgcRecHitsTask))#*cms.Sequence(process.hgcCMDigiTable*process.unpackerFlagsTable))#*cms.Sequence(process.hgcSoaDigiTable))
 #process.analysis_step = cms.Path(process.HGCalTB23Analyzer)
 #process.prevalidation_step7 = cms.Path(process.globalPrevalidationHGCal)
@@ -326,9 +342,10 @@ associatePatAlgosToolsTask(process)
 
 # attempt to calculate the dEdx correction for electromagnetic stack with steel absorbers
 #radiation length: FromChrisdEdx['StainlessSteel'] = 1.14 in MeV/mm from https://github.com/cms-sw/cmssw/blob/master/SimTracker/TrackerMaterialAnalysis/test/dEdxWeights.ipynb
-# time layer thickness 16mm
-# --> dE=18.24 MeV
-print(len(process.hgcalLayerClustersHSci.plugin.dEdXweights))
-process.hgcalLayerClustersHSci.plugin.dEdXweights = cms.vdouble([1e-10 for i in range(51-15)]+[18.24 for i in range(15)]) # last 14 layers in HB
-print(len(process.hgcalLayerClustersHSci.plugin.dEdXweights))
+# time layer thickness 19mm
+# --> dE=21.66 MeV
+print("old dEdX", len(process.hgcalLayerClustersHSci.plugin.dEdXweights),process.hgcalLayerClustersHSci.plugin.dEdXweights)
+process.hgcalLayerClustersHSci.plugin.dEdXweights = cms.vdouble([1e-10 for i in range(51-17)]+[21.66 for i in range(14)]+[1e-10 for i in range(3)]) #  14 layers in HB (last three are HFnose)
+print("new dEdX", len(process.hgcalLayerClustersHSci.plugin.dEdXweights),process.hgcalLayerClustersHSci.plugin.dEdXweights)
 process.HGCalRecHit.layerWeights = process.hgcalLayerClustersHSci.plugin.dEdXweights
+print("correction", process.HGCalRecHit.sciThicknessCorrection)

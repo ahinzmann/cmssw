@@ -96,28 +96,51 @@
       hgcalwafer:HGCalHEWafer06Coarse2LD6, hgcalwafer:HGCalHEWafer07Coarse2LD6,
       hgcalwafer:HGCalHEWafer08Coarse2LD6, hgcalwafer:HGCalHEWafer09Coarse2LD6,
       hgcalwafer:HGCalHEWafer10Coarse2LD6, hgcalwafer:HGCalHEWafer11Coarse2LD6</Vector>
-    <Vector name="MaterialNames" type="string" nEntries="6">
-      materials:Air, materials:Air, materials:StainlessSteel,
-      materials:Air, materials:Air, materials:Air
+    <Vector name="MaterialNames" type="string" nEntries="8">
+      materials:StainlessSteel, materials:Air, materials:Aluminium, materials:Air,
+      materials:Air, materials:Air, materials:Aluminium, materials:Air
+ <!-- materials:Air, materials:Air, materials:StainlessSteel,
+      materials:Air, materials:Air, materials:Air # First version of Stack -->
  <!-- materials:StainlessSteel, materials:StainlessSteel, materials:Air,
-      materials:StainlessSteel, materials:Air, materials:Copper -->
+      materials:StainlessSteel, materials:Air, materials:Copper # Original full detector -->
     </Vector>
-    <Vector name="VolumeNames" type="string" nEntries="6">
-      HGCalHENoAbsorber1, HGCalHENoAbsorber2, HGCalHETBAbsorber, HGCalHENoSteelCover, 
-      HGCalHESiliconLayer, HGCalHENoCoolingPlate</Vector>
+    <Vector name="VolumeNames" type="string" nEntries="8">
+      HGCalTBAbsorber, HGCalTBGap1, HGCalTBCoverFront, HGCalTBGap2,
+      HGCalTBSiliconLayer, HGCalTBGap3,HGCalTBCoverBack, HGCalTBGap4
+ <!-- HGCalHENoAbsorber1, HGCalHENoAbsorber2, HGCalHETBAbsorber, HGCalHENoSteelCover,
+      HGCalHESiliconLayer, HGCalHENoCoolingPlate # First version of Stack -->
  <!-- HGCalHEAbsorber1, HGCalHEAbsorber2, HGCalHEAirGap1, HGCalHESteelCover, 
-      HGCalHESiliconLayer, HGCalHECoolingPlate</Vector> -->
-    <Vector name="Thickness" type="numeric" nEntries="6">
-      33.5*mm, 52.7*mm,  12.0*mm,  2.5*mm, [hgcal:ModuleThicknessHE], 6.35*mm
- <!-- 41.5*mm, 60.7*mm,  4.0*mm,  2.5*mm, [hgcal:ModuleThicknessHE], 6.35*mm -->
+      HGCalHESiliconLayer, HGCalHECoolingPlate # Original full detector -->
+    </Vector>
+    <Vector name="Thickness" type="numeric" nEntries="8">
+      19.0*mm, 1.0*mm, 2.0*mm, 1.3*mm,
+      [hgcal:ModuleThicknessHE], 6.0*mm, 3.0*mm, 1*mm
+ <!-- 33.5*mm, 52.7*mm,  12.0*mm,  2.5*mm, [hgcal:ModuleThicknessHE], 6.35*mm # First version of Stack -->
+ <!-- 41.5*mm, 60.7*mm,  4.0*mm,  2.5*mm, [hgcal:ModuleThicknessHE], 6.35*mm # Original full detector -->
     </Vector>
     <Vector name="Layers" type="numeric" nEntries="14"> 
-      5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5</Vector>
+      8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8</Vector>
+ <!-- 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5</Vector> -->
     <Vector name="LayerThick" type="numeric" nEntries="14">
-      63.05*mm, 63.05*mm, 63.05*mm, 63.05*mm, 82.25*mm, 82.25*mm,
+      42*mm, 42*mm, 42*mm, 42*mm, 42*mm, 42*mm,
+      42*mm, 42*mm, 42*mm, 42*mm, 42*mm, 42*mm,  
+      42*mm, 42*mm</Vector>
+ <!-- 63.05*mm, 63.05*mm, 63.05*mm, 63.05*mm, 82.25*mm, 82.25*mm,
       82.25*mm, 82.25*mm, 82.25*mm, 82.25*mm, 82.25*mm, 82.25*mm,  
-      82.25*mm, 82.25*mm</Vector>
-    <Vector name="LayerType" type="numeric" nEntries="70">
+      82.25*mm, 82.25*mm</Vector> --> # Original full detector
+    <Vector name="LayerType" type="numeric" nEntries="112">
+      0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7,
+      0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7,
+      0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7,
+      0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7,
+      0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7</Vector>
+    <Vector name="LayerSense" type="numeric" nEntries="112">
+      -1, 0, -1, -1, 1, -2, -2, -2, -1, 0, -1, -1, 1, -2, -2, -2, -1, 0, -1, -1, 1, -2, -2, -2,
+      -1, 0, -1, -1, 1, -2, -2, -2, -1, 0, -1, -1, 1, -2, -2, -2, -1, 0, -1, -1, 1, -2, -2, -2,
+      -1, 0, -1, -1, 1, -2, -2, -2, -1, 0, -1, -1, 1, -2, -2, -2, -1, 0, -1, -1, 1, -2, -2, -2,
+      -1, 0, -1, -1, 1, -2, -2, -2, -1, 0, -1, -1, 1, -2, -2, -2, -1, 0, -1, -1, 1, -2, -2, -2,
+      -1, 0, -1, -1, 1, -2, -2, -2, -1, 0, -1, -1, 1, -2, -2, -2</Vector>
+ <!--   <Vector name="LayerType" type="numeric" nEntries="70">
       0, 2, 3, 4, 5,  0, 2, 3, 4, 5,  0, 2, 3, 4, 5,
       0, 2, 3, 4, 5,  1, 2, 3, 4, 5,  1, 2, 3, 4, 5,
       1, 2, 3, 4, 5,  1, 2, 3, 4, 5,  1, 2, 3, 4, 5,
@@ -128,7 +151,7 @@
       -1, 0, -1, 1, -2, -1, 0, -1, 1, -2, -1, 0, -1, 1, -2,
       -1, 0, -1, 1, -2, -1, 0, -1, 1, -2, -1, 0, -1, 1, -2,
       -1, 0, -1, 1, -2, -1, 0, -1, 1, -2, -1, 0, -1, 1, -2,
-      -1, 0, -1, 1, -2, -1, 0, -1, 1, -2</Vector>
+      -1, 0, -1, 1, -2, -1, 0, -1, 1, -2</Vector> # Original full detector -->
     <Vector name="TopMaterialNames" type="string" nEntries="7">
       materials:Air, hgcalMaterial:HGC_Cables, hgcalMaterial:HGC_G10-FR4,
       materials:Polystyrene, materials:H_Scintillator, materials:Polystyrene,
