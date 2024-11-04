@@ -10,17 +10,22 @@ from DataFormats.FWLite import Events, Handle
 if __name__=="__main__":
 
  pointsX=array.array("f",[])
- pointsY=array.array("f",[])
+ pointsXErr=array.array("f",[])
+ pointsYresponse=array.array("f",[])
+ pointsYresponseErr=array.array("f",[])
+ pointsYresolution=array.array("f",[])
+ pointsYresolutionErr=array.array("f",[])
  
  def layer(id):
    kHGCalLayerOffset = 17
    kHGCalLayerMask = 0x1F
    return (int(id) >> kHGCalLayerOffset) & kHGCalLayerMask
  
- #for particleEnergy in [2,3,4,5,7,8,9,10]:
- for particleEnergy in [5]:
+ particle="Electron"
+ #particle="Muon"
+
+ for particleEnergy in ([2,3,4,5,6,7,8,9,10] if particle=="Electron" else [5]):
   
-  particle="Muon"
   version=str(particleEnergy)+"GeV"+particle
 
   print("start ROOT")
@@ -78,6 +83,7 @@ if __name__=="__main__":
   ("LayerCluster_energy_vs_z",400,550,100,"recoCaloClusters_hgcalLayerClustersHSci__GENSIMDIGIRECO","energy","LayerCluster z [cm]","Energy sum per event [GeV]"),
   ("LayerCluster_x_vs_z",400,550,100,"recoCaloClusters_hgcalLayerClustersHSci__GENSIMDIGIRECO","x","LayerCluster z [cm]","Average |x| per cluster"),
   ("LayerCluster_y_vs_z",400,550,100,"recoCaloClusters_hgcalLayerClustersHSci__GENSIMDIGIRECO","y","LayerCluster z [cm]","Average |y| per cluster"),
+  ("LayerCluster_energy_integral",0,10,100,"recoCaloClusters_hgcalLayerClustersHSci__GENSIMDIGIRECO","energy","Reconstructed Energy [GeV]","Fraction of events"),
   ("n_MultiClusters",0,10,100,"recoHGCalMultiClusters_hgcalMultiClusters__GENSIMDIGIRECO","size","Number of MultiClusters","Events"),
   ("MultiCluster_energy",0,5,100,"recoHGCalMultiClusters_hgcalMultiClusters__GENSIMDIGIRECO","energy","MultiCluster Energy [GeV]","Clusters per event"),
   ("MultiCluster_x",-100,100,100,"recoHGCalMultiClusters_hgcalMultiClusters__GENSIMDIGIRECO","x","MultiCluster x [cm]","Cluster per events"),
@@ -124,11 +130,17 @@ if __name__=="__main__":
         if ("_x_vs_z" in name or "_y_vs_z" in name) and len(prod)>0:
           hists[name].Scale(1./len(prod))
       else:
+        integral=0
         for p in prod:
          if "data" in name and "DetIdHGCSampleHGCDataFramesSorted" in branch_name:
-          hists[name].Fill(getattr(p,var)()[2].data()) # index 2 of 5 time-samples
+          x=getattr(p,var)()[2].data() # index 2 of 5 time-samples
          else:
-          hists[name].Fill(getattr(p,var)())
+          x=getattr(p,var)()
+         integral+=x
+         if not "integral" in name:
+          hists[name].Fill(x)
+        if "integral" in name:
+         hists[name].Fill(integral)
     if not var=="size":
       hists[name].Scale(1./events.GetEntries())
         
@@ -153,17 +165,38 @@ if __name__=="__main__":
     
     canvas.SaveAs(name+"_"+version+".pdf")
     
-    if "energy_vs_z" in name:
+    if "LayerCluster_energy_integral" in name:
        pointsX.append(particleEnergy)
-       pointsY.append(hists[name].Integral())
+       pointsXErr.append(0)
+       pointsYresponse.append(hists[name].GetMean())
+       pointsYresponseErr.append(hists[name].GetMeanError())
+       pointsYresolution.append(hists[name].GetStdDev()/hists[name].GetMean()*100.)
+       pointsYresolutionErr.append(hists[name].GetStdDevError()/hists[name].GetMean()*100.)
 
- canvas = TCanvas("Energy_reconstruction_linearity", "Energy_reconstruction_linearity", 0, 0, 300, 300)
- g=TGraph(len(pointsX),pointsX,pointsY)
- g.SetMarkerColor(1)
- g.SetMarkerSize(1)
- g.SetLineWidth(2)
- g.Draw("apl")
- g.SetTitle("")
- g.GetXaxis().SetTitle("Beam energy [GeV]")
- g.GetYaxis().SetTitle("Reconstructed energy [GeV]")
- canvas.SaveAs("Energy_reconstruction_linearity.pdf")
+ if len(pointsX)>0:
+  canvas = TCanvas("Energy_reconstruction_response", "Energy_reconstruction_response", 0, 0, 300, 300)
+  g=TGraphErrors(len(pointsX),pointsX,pointsYresponse,pointsXErr,pointsYresponseErr)
+  g.SetMarkerColor(1)
+  g.SetMarkerSize(1)
+  g.SetLineWidth(2)
+  g.SetMarkerStyle(24)
+  g.Draw("ap")
+  f=TF1("fit","pol1")
+  g.Fit(f,"")
+  f.Draw("lsame")
+  g.SetTitle("")
+  g.GetXaxis().SetTitle("Beam energy [GeV]")
+  g.GetYaxis().SetTitle("Reconstructed energy [GeV]")
+  canvas.SaveAs("Energy_reconstruction_response.pdf")
+  
+  canvas = TCanvas("Energy_reconstruction_resolution", "Energy_reconstruction_resolution", 0, 0, 300, 300)
+  g=TGraphErrors(len(pointsX),pointsX,pointsYresolution,pointsXErr,pointsYresolutionErr)
+  g.SetMarkerColor(1)
+  g.SetMarkerSize(1)
+  g.SetLineWidth(2)
+  g.SetMarkerStyle(24)
+  g.Draw("apl")
+  g.SetTitle("")
+  g.GetXaxis().SetTitle("Beam energy [GeV]")
+  g.GetYaxis().SetTitle("Energy resolution [%]")
+  canvas.SaveAs("Energy_reconstruction_resolution.pdf")
