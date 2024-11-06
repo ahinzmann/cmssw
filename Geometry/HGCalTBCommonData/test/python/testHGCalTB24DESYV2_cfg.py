@@ -156,7 +156,7 @@ process.NANOAODoutput = cms.OutputModule("NanoAODOutputModule",
         dataTier = cms.untracked.string('NANOAOD'),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string('file:nanoaod.root'),
+    fileName = cms.untracked.string('file:nanoaod_'+particle+str(particleEnergy)+'.root'),
     outputCommands = process.NANOAODEventContent.outputCommands
 )
 process.NANOAODoutput.compressionAlgorithm = 'ZSTD'
@@ -167,7 +167,7 @@ process.DQMoutput = cms.OutputModule("DQMRootOutputModule",
         dataTier = cms.untracked.string('DQMIO'),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string('file:dqm.root'),
+    fileName = cms.untracked.string('file:dqm_'+particle+str(particleEnergy)+'.root'),
     outputCommands = process.DQMEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -344,8 +344,12 @@ associatePatAlgosToolsTask(process)
 #radiation length: FromChrisdEdx['StainlessSteel'] = 1.14 in MeV/mm from https://github.com/cms-sw/cmssw/blob/master/SimTracker/TrackerMaterialAnalysis/test/dEdxWeights.ipynb
 # time layer thickness 19mm
 # --> dE=21.66 MeV
-print("old dEdX", len(process.hgcalLayerClustersHSci.plugin.dEdXweights),process.hgcalLayerClustersHSci.plugin.dEdXweights)
+#print("old dEdX", len(process.hgcalLayerClustersHSci.plugin.dEdXweights),process.hgcalLayerClustersHSci.plugin.dEdXweights)
 process.hgcalLayerClustersHSci.plugin.dEdXweights = cms.vdouble([1e-10 for i in range(51-17)]+[21.66 for i in range(14)]+[1e-10 for i in range(3)]) #  14 layers in HB (last three are HFnose)
-print("new dEdX", len(process.hgcalLayerClustersHSci.plugin.dEdXweights),process.hgcalLayerClustersHSci.plugin.dEdXweights)
+#print("new dEdX", len(process.hgcalLayerClustersHSci.plugin.dEdXweights),process.hgcalLayerClustersHSci.plugin.dEdXweights)
 process.HGCalRecHit.layerWeights = process.hgcalLayerClustersHSci.plugin.dEdXweights
-print("correction", process.HGCalRecHit.sciThicknessCorrection)
+#print("correction", process.HGCalRecHit.sciThicknessCorrection)
+
+#print(process.mix.digitizers)
+#process.mix.digitizers.hgcalHEback.digiCfg.algo=0 #no digitization
+process.mix.digitizers.hgcalHEback.tofDelay=999 # this time offset is used to calculate the amount of energy that should be accounted to the previous bunch crossing. Increasing it from -13 to 999 makes sure we account everything in the current bunch crossing.
