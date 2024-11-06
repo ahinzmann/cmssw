@@ -352,4 +352,4 @@ process.HGCalRecHit.layerWeights = process.hgcalLayerClustersHSci.plugin.dEdXwei
 
 #print(process.mix.digitizers)
 #process.mix.digitizers.hgcalHEback.digiCfg.algo=0 #no digitization
-process.mix.digitizers.hgcalHEback.tofDelay=999 # this time offset is used to calculate the amount of energy that should be accounted to the previous bunch crossing. Increasing it from -13 to 999 makes sure we account everything in the current bunch crossing.
+process.mix.digitizers.hgcalHEback.tofDelay=0 # this time offset is used to calculate the amount of energy that should be accounted to the previous bunch crossing. Increasing it from -13 to 0 makes sure we account everything in the current bunch crossing.
