@@ -6,6 +6,14 @@ from Configuration.Eras.Modifier_hgcaltb_cff import hgcaltb
 
 process = cms.Process('GENSIMDIGIRECO', hgcaltb)
 
+from FWCore.ParameterSet.VarParsing import VarParsing
+options = VarParsing ('analysis')
+options.register ('seed',
+				  1,
+				  VarParsing.multiplicity.singleton,
+				  VarParsing.varType.float,
+				  "Random seed")
+                                  
 # import of standard configurations
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.load('Configuration.StandardSequences.Services_cff')
@@ -353,3 +361,6 @@ process.HGCalRecHit.layerWeights = process.hgcalLayerClustersHSci.plugin.dEdXwei
 #print(process.mix.digitizers)
 #process.mix.digitizers.hgcalHEback.digiCfg.algo=0 #no digitization
 process.mix.digitizers.hgcalHEback.tofDelay=0 # this time offset is used to calculate the amount of energy that should be accounted to the previous bunch crossing. Increasing it from -13 to 0 makes sure we account everything in the current bunch crossing.
+
+process.RandomNumberGeneratorService.generator.initialSeed=int(options.seed)
+print("Using random seed", int(options.seed))

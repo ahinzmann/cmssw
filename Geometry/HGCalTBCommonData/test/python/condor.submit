@@ -1,0 +1,18 @@
+#HTC Submission File for GEN sample production
+#requirements      =  OpSysAndVer == "EL9"
+universe          = vanilla
+notification      = Error
+notify_user       = andreas.hinzmann@desy.de
+initialdir        = /afs/desy.de/user/h/hinzmann/hgcal/el9/CMSSW_13_2_0_pre3/src/Geometry/HGCalTBCommonData/test/python
+#output            = gen$(JobId).o
+#error             = gen$(JobId).e
+#log               = gen$(JobId).log
+#Requesting CPU and DISK Memory - default +RequestRuntime of 3h stays unaltered
++RequestRuntime   = 80000
+RequestMemory     = 10G
+JobBatchName      = hgcalSimulation
+#RequestDisk       = 10G
+getenv            = True
+executable        = /usr/bin/sh
+arguments         = " condor.sh $(JobId)"
+queue 1
