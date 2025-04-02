@@ -1,5 +1,5 @@
 particle=""
-particleEnergy=5
+particleEnergy=1.6
 
 import FWCore.ParameterSet.Config as cms
 from Configuration.Eras.Modifier_hgcaltb_cff import hgcaltb
@@ -110,7 +110,7 @@ process.hgcalCalibrationParameterESRecord = cms.ESSource('EmptyESSource',
 
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(50)
+    input = cms.untracked.int32(1000)
 )
 
 if 'MessageLogger' in process.__dict__:
@@ -361,6 +361,7 @@ process.HGCalRecHit.layerWeights = process.hgcalLayerClustersHSci.plugin.dEdXwei
 #print(process.mix.digitizers)
 #process.mix.digitizers.hgcalHEback.digiCfg.algo=0 #no digitization
 process.mix.digitizers.hgcalHEback.tofDelay=0 # this time offset is used to calculate the amount of energy that should be accounted to the previous bunch crossing. Increasing it from -13 to 0 makes sure we account everything in the current bunch crossing.
+process.mix.digitizers.hgcalHEback.digiCfg.feCfg.adcThreshold_fC=0.25 # Lower digitizer threshold from 0.5MIPs to 0.25MIPs
 
 process.RandomNumberGeneratorService.generator.initialSeed=int(options.seed)
 print("Using random seed", int(options.seed))
