@@ -78,9 +78,9 @@ if __name__=="__main__":
   #("DigiNano_data",0,500,100,"nanoaodFlatTable_hgcDigiHEbackTable__GENSIMDIGIRECO","data","ADC counts","Hits per event"),
   #("n_Digis",0,100,100,"DetIdHGCSampleHGCDataFramesSorted_mix_HGCDigisHEback_GENSIMDIGIRECO","size","Number of Digis","Events"),
   #("Digi_n_vs_layer",0.5,layers+0.5,layers,"DetIdHGCSampleHGCDataFramesSorted_mix_HGCDigisHEback_GENSIMDIGIRECO","data","Layer number","Number of Digis per layer"),
-  ("Digi_n_integral",-0.5,40.5,41,"DetIdHGCSampleHGCDataFramesSorted_mix_HGCDigisHEback_GENSIMDIGIRECO","data","Number of Digis per event","Fraction of events"),
+  ("Digi_n_integral",-0.5,80.5,81,"DetIdHGCSampleHGCDataFramesSorted_mix_HGCDigisHEback_GENSIMDIGIRECO","data","Number of Digis per event","Fraction of events"),
   #("Digi_data",0,500,100,"DetIdHGCSampleHGCDataFramesSorted_mix_HGCDigisHEback_GENSIMDIGIRECO","data","ADC counts","Hits per event"),
-  ("Digi_data_integral",0,4000,100,"DetIdHGCSampleHGCDataFramesSorted_mix_HGCDigisHEback_GENSIMDIGIRECO","data","ADC count sum per event","Fraction of events"),
+  ("Digi_data_integral",0,4000,200,"DetIdHGCSampleHGCDataFramesSorted_mix_HGCDigisHEback_GENSIMDIGIRECO","data","ADC count sum per event","Fraction of events"),
   #("Digi_data_vs_layer",0.5,layers+0.5,layers,"DetIdHGCSampleHGCDataFramesSorted_mix_HGCDigisHEback_GENSIMDIGIRECO","data","Layer number","ADC counts per layer"),
   #("Digi_dataoutoftime",0,500,100,"DetIdHGCSampleHGCDataFramesSorted_mix_HGCDigisHEback_GENSIMDIGIRECO","data","Out-of-time ADC counts","Hits per event"),
   #("Digi_dataoutoftime_vs_layer",0.5,layers+0.5,layers,"DetIdHGCSampleHGCDataFramesSorted_mix_HGCDigisHEback_GENSIMDIGIRECO","data","Layer number","Out-of-time ADC counts per layer"),
@@ -116,7 +116,7 @@ if __name__=="__main__":
   #("SimHit_n_integral_in_layer"+str(l),0,1000,100,"PCaloHits_g4SimHits_HGCHitsHEback_GENSIMDIGIRECO","energy","Number of SimHits per layer","Fraction of events"),
   #("SimHit_energy_integral_in_layer"+str(l),0,0.005,100,"PCaloHits_g4SimHits_HGCHitsHEback_GENSIMDIGIRECO","energy","SimHit energy sum per layer[GeV]","Fraction of events"),
   ("Digi_n_integral_in_layer"+str(l),-0.5,40.5,41,"DetIdHGCSampleHGCDataFramesSorted_mix_HGCDigisHEback_GENSIMDIGIRECO","data","Number of Digis per layer","Fraction of events"),
-  ("Digi_data_integral_in_layer"+str(l),0,2000,100,"DetIdHGCSampleHGCDataFramesSorted_mix_HGCDigisHEback_GENSIMDIGIRECO","data","ADC count sum per layer","Fraction of events"),
+  ("Digi_data_integral_in_layer"+str(l),0,2000,200,"DetIdHGCSampleHGCDataFramesSorted_mix_HGCDigisHEback_GENSIMDIGIRECO","data","ADC count sum per layer","Fraction of events"),
   #("UncalibratedRecHits_n_integral_in_layer"+str(l),0,100,100,"HGCUncalibratedRecHitsSorted_HGCalUncalibRecHit_HGCHEBUncalibRecHits_GENSIMDIGIRECO","amplitude","Number of RecHits per layer","Fraction of events"),
   #("UncalibratedRecHits_amplitude_integral_in_layer"+str(l),0,100,100,"HGCUncalibratedRecHitsSorted_HGCalUncalibRecHit_HGCHEBUncalibRecHits_GENSIMDIGIRECO","amplitude","Number of MIP sum per layer","Fraction of events"),
   #("RecHits_n_integral_in_layer"+str(l),0,100,100,"HGCRecHitsSorted_HGCalRecHit_HGCHEBRecHits_GENSIMDIGIRECO","energy","Number of RecHits per layer","Fraction of events"),
@@ -124,13 +124,15 @@ if __name__=="__main__":
     ]
   hists={}
   
-  for name,xmin,xmax,nbins,branch_name,var,xtitle,ytitle in histograms:
-    print("plotting", name)
-    canvas = TCanvas(name+"_", name+"_", 0, 0, 300, 300)
-    hists[name]=TH1F(name,name,nbins,xmin,xmax)
-    events=TChain("Events")
-    events.Add("/data/dust/user/hinzmann/hgcal/5feb2025/gensimdigireco_"+particle.replace("Electron","").replace("Muon","muon")+str(particleEnergy)+".root")
-    for event in events:
+  events=TChain("Events")
+  events.Add("/data/dust/user/hinzmann/hgcal/8apr2025_th025MIP_10000/gensimdigireco_"+particle.replace("Electron","").replace("Muon","muon")+str(particleEnergy)+".root")
+  i=0
+  for event in events:
+    if i%100==0: print("event",i)
+    i+=1
+    for name,xmin,xmax,nbins,branch_name,var,xtitle,ytitle in histograms:
+      if not name in hists.keys():
+        hists[name]=TH1F(name,name,nbins,xmin,xmax)
       prod=getattr(event,branch_name).product()
       if var=="size":
         hists[name].Fill(len(prod))
@@ -206,6 +208,11 @@ if __name__=="__main__":
           hists[name].Fill(x)
         if "integral" in name:
          hists[name].Fill(integral)
+
+  for name,xmin,xmax,nbins,branch_name,var,xtitle,ytitle in histograms:
+    print("plotting", name)
+    canvas = TCanvas(name+"_", name+"_", 0, 0, 300, 300)
+
     if not var=="size":
       hists[name].Scale(1./events.GetEntries())
         
