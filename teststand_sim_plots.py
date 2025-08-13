@@ -63,11 +63,11 @@ if __name__=="__main__":
   #gROOT.LoadMacro("CMS_lumi.C");
   #iPeriod = 4;       #// 1=7TeV, 2=8TeV, 3=7+8TeV, 7=7+8+13TeV 
   #iPos = 11;
-  layers=8
+  layers=9
   x_offset=1 #cm
   y_offset=160 #cm
   z_offset=406.581 #cm (zHGCal6=zHGCalHEmix1)
-  z_max=8*4.2 #cm
+  z_max=10*15 #cm
 
   histograms=[
   ("n_SimHits",0,1000,100,"PCaloHits_g4SimHits_HGCHitsHEback_GENSIMDIGIRECO","size","Number of SimHits","Events"),
@@ -88,19 +88,19 @@ if __name__=="__main__":
   ("UncalibratedRecHits_n_vs_layer",0.5,layers+0.5,layers,"HGCUncalibratedRecHitsSorted_HGCalUncalibRecHit_HGCHEBUncalibRecHits_GENSIMDIGIRECO","amplitude","Layer number","Number of RecHits per layer"),
   ("UncalibratedRecHits_amplitude",0,100,100,"HGCUncalibratedRecHitsSorted_HGCalUncalibRecHit_HGCHEBUncalibRecHits_GENSIMDIGIRECO","amplitude","Number of MIPs","Hits per event"),
   ("UncalibratedRecHits_amplitude_vs_layer",0.5,layers+0.5,layers,"HGCUncalibratedRecHitsSorted_HGCalUncalibRecHit_HGCHEBUncalibRecHits_GENSIMDIGIRECO","amplitude","Layer number","Number of MIPs per layer"),
-  #("n_RecHits",0,100,100,"HGCRecHitsSorted_HGCalRecHit_HGCHEBRecHits_GENSIMDIGIRECO","size","Number of calibrated RecHits","Events"),
-  #("RecHits_n_vs_layer",0.5,layers+0.5,layers,"HGCRecHitsSorted_HGCalRecHit_HGCHEBRecHits_GENSIMDIGIRECO","energy","Layer number","Number of RecHits per layer"),
-  #("RecHits_energy",0,5,100,"HGCRecHitsSorted_HGCalRecHit_HGCHEBRecHits_GENSIMDIGIRECO","energy","Calibrated RecHit Energy [GeV]","Hits per event"),
-  #("RecHits_energy_vs_layer",0.5,layers+0.5,layers,"HGCRecHitsSorted_HGCalRecHit_HGCHEBRecHits_GENSIMDIGIRECO","energy","Layer number","Energy sum per layer [GeV]"),
-  #("n_LayerClusters",0,100,100,"recoCaloClusters_hgcalLayerClustersHSci__GENSIMDIGIRECO","size","Number of LayerClusters","Events"),
-  #("LayerCluster_energy",0,5,100,"recoCaloClusters_hgcalLayerClustersHSci__GENSIMDIGIRECO","energy","LayerCluster Energy [GeV]","Clusters per event"),
-  #("LayerCluster_x",-100,100,100,"recoCaloClusters_hgcalLayerClustersHSci__GENSIMDIGIRECO","x","LayerCluster x [cm]","Clusters per event"),
-  #("LayerCluster_y",-100,100,100,"recoCaloClusters_hgcalLayerClustersHSci__GENSIMDIGIRECO","y","LayerCluster y [cm]","Clusters per event"),
-  #("LayerCluster_z",0,z_max,100,"recoCaloClusters_hgcalLayerClustersHSci__GENSIMDIGIRECO","z","LayerCluster z [cm]","Clusters per event"),
-  #("LayerCluster_energy_vs_z",0,z_max,100,"recoCaloClusters_hgcalLayerClustersHSci__GENSIMDIGIRECO","energy","LayerCluster z [cm]","Energy sum per event [GeV]"),
-  #("LayerCluster_x_vs_z",0,z_max,100,"recoCaloClusters_hgcalLayerClustersHSci__GENSIMDIGIRECO","x","LayerCluster z [cm]","Average |x| per cluster"),
-  #("LayerCluster_y_vs_z",0,z_max,100,"recoCaloClusters_hgcalLayerClustersHSci__GENSIMDIGIRECO","y","LayerCluster z [cm]","Average |y| per cluster"),
-  #("LayerCluster_energy_integral",0,10,100,"recoCaloClusters_hgcalLayerClustersHSci__GENSIMDIGIRECO","energy","Reconstructed Energy [GeV]","Fraction of events"),
+  ("n_RecHits",0,100,100,"HGCRecHits_HGCalRecHit_HGCHEBRecHits_GENSIMDIGIRECO","size","Number of calibrated RecHits","Events"),
+  ("RecHits_n_vs_layer",0.5,layers+0.5,layers,"HGCRecHits_HGCalRecHit_HGCHEBRecHits_GENSIMDIGIRECO","energy","Layer number","Number of RecHits per layer"),
+  ("RecHits_energy",0,5,100,"HGCRecHits_HGCalRecHit_HGCHEBRecHits_GENSIMDIGIRECO","energy","Calibrated RecHit Energy [GeV]","Hits per event"),
+  ("RecHits_energy_vs_layer",0.5,layers+0.5,layers,"HGCRecHits_HGCalRecHit_HGCHEBRecHits_GENSIMDIGIRECO","energy","Layer number","Energy sum per layer [GeV]"),
+  ("n_LayerClusters",0,100,100,"recoCaloClusters_hgcalLayerClustersHSci__GENSIMDIGIRECO","size","Number of LayerClusters","Events"),
+  ("LayerCluster_energy",0,5,100,"recoCaloClusters_hgcalLayerClustersHSci__GENSIMDIGIRECO","energy","LayerCluster Energy [GeV]","Clusters per event"),
+  ("LayerCluster_x",-100,200,100,"recoCaloClusters_hgcalLayerClustersHSci__GENSIMDIGIRECO","x","LayerCluster x [cm]","Clusters per event"),
+  ("LayerCluster_y",-100,100,100,"recoCaloClusters_hgcalLayerClustersHSci__GENSIMDIGIRECO","y","LayerCluster y [cm]","Clusters per event"),
+  ("LayerCluster_z",0,z_max,100,"recoCaloClusters_hgcalLayerClustersHSci__GENSIMDIGIRECO","z","LayerCluster z [cm]","Clusters per event"),
+  ("LayerCluster_energy_vs_z",0,z_max,100,"recoCaloClusters_hgcalLayerClustersHSci__GENSIMDIGIRECO","energy","LayerCluster z [cm]","Energy sum per event [GeV]"),
+  ("LayerCluster_x_vs_z",0,z_max,100,"recoCaloClusters_hgcalLayerClustersHSci__GENSIMDIGIRECO","x","LayerCluster z [cm]","Average |x| per cluster"),
+  ("LayerCluster_y_vs_z",0,z_max,100,"recoCaloClusters_hgcalLayerClustersHSci__GENSIMDIGIRECO","y","LayerCluster z [cm]","Average |y| per cluster"),
+  ("LayerCluster_energy_integral",0,10,100,"recoCaloClusters_hgcalLayerClustersHSci__GENSIMDIGIRECO","energy","Reconstructed Energy [GeV]","Fraction of events"),
   #("n_MultiClusters",0,10,100,"recoHGCalMultiClusters_hgcalMultiClusters__GENSIMDIGIRECO","size","Number of MultiClusters","Events"),
   #("MultiCluster_energy",0,5,100,"recoHGCalMultiClusters_hgcalMultiClusters__GENSIMDIGIRECO","energy","MultiCluster Energy [GeV]","Clusters per event"),
   #("MultiCluster_x",-100,100,100,"recoHGCalMultiClusters_hgcalMultiClusters__GENSIMDIGIRECO","x","MultiCluster x [cm]","Cluster per events"),
@@ -119,8 +119,8 @@ if __name__=="__main__":
   ("Digi_data_integral_in_layer"+str(l),0,2000,200,"DetIdHGCSampleHGCDataFramesSorted_mix_HGCDigisHEback_GENSIMDIGIRECO","data","ADC count sum per layer","Fraction of events"),
   ("UncalibratedRecHits_n_integral_in_layer"+str(l),0,100,100,"HGCUncalibratedRecHitsSorted_HGCalUncalibRecHit_HGCHEBUncalibRecHits_GENSIMDIGIRECO","amplitude","Number of RecHits per layer","Fraction of events"),
   ("UncalibratedRecHits_amplitude_integral_in_layer"+str(l),0,100,100,"HGCUncalibratedRecHitsSorted_HGCalUncalibRecHit_HGCHEBUncalibRecHits_GENSIMDIGIRECO","amplitude","Number of MIP sum per layer","Fraction of events"),
-  #("RecHits_n_integral_in_layer"+str(l),0,100,100,"HGCRecHitsSorted_HGCalRecHit_HGCHEBRecHits_GENSIMDIGIRECO","energy","Number of RecHits per layer","Fraction of events"),
-  #("RecHits_energy_integral_in_layer"+str(l),0,5,100,"HGCRecHitsSorted_HGCalRecHit_HGCHEBRecHits_GENSIMDIGIRECO","energy","Calibrated RecHit Energy sum per layer [GeV]","Fraction of events"),
+  ("RecHits_n_integral_in_layer"+str(l),0,100,100,"HGCRecHits_HGCalRecHit_HGCHEBRecHits_GENSIMDIGIRECO","energy","Number of RecHits per layer","Fraction of events"),
+  ("RecHits_energy_integral_in_layer"+str(l),0,5,100,"HGCRecHits_HGCalRecHit_HGCHEBRecHits_GENSIMDIGIRECO","energy","Calibrated RecHit Energy sum per layer [GeV]","Fraction of events"),
     ]
   hists={}
   
