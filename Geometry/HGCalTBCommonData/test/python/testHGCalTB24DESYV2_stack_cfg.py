@@ -229,11 +229,11 @@ process.generator = cms.EDProducer("FlatRandomAngleEGunProducer",
         MaxE = cms.double(particleEnergy),
         
         # Add dummy values for MinEta and MaxEta
-        MinEta = cms.double(1.32),  # Dummy value
-        MaxEta = cms.double(1.32),  # Dummy value
+        MinEta = cms.double(0),  # Dummy value
+        MaxEta = cms.double(0),  # Dummy value
 
         MinTheta = cms.double(0.0),  # 0 radians (along beam axis)
-        MaxTheta = cms.double(1.57),  # π/2 radians
+        MaxTheta = cms.double(0),  # π/2 radians
 
         MinPhi = cms.double(0.0),
         MaxPhi = cms.double(0.0),
