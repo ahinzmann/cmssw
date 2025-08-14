@@ -33,7 +33,7 @@ process.load("FWCore.MessageService.MessageLogger_cfi")
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('SimGeneral.HepPDTESSource.pythiapdt_cfi')
 process.load('Configuration.EventContent.EventContent_cff')
-process.load('Geometry.HGCalTBCommonData.testTB24DESYV2bXML_cfi')
+process.load('Geometry.HGCalTBCommonData.testTB24DESYV2_teststand_XML_cfi')
 process.load('Geometry.HGCalCommonData.hgcalNumberingInitialization_cfi')
 process.load('Geometry.HGCalCommonData.hgcalParametersInitialization_cfi')
 process.load('Geometry.HcalTestBeamData.hcalTB06Parameters_cff')
@@ -394,3 +394,6 @@ process.mix.digitizers.hgcalHEback.digiCfg.feCfg.adcThreshold_fC=0.25 #lowering 
 process.mix.digitizers.hgcalHEback.digiCfg.feCfg.targetMIPvalue_ADC=15  #increase granularity of the digitiser 
 process.RandomNumberGeneratorService.generator.initialSeed=int(options.seed)
 print("Using random seed", int(options.seed))
+from SimCalorimetry.HGCalSimProducers.hgcalDigitizer_cfi import *
+#HGCal_setRealisticNoiseSci(process)
+#HGCal_setEndOfLifeNoise(process)
