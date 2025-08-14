@@ -2,7 +2,7 @@ particle="electron"
 particleEnergy=5
 
 
-pgun_pos="_testcosmic_500events_x2_y160_z400_digitiser_mipthreshold_granularity15_adjusted"
+pgun_pos="_teststack"
 
 
 #pgun_pos="_200events_x2_y160_z400_digitiser_mipthreshold_granularity30_adjusted"#####
