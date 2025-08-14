@@ -145,7 +145,7 @@ if __name__=="__main__":
       elif "vs" in name:
         for p in prod:
          if "_x_vs_z" in name or "_y_vs_z" in name:
-           hists[name].Fill(getattr(p,name.split("_")[-1])(),abs(getattr(p,var)()-160.*("_y_vs_z" in name)))
+           hists[name].Fill(getattr(p,name.split("_")[-1])(),abs(getattr(p,var)()-y_offset*("_y_vs_z" in name)))
          elif "vs_layer" in name:
           if "DetIdHGCSampleHGCDataFramesSorted" in branch_name:
            if "outoftime" in name:

@@ -125,7 +125,8 @@ if __name__=="__main__":
   hists={}
   
   events=TChain("Events")
-  events.Add("/data/dust/user/hinzmann/hgcal/8apr2025_th025MIP_10000/gensimdigireco_"+particle.replace("Electron","").replace("Muon","muon")+str(particleEnergy)+".root")
+  #events.Add("/data/dust/user/hinzmann/hgcal/8apr2025_th025MIP_10000/gensimdigireco_"+particle.replace("Electron","").replace("Muon","muon")+str(particleEnergy)+".root")
+  events.Add("gensimdigireco_"+particle.replace("Electron","electron").replace("Muon","muon")+str(particleEnergy)+".root")
   i=0
   for event in events:
     if i%100==0: print("event",i)
