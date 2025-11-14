@@ -1,8 +1,8 @@
 particle="electron"
-particleEnergy=5
+particleEnergy=20
 
 
-pgun_pos="_teststack"
+pgun_pos="_cernstack"
 
 
 #pgun_pos="_200events_x2_y160_z400_digitiser_mipthreshold_granularity30_adjusted"#####
