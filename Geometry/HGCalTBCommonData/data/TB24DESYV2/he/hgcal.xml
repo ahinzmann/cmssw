@@ -2,7 +2,7 @@
 <DDDefinition>
 
 <ConstantsSection label="hgcal.xml" eval="true">
-  <Constant name="WaferSize"             value="167.44*mm"/>
+  <Constant name="WaferSize"             value="167.4408*mm"/>
   <Constant name="WaferSizeNominal"      value="167.4408*mm"/>
   <Constant name="WaferThickness"        value="0.30*mm"/>
   <Constant name="WaferThicknessFine"    value="0.30*mm"/>
@@ -20,7 +20,7 @@
   <Constant name="ScintillatorThickness" value="3.0*mm"/>
   <Constant name="NumberOfCellsFine"     value="12"/>
   <Constant name="NumberOfCellsCoarse"   value="8"/>
-  <Constant name="NPhiBinBHFine"         value="432"/>
+  <Constant name="NPhiBinBHFine"         value="288"/>
   <Constant name="NPhiBinBH"             value="288"/>
   <Constant name="FirstMixedLayer"       value="8"/>
   <Constant name="LayerRotation"         value="-30*deg"/>
@@ -125,7 +125,7 @@
   <Constant name="zHGCalHEmix3"          value="[zHGCal8]"/>
   <Constant name="zHGCalHEmix4"          value="[zHGCal10]"/>
   <Constant name="zHGCalHEmix5"          value="[zHGCal11]"/>
-  <Constant name="zHGCalHEmix6"          value="6000*mm"/>
+  <Constant name="zHGCalHEmix6"          value="[zHGCal12]"/>
   <Constant name="rMinHGCalHEmix1"       value="[rMinHGCal6]"/>
   <Constant name="rMinHGCalHEmix2"       value="[rMinHGCal8]"/>
   <Constant name="rMaxHGCalHEmix1"       value="[rMaxHGCal6]"/>
@@ -292,25 +292,21 @@
     <rParent name="hgcal:HGCal"/>
     <rChild name="hgcal:HGCalHEsup1"/>
     <rRotation name="rotations:000D"/>
-    <Translation x="0*fm" y="-5*m" z="0*m"/>
   </PosPart>
   <PosPart copyNumber="1">
     <rParent name="hgcal:HGCal"/>
     <rChild name="hgcal:HGCalHEsup2"/>
     <rRotation name="rotations:000D"/>
-    <Translation x="0*fm" y="-5*m" z="0*m"/>
   </PosPart>
   <PosPart copyNumber="1">
     <rParent name="hgcal:HGCal"/>
     <rChild name="hgcal:HGCalHEsup3"/>
     <rRotation name="rotations:000D"/>
-    <Translation x="0*fm" y="-5*m" z="0*m"/>
   </PosPart>
   <PosPart copyNumber="1">
     <rParent name="hgcal:HGCal"/>
     <rChild name="hgcal:HGCalBackPlate"/>
     <rRotation name="rotations:000D"/>
-    <Translation x="0*fm" y="-5*m" z="0*m"/>
   </PosPart>
 </PosPartSection>
 </DDDefinition>

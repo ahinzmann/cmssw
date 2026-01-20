@@ -1,7 +1,7 @@
 particle="muon"
 particleEnergy=5
 
-pgun_pos="_random_cosmics_he_xFlat70_yFlat_z400_phiFlat_cos2Theta"
+pgun_pos="_random_cosmics_he10_xFlat_yFlat_z360_phiFlat_cos2Theta"
 #pgun_pos="_random_cosmics_xFlat_yFlat310_z300_phiFlat_cos2Theta"
 
 #pgun_pos="_testcosmic_500events_x2_y160_z400_digitiser_mipthreshold_granularity15_adjusted"
@@ -243,10 +243,8 @@ process.generator = cms.EDProducer("FlatRandomAngleEGunProducer",
         #MaxX = cms.double(1.0),
         #MinX = cms.double(-50.0),
         #MaxX = cms.double(50.0),
-        #MinX = cms.double(-60.0),
-        #MaxX = cms.double(60.0),
-        MinX = cms.double(-70.0),
-        MaxX = cms.double(70.0),
+        MinX = cms.double(-60.0), # 10-deg Sector
+        MaxX = cms.double(60.0),
 
         #MinY = cms.double(160.0), # D-Module
         #MaxY = cms.double(160.0),
@@ -254,11 +252,11 @@ process.generator = cms.EDProducer("FlatRandomAngleEGunProducer",
         #MaxY = cms.double(210.0),
         #MinY = cms.double(140.0), #E-Module
         #MaxY = cms.double(260.0),
-        MinY = cms.double(0.0), # Sector
-        MaxY = cms.double(310.0),
+        MinY = cms.double(-60.0), # 10-deg Sector
+        MaxY = cms.double(360.0),
 
         #ZPosition = cms.double(400.0), # HEback
-        ZPosition = cms.double(350.0), # HEsil
+        ZPosition = cms.double(360.0), # HEsil
         PartID = cms.vint32((13 if particle == "muon" else 11)),  # Particle ID
 
         MinEta = cms.double(0.0), # DUMMY VALUE NOT USED
