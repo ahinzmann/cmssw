@@ -1,8 +1,10 @@
-particle="electron"
-particleEnergy=20
+particle="muon"
+particleEnergy=5
 
+pgun_pos="_random_cosmics_hgcal_xFlat70_yFlat_z400_phiFlat_cos2Theta"
+#pgun_pos="_random_cosmics_xFlat_yFlat310_z300_phiFlat_cos2Theta"
 
-pgun_pos="_cernstack"
+#pgun_pos="_testcosmic_500events_x2_y160_z400_digitiser_mipthreshold_granularity15_adjusted"
 
 
 #pgun_pos="_200events_x2_y160_z400_digitiser_mipthreshold_granularity30_adjusted"#####
@@ -24,7 +26,6 @@ options.register ('seed',
 				  VarParsing.varType.float,
 				  "Random seed")
 options.parseArguments()                                  
-                                  
 
 # import of standard configurations
 
@@ -34,7 +35,7 @@ process.load("FWCore.MessageService.MessageLogger_cfi")
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('SimGeneral.HepPDTESSource.pythiapdt_cfi')
 process.load('Configuration.EventContent.EventContent_cff')
-process.load('Geometry.HGCalTBCommonData.testTB24DESYV2_stack_XML_cfi')
+process.load('Geometry.HGCalTBCommonData.testTB24DESYV2_hgcal_XML_cfi')
 process.load('Geometry.HGCalCommonData.hgcalNumberingInitialization_cfi')
 process.load('Geometry.HGCalCommonData.hgcalParametersInitialization_cfi')
 process.load('Geometry.HcalTestBeamData.hcalTB06Parameters_cff')
@@ -62,6 +63,7 @@ process.load('RecoLocalCalo.Configuration.hgcalLocalReco_cff')
 process.load('Configuration.StandardSequences.Validation_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
+
 #process.load('SimG4CMS.HGCalTestBeam.HGCalTB23Analyzer_cfi')
 
 #process.load('DPGAnalysis.HGCalNanoAOD.hgcRecHits_cff')
@@ -229,24 +231,38 @@ process.generator = cms.EDProducer("FlatRandomAngleEGunProducer",
         MinE = cms.double(particleEnergy),  # GeV
         MaxE = cms.double(particleEnergy),
         
-        # Add dummy values for MinEta and MaxEta
-        MinEta = cms.double(0),  # Dummy value
-        MaxEta = cms.double(0),  # Dummy value
-        
-        MinTheta = cms.double(0.0),  # 0 radians (along beam axis)
-        MaxTheta = cms.double(0.0),  # π/2 radians
+        MinTheta = cms.double(0.0),  #  along beam axis
+        MaxTheta = cms.double(1.57),  # orthogonal to beam axis
 
-        MinPhi = cms.double(0.0),
-        MaxPhi = cms.double(0.0),
-        #XCoordinates = cms.vdouble(2.0),  # X positions, old interface
-        #YCoordinates = cms.vdouble(160.0),  # Y positions, old interface
-        MinX = cms.double(2), # new interface
-        MaxX = cms.double(2), # new interface
-        MinY = cms.double(160), # new interface
-        MaxY = cms.double(160), # new interface
-        #ParticlesPerPosition = cms.int32(500),  # Number of particles at each position
-        ZPosition = cms.double(400.0),
-        PartID = cms.vint32((13 if particle == "muon" else 11))  # Particle ID
+        #MinPhi = cms.double(0),
+        #MaxPhi = cms.double(0),
+        MinPhi = cms.double(0),
+        MaxPhi = cms.double(6.282),
+
+        #MinX = cms.double(1.0),
+        #MaxX = cms.double(1.0),
+        #MinX = cms.double(-50.0),
+        #MaxX = cms.double(50.0),
+        #MinX = cms.double(-60.0),
+        #MaxX = cms.double(60.0),
+        MinX = cms.double(-70.0),
+        MaxX = cms.double(70.0),
+
+        #MinY = cms.double(160.0), # D-Module
+        #MaxY = cms.double(160.0),
+        #MinY = cms.double(110.0),
+        #MaxY = cms.double(210.0),
+        #MinY = cms.double(140.0), #E-Module
+        #MaxY = cms.double(260.0),
+        MinY = cms.double(0.0), # Sector
+        MaxY = cms.double(310.0),
+
+        #ZPosition = cms.double(400.0), # HEback
+        ZPosition = cms.double(300.0), # HGCAL
+        PartID = cms.vint32((13 if particle == "muon" else 11)),  # Particle ID
+
+        MinEta = cms.double(0.0), # DUMMY VALUE NOT USED
+        MaxEta = cms.double(0.0), # DUMMY VALUE NOT USED
     ),
     Verbosity = cms.untracked.int32(1),
     firstRun = cms.untracked.uint32(1),
@@ -390,10 +406,10 @@ associatePatAlgosToolsTask(process)
 #radiation length: FromChrisdEdx['StainlessSteel'] = 1.14 in MeV/mm from https://github.com/cms-sw/cmssw/blob/master/SimTracker/TrackerMaterialAnalysis/test/dEdxWeights.ipynb
 # time layer thickness 16mm
 # --> dE=18.24 MeV
-print(len(process.hgcalLayerClustersHSci.plugin.dEdXweights))
-process.hgcalLayerClustersHSci.plugin.dEdXweights = cms.vdouble([1e-10 for i in range(51-15)]+[18.24 for i in range(15)]) # last 14 layers in HB
-print(len(process.hgcalLayerClustersHSci.plugin.dEdXweights))
-process.HGCalRecHit.layerWeights = process.hgcalLayerClustersHSci.plugin.dEdXweights
+#print(len(process.hgcalLayerClustersHSci.plugin.dEdXweights))
+#process.hgcalLayerClustersHSci.plugin.dEdXweights = cms.vdouble([1e-10 for i in range(51-15)]+[18.24 for i in range(15)]) # last 14 layers in HB
+#print(len(process.hgcalLayerClustersHSci.plugin.dEdXweights))
+#process.HGCalRecHit.layerWeights = process.hgcalLayerClustersHSci.plugin.dEdXweights
 process.mix.digitizers.hgcalHEback.tofDelay=0 # line to adjust the digitizer to adjust for the time of arrival of particles shot from close to the detector
 process.mix.digitizers.hgcalHEback.digiCfg.feCfg.adcThreshold_fC=0.25 #lowering the MIP threshold in digitizer
 process.mix.digitizers.hgcalHEback.digiCfg.feCfg.targetMIPvalue_ADC=15  #increase granularity of the digitiser 

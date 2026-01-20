@@ -1,8 +1,10 @@
 particle="muon"
 particleEnergy=5
 
+pgun_pos="_random_cosmics_xFlat70_yFlat_z400_phiFlat_cos2Theta"
+#pgun_pos="_random_cosmics_xFlat_yFlat310_z300_phiFlat_cos2Theta"
 
-pgun_pos="_testcosmic_500events_x2_y160_z400_digitiser_mipthreshold_granularity15_adjusted"
+#pgun_pos="_testcosmic_500events_x2_y160_z400_digitiser_mipthreshold_granularity15_adjusted"
 
 
 #pgun_pos="_200events_x2_y160_z400_digitiser_mipthreshold_granularity30_adjusted"#####
@@ -23,7 +25,7 @@ options.register ('seed',
 				  VarParsing.multiplicity.singleton,
 				  VarParsing.varType.float,
 				  "Random seed")
-                                  
+options.parseArguments()                                  
 
 # import of standard configurations
 
@@ -61,6 +63,7 @@ process.load('RecoLocalCalo.Configuration.hgcalLocalReco_cff')
 process.load('Configuration.StandardSequences.Validation_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
+
 #process.load('SimG4CMS.HGCalTestBeam.HGCalTB23Analyzer_cfi')
 
 #process.load('DPGAnalysis.HGCalNanoAOD.hgcRecHits_cff')
@@ -121,7 +124,7 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 #vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(50)    #Number of Events 
+    input = cms.untracked.int32(10)    #Number of Events 
 )
 
 if 'MessageLogger' in process.__dict__:
@@ -228,20 +231,38 @@ process.generator = cms.EDProducer("FlatRandomAngleEGunProducer",
         MinE = cms.double(particleEnergy),  # GeV
         MaxE = cms.double(particleEnergy),
         
-        # Add dummy values for MinEta and MaxEta
-        MinEta = cms.double(1.32),  # Dummy value
-        MaxEta = cms.double(1.32),  # Dummy value
+        MinTheta = cms.double(0.0),  #  along beam axis
+        MaxTheta = cms.double(1.57),  # orthogonal to beam axis
 
-        MinTheta = cms.double(0.0),  # 0 radians (along beam axis)
-        MaxTheta = cms.double(1.57),  # π/2 radians
+        #MinPhi = cms.double(0),
+        #MaxPhi = cms.double(0),
+        MinPhi = cms.double(0),
+        MaxPhi = cms.double(6.282),
 
-        MinPhi = cms.double(0.0),
-        MaxPhi = cms.double(0.0),
-        XCoordinates = cms.vdouble(2.0),  # X positions
-        YCoordinates = cms.vdouble(160.0),  # Y positions
-        ParticlesPerPosition = cms.int32(500),  # Number of particles at each position
+        #MinX = cms.double(1.0),
+        #MaxX = cms.double(1.0),
+        #MinX = cms.double(-50.0),
+        #MaxX = cms.double(50.0),
+        #MinX = cms.double(-60.0),
+        #MaxX = cms.double(60.0),
+        MinX = cms.double(-70.0),
+        MaxX = cms.double(70.0),
+
+        #MinY = cms.double(160.0), # D-Module
+        #MaxY = cms.double(160.0),
+        #MinY = cms.double(110.0),
+        #MaxY = cms.double(210.0),
+        #MinY = cms.double(140.0), #E-Module
+        #MaxY = cms.double(260.0),
+        MinY = cms.double(0.0), # Sector
+        MaxY = cms.double(310.0),
+
         ZPosition = cms.double(400.0),
-        PartID = cms.vint32((13 if particle == "muon" else 11))  # Particle ID
+        #ZPosition = cms.double(300.0),
+        PartID = cms.vint32((13 if particle == "muon" else 11)),  # Particle ID
+
+        MinEta = cms.double(0.0), # DUMMY VALUE NOT USED
+        MaxEta = cms.double(0.0), # DUMMY VALUE NOT USED
     ),
     Verbosity = cms.untracked.int32(1),
     firstRun = cms.untracked.uint32(1),
@@ -338,7 +359,7 @@ process.generation_step = cms.Path(process.pgen)
 process.simulation_step = cms.Path(process.psim)
 process.genfiltersummary_step = cms.EndPath(process.genFilterSummary)
 process.digitisation_step = cms.Path(process.mix)
-#process.reconstruction_step = cms.Path(cms.Sequence(process.HGCalUncalibRecHit*process.HGCalRecHit*process.hgcalRecHitMapProducer*process.hgcalLayerClustersEE*process.hgcalLayerClustersHSi*process.hgcalLayerClustersHSci*process.hgcalMergeLayerClusters*process.hgcalMultiClusters))
+process.reconstruction_step = cms.Path(cms.Sequence(process.HGCalUncalibRecHit*process.HGCalRecHit*process.recHitMapProducer*process.hgcalLayerClustersEE*process.hgcalLayerClustersHSi*process.hgcalLayerClustersHSci*process.hgcalMergeLayerClusters*process.hgcalMultiClusters))
 process.reconstruction_short_step = cms.Path(cms.Sequence(process.HGCalUncalibRecHit*process.HGCalRecHit*process.hgcalLayerClustersEE*process.hgcalLayerClustersHSi*process.hgcalLayerClustersHSci*process.hgcalMergeLayerClusters))
 #process.hgcalnano_step = cms.Path(cms.Sequence(process.hgcDigiHEbackTable*process.hgcHEbackRecHitsTable))#*cms.Sequence(process.hgcRecHitsTask))#*cms.Sequence(process.hgcCMDigiTable*process.unpackerFlagsTable))#*cms.Sequence(process.hgcSoaDigiTable))
 #process.analysis_step = cms.Path(process.HGCalTB23Analyzer)
@@ -354,8 +375,8 @@ process.schedule = cms.Schedule(process.generation_step,
 				process.genfiltersummary_step,
 				process.simulation_step,
 				process.digitisation_step,
-				process.reconstruction_short_step,
-				#process.reconstruction_step,
+				#process.reconstruction_short_step,
+				process.reconstruction_step,
 				#process.hgcalnano_step,
 			        #process.analysis_step,
                                 #process.prevalidation_step7,
@@ -393,6 +414,7 @@ process.mix.digitizers.hgcalHEback.tofDelay=0 # line to adjust the digitizer to 
 process.mix.digitizers.hgcalHEback.digiCfg.feCfg.adcThreshold_fC=0.25 #lowering the MIP threshold in digitizer
 process.mix.digitizers.hgcalHEback.digiCfg.feCfg.targetMIPvalue_ADC=15  #increase granularity of the digitiser 
 process.RandomNumberGeneratorService.generator.initialSeed=int(options.seed)
+process.RandomNumberGeneratorService.g4SimHits.initialSeed=int(options.seed)
 print("Using random seed", int(options.seed))
 from SimCalorimetry.HGCalSimProducers.hgcalDigitizer_cfi import *
 #HGCal_setRealisticNoiseSci(process)

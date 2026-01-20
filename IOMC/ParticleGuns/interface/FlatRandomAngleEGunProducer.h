@@ -28,10 +28,11 @@ namespace edm {
     double fMaxTheta;  // Maximum zenith angle
 
     // Data members for position offsets
+    double fMinX;  // Minimum x
+    double fMaxX;  // Maximum x
+    double fMinY;  // Minimum y
+    double fMaxY;  // Maximum y
     double zpos_;  // Z position
-    std::vector<double> xCoords_;  // Multiple X positions
-    std::vector<double> yCoords_;  // Multiple Y positions
-    int particlesPerPosition_;  // Number of particles per position
 
     // Constants
     static constexpr double mm2cm_ = 0.1;  // Conversion from mm to cm

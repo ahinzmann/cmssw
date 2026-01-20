@@ -33,9 +33,11 @@ FlatRandomAngleEGunProducer::FlatRandomAngleEGunProducer(const ParameterSet& pse
   fMinPhi = pgun_params.getParameter<double>("MinPhi"); // Flat phi distribution
   fMaxPhi = pgun_params.getParameter<double>("MaxPhi");
 
-  xCoords_ = pgun_params.getParameter<std::vector<double>>("XCoordinates"); // Edited by Adnan
-  yCoords_ = pgun_params.getParameter<std::vector<double>>("YCoordinates");
-  particlesPerPosition_ = pgun_params.getParameter<int>("ParticlesPerPosition");
+  fMinX = pgun_params.getParameter<double>("MinX"); // Flat x distribution
+  fMaxX = pgun_params.getParameter<double>("MaxX");
+
+  fMinY = pgun_params.getParameter<double>("MinY"); // Flat y distribution
+  fMaxY = pgun_params.getParameter<double>("MaxY");
 
   zpos_ = pgun_params.getParameter<double>("ZPosition");
 
@@ -51,21 +53,19 @@ void FlatRandomAngleEGunProducer::produce(Event& e, const EventSetup& es) {
   edm::Service<edm::RandomNumberGenerator> rng;
   CLHEP::HepRandomEngine* engine = &rng->getEngine(e.streamID());
 
-  int eventIndex = e.id().event() - 1; // Events are 1-indexed
-  int positionIndex = eventIndex / particlesPerPosition_;
-
   if (fVerbosity > 0) {
     cout << " FlatRandomAngleEGunProducer : Begin New Event Generation" << endl;
   }
 
   fEvt = new HepMC::GenEvent();
 
+  double x = CLHEP::RandFlat::shoot(engine, fMinX, fMaxX);
+  double y = CLHEP::RandFlat::shoot(engine, fMinY, fMaxY);
+
   // Assign coordinates for this event
   HepMC::GenVertex* Vtx = new HepMC::GenVertex(
-      HepMC::FourVector(xCoords_[positionIndex] * cm2mm_, 
-                        yCoords_[positionIndex] * cm2mm_, 
-                        zpos_ * cm2mm_));
-
+      HepMC::FourVector(x * cm2mm_, y * cm2mm_, zpos_ * cm2mm_));
+  std::cerr << y << std::endl;
   int barcode = 1;
   for (unsigned int ip = 0; ip < fPartIDs.size(); ip++) {
     // Generate energy
