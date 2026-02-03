@@ -6,7 +6,7 @@ XMLIdealGeometryESSource = cms.ESSource("XMLIdealGeometryESSource",
                                'Geometry/HGCalCommonData/data/hgcalMaterial/v2/hgcalMaterial.xml',
                                'Geometry/HGCalTBCommonData/data/TB24DESYV2/cms.xml',
                                'Geometry/HGCalTBCommonData/data/TB24DESYV2/caloBase.xml',
-                               'Geometry/HGCalTBCommonData/data/TB24DESYV2/hgcalBeam.xml',
+                               #'Geometry/HGCalTBCommonData/data/TB24DESYV2/hgcalBeam.xml',
                                'Geometry/HGCalTBCommonData/data/TB24DESYV2/he/hgcal.xml', # adapted from Geometry/HGCalCommonData/data/hgcal/v17/hgcal.xml
                                'Geometry/HGCalCommonData/data/hgcalHEmix/v17/hgcalHEmix.xml',
                                'Geometry/HGCalCommonData/data/hgcalcell/v17/hgcalcell.xml',

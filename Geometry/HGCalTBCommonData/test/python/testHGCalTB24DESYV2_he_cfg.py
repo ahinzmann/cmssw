@@ -1,7 +1,8 @@
 particle="muon"
 particleEnergy=5
+saveOnlyClusters=True
 
-pgun_pos="_random_cosmics_he_xFlat_yFlat_z360_phiFlat_cos2Theta"
+pgun_pos="_random_cosmics_he_xFlat_yFlat_z360_phiFlat_cos2Theta_thrSci0p25_noCluster_time0_son6"
 #pgun_pos="_random_cosmics_xFlat_yFlat310_z300_phiFlat_cos2Theta"
 
 #pgun_pos="_testcosmic_500events_x2_y160_z400_digitiser_mipthreshold_granularity15_adjusted"
@@ -26,6 +27,7 @@ options.register ('seed',
 				  VarParsing.varType.float,
 				  "Random seed")
 options.parseArguments()                                  
+pgun_pos+="_"+str(options.seed)
 
 # import of standard configurations
 
@@ -38,7 +40,7 @@ process.load('Configuration.EventContent.EventContent_cff')
 process.load('Geometry.HGCalTBCommonData.testTB24DESYV2_he_XML_cfi')
 process.load('Geometry.HGCalCommonData.hgcalNumberingInitialization_cfi')
 process.load('Geometry.HGCalCommonData.hgcalParametersInitialization_cfi')
-process.load('Geometry.HcalTestBeamData.hcalTB06Parameters_cff')
+#process.load('Geometry.HcalTestBeamData.hcalTB06Parameters_cff')
 #process.load('Geometry.ForwardCommonData.hfnoseNumberingInitialization_cfi') # for HFnose
 #process.load('Geometry.ForwardCommonData.hfnoseParametersInitialization_cfi') # for HFnose
 #process.load('Geometry.CaloEventSetup.HFNoseTopology_cfi') # for HFnose
@@ -124,7 +126,7 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 #vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(10)    #Number of Events 
+    input = cms.untracked.int32(1000)    #Number of Events 
 )
 
 if 'MessageLogger' in process.__dict__:
@@ -166,6 +168,8 @@ process.EDMoutput = cms.OutputModule("PoolOutputModule",
     outputCommands = cms.untracked.vstring("keep *"),
     splitLevel = cms.untracked.int32(0)
 )
+if saveOnlyClusters:
+  process.EDMoutput.outputCommands = cms.untracked.vstring("drop *","keep recoCaloClusters_*_*_*")
 
 # Additional output definition for TBAnalyser
 #process.TFileService = cms.Service("TFileService",
@@ -233,11 +237,13 @@ process.generator = cms.EDProducer("FlatRandomAngleEGunProducer",
         
         MinTheta = cms.double(0.0),  #  along beam axis
         MaxTheta = cms.double(1.57),  # orthogonal to beam axis
+        #MaxTheta = cms.double(0),  # test
 
         #MinPhi = cms.double(0),
         #MaxPhi = cms.double(0),
         MinPhi = cms.double(0),
         MaxPhi = cms.double(6.282),
+        #MaxPhi = cms.double(0), # test
 
         #MinX = cms.double(1.0),
         #MaxX = cms.double(1.0),
@@ -245,15 +251,19 @@ process.generator = cms.EDProducer("FlatRandomAngleEGunProducer",
         #MaxX = cms.double(50.0),
         MinX = cms.double(-250.0), # Sector
         MaxX = cms.double(250.0),
+        #MinX = cms.double(1.0), # test
+        #MaxX = cms.double(1.0),
 
         #MinY = cms.double(160.0), # D-Module
         #MaxY = cms.double(160.0),
         #MinY = cms.double(110.0),
         #MaxY = cms.double(210.0),
-        #MinY = cms.double(140.0), #E-Module
+        #MinY = cms.double(140.0), # E-Module
         #MaxY = cms.double(260.0),
-        MinY = cms.double(-100.0), # 10-deg Sector
+        MinY = cms.double(-100.0), # Sector
         MaxY = cms.double(400.0),
+        #MinY = cms.double(55.0), # test
+        #MaxY = cms.double(55.0),
 
         #ZPosition = cms.double(400.0), # HEback
         ZPosition = cms.double(360.0), # HEsil
@@ -309,7 +319,7 @@ process.VtxSmeared.MinY =  0.0
 process.VtxSmeared.MaxY =  0.0
 process.VtxSmeared.MinT =  0.0
 process.VtxSmeared.MaxT =  0.0
-process.g4SimHits.OnlySDs = ['HGCalSensitiveDetector','HGCScintillatorSensitiveDetector', 'HcalTB06BeamDetector','HFNoseSensitiveDetector']
+process.g4SimHits.OnlySDs = ['HGCalSensitiveDetector','HGCScintillatorSensitiveDetector'] #, 'HcalTB06BeamDetector','HFNoseSensitiveDetector'
 process.g4SimHits.HGCSD.Detectors = 1
 process.g4SimHits.HGCSD.RejectMouseBite = False
 process.g4SimHits.HGCSD.RotatedWafer    = False
@@ -331,26 +341,26 @@ process.HGCalUncalibRecHit.HGCEEdigiCollection = cms.InputTag("mix","HGCDigisEE"
 process.HGCalUncalibRecHit.HGCHEBdigiCollection = cms.InputTag("mix","HGCDigisHEback")
 process.HGCalUncalibRecHit.HGCHEFdigiCollection = cms.InputTag("mix","HGCDigisHEfront")
 
-from PhysicsTools.NanoAOD.common_cff import Var
-process.hgcDigiHEbackTable = cms.EDProducer("SimpleHGCDigiFlatTableProducer",
-     src = cms.InputTag("mix","HGCDigisHEback"),
-     cut = cms.string(""), 
-     name = cms.string("HGCDigisHEback"),
-     doc  = cms.string("HGCAL hadronic scintillator digis"),
-     singleton = cms.bool(False), # the number of entries is variable
-     extension = cms.bool(False),
-     variables = cms.PSet(
-         rawId = Var('id().rawId()', 'uint', precision=-1, doc='raw id'),
-         raw = Var('sample(2).raw()', 'uint', doc='raw'),
-         threshold = Var('sample(2).threshold()', 'bool', doc='threshold'),
-         mode = Var('sample(2).mode()', 'bool', doc='mode'),
-         gain = Var('sample(2).gain()', 'uint16', doc='gain'),
-         toa = Var('sample(2).toa()', 'uint16', doc='toa'),
-         data = Var('sample(2).data()', 'uint16', doc='data'),
-         getToAValid = Var('sample(2).getToAValid()', 'bool', doc='getToAValid'),
-     )
-)
-process.hgcDigiHEfrontTable=process.hgcDigiHEbackTable.clone(src = cms.InputTag("mix","HGCDigisHEfront"))
+#from PhysicsTools.NanoAOD.common_cff import Var
+#process.hgcDigiHEbackTable = cms.EDProducer("SimpleHGCDigiFlatTableProducer",
+#     src = cms.InputTag("mix","HGCDigisHEback"),
+#     cut = cms.string(""), 
+#     name = cms.string("HGCDigisHEback"),
+#     doc  = cms.string("HGCAL hadronic scintillator digis"),
+#     singleton = cms.bool(False), # the number of entries is variable
+#     extension = cms.bool(False),
+#     variables = cms.PSet(
+#         rawId = Var('id().rawId()', 'uint', precision=-1, doc='raw id'),
+#         raw = Var('sample(2).raw()', 'uint', doc='raw'),
+#         threshold = Var('sample(2).threshold()', 'bool', doc='threshold'),
+#         mode = Var('sample(2).mode()', 'bool', doc='mode'),
+#         gain = Var('sample(2).gain()', 'uint16', doc='gain'),
+#         toa = Var('sample(2).toa()', 'uint16', doc='toa'),
+#         data = Var('sample(2).data()', 'uint16', doc='data'),
+#         getToAValid = Var('sample(2).getToAValid()', 'bool', doc='getToAValid'),
+#     )
+#)
+#process.hgcDigiHEfrontTable=process.hgcDigiHEbackTable.clone(src = cms.InputTag("mix","HGCDigisHEfront"))
 
 # Path and EndPath definitions
 process.generation_step = cms.Path(process.pgen)
@@ -409,11 +419,40 @@ associatePatAlgosToolsTask(process)
 #print(len(process.hgcalLayerClustersHSci.plugin.dEdXweights))
 #process.HGCalRecHit.layerWeights = process.hgcalLayerClustersHSci.plugin.dEdXweights
 process.mix.digitizers.hgcalHEback.tofDelay=0 # line to adjust the digitizer to adjust for the time of arrival of particles shot from close to the detector
-process.mix.digitizers.hgcalHEback.digiCfg.feCfg.adcThreshold_fC=0.25 #lowering the MIP threshold in digitizer
+process.mix.digitizers.hgcalHEback.digiCfg.feCfg.adcThreshold_fC=0.25 # lowering the MIP threshold in digitizer
 process.mix.digitizers.hgcalHEback.digiCfg.feCfg.targetMIPvalue_ADC=15  #increase granularity of the digitiser 
+#print(process.mix.digitizers.hgcalHEfront)
+process.mix.digitizers.hgcalHEfront.tofDelay=0 # line to adjust the digitizer to adjust for the time of arrival of particles shot from close to the detector
+process.mix.digitizers.hgcalEE.tofDelay=0 # line to adjust the digitizer to adjust for the time of arrival of particles shot from close to the detector
+#process.mix.digitizers.hgcalHEfront.digiCfg.feCfg.adcThreshold_fC=0.672/2 # lowering the threshold in digitizer to 50%
+#process.mix.digitizers.hgcalEE.digiCfg.feCfg.adcThreshold_fC=0.672/2 # lowering the threshold in digitizer to 50%
 process.RandomNumberGeneratorService.generator.initialSeed=int(options.seed)
 process.RandomNumberGeneratorService.g4SimHits.initialSeed=int(options.seed)
 print("Using random seed", int(options.seed))
 from SimCalorimetry.HGCalSimProducers.hgcalDigitizer_cfi import *
 #HGCal_setRealisticNoiseSci(process)
 #HGCal_setEndOfLifeNoise(process)
+
+print(process.hgcalLayerClustersEE.dumpPython())
+#process.hgcalLayerClustersEE.plugin.kappa=0 # disable clustering, by treating every hit as seed
+#process.hgcalLayerClustersHSi.plugin.kappa=0 # disable clustering, by treating every hit as seed
+#process.hgcalLayerClustersHSci.plugin.kappa=0 # disable clustering, by treating every hit as seed
+process.hgcalLayerClustersEE.plugin.kappa=6 # disable clustering, by treating every hit as seed
+process.hgcalLayerClustersHSi.plugin.kappa=6 # disable clustering, by treating every hit as seed
+process.hgcalLayerClustersHSci.plugin.kappa=6 # disable clustering, by treating every hit as seed
+process.hgcalLayerClustersHSci.plugin.deltac=cms.vdouble(0.00001,0.00001,0.00001,0.00001) # disable clustering, by treating every hit as outlier
+process.hgcalLayerClustersHSi.plugin.deltac=cms.vdouble(0.00001,0.00001,0.00001,0.00001) # disable clustering, by treating every hit as outlier
+process.hgcalLayerClustersEE.plugin.deltac=cms.vdouble(0.00001,0.00001,0.00001,0.00001) # disable clustering, by treating every hit as outlier
+#process.hgcalLayerClustersEE.plugin.ecut=4 # cut on Signal/Noise>4
+#process.hgcalLayerClustersHSi.plugin.ecut=4 # cut on Signal/Noise>4
+#process.hgcalLayerClustersHSci.plugin.ecut=4 # cut on Signal/Noise>4
+#process.hgcalLayerClustersEE.plugin.dependSensor=False # disable clustering, by treating every hit as outlier
+#process.hgcalLayerClustersHSi.plugin.dependSensor=False # disable clustering, by treating every hit as outlier
+#process.hgcalLayerClustersHSci.plugin.dependSensor=False # disable clustering, by treating every hit as outlier
+#process.hgcalLayerClustersEE.plugin.use2x2=False # disable clustering, by treating every hit as outlier
+#process.hgcalLayerClustersHSi.plugin.use2x2=False # disable clustering, by treating every hit as outlier
+#process.hgcalLayerClustersHSci.plugin.use2x2=False # disable clustering, by treating every hit as outlier
+#process.hgcalLayerClustersHSci.plugin.fcPerMip = cms.vdouble(
+#            1.25, 2.57, 3.88, 3.0000, 2.57,
+#            3.88
+#        )
