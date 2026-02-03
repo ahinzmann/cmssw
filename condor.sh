@@ -8,6 +8,6 @@ cd /tmp/job$1
 cmsRun /afs/desy.de/user/h/hinzmann/hgcal/CMSSW_15_1_0_pre5/src/Geometry/HGCalTBCommonData/test/python/testHGCalTB24DESYV2_he_cfg.py seed=$1
 echo "Writing output to /data/dust/user/hinzmann/hgcal"
 mkdir /data/dust/user/hinzmann/hgcal
-mkdir /data/dust/user/hinzmann/hgcal/job$1
-mv *.root /data/dust/user/hinzmann/hgcal/job$1
+mkdir /data/dust/user/hinzmann/hgcal/he_son6
+mv *.root /data/dust/user/hinzmann/hgcal/he_son6
 rm -r /tmp/job$1
