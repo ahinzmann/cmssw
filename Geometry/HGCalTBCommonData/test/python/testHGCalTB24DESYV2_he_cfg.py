@@ -3,13 +3,6 @@ particleEnergy=5
 saveOnlyClusters=True
 
 pgun_pos="_random_cosmics_he_xFlat_yFlat_z360_phiFlat_cos2Theta_thrSci0p25_noCluster_time0_son6"
-#pgun_pos="_random_cosmics_xFlat_yFlat310_z300_phiFlat_cos2Theta"
-
-#pgun_pos="_testcosmic_500events_x2_y160_z400_digitiser_mipthreshold_granularity15_adjusted"
-
-
-#pgun_pos="_200events_x2_y160_z400_digitiser_mipthreshold_granularity30_adjusted"#####
-
 
 import FWCore.ParameterSet.Config as cms
 from Configuration.Eras.Modifier_hgcaltb_cff import hgcaltb

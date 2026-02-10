@@ -2,7 +2,7 @@ particle="muon"
 particleEnergy=5
 saveOnlyClusters=True
 
-pgun_pos="_random_cosmics_xFlat40_yFlat40_z400_phiFlat_cos2Theta_noCluster_time0_son6"
+pgun_pos="_random_cosmics_xFlat45_yFlat45_z400_phiFlat_cos2Theta_noCluster_time0_son6_trigtime"
 #pgun_pos="_random_cosmics_xFlat_yFlat310_z300_phiFlat_cos2Theta"
 
 #pgun_pos="_testcosmic_500events_x2_y160_z400_digitiser_mipthreshold_granularity15_adjusted"
@@ -125,7 +125,7 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 #vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(10)    #Number of Events 
+    input = cms.untracked.int32(50)    #Number of Events 
 )
 
 if 'MessageLogger' in process.__dict__:
@@ -249,15 +249,15 @@ process.generator = cms.EDProducer("FlatRandomAngleEGunProducer",
         #MaxX = cms.double(50.0),
         #MinX = cms.double(-60.0),
         #MaxX = cms.double(60.0),
-        MinX = cms.double(-20.0), # Trigger of teststand
-        MaxX = cms.double(20.0), # Trigger of teststand
+        MinX = cms.double(-22.50), # Trigger of teststand
+        MaxX = cms.double(22.50), # Trigger of teststand
 
         #MinY = cms.double(160.0), # D-Module
         #MaxY = cms.double(160.0),
         #MinY = cms.double(110.0),
         #MaxY = cms.double(210.0),
-        MinY = cms.double(180.0), # Trigger of teststand
-        MaxY = cms.double(220.0), # Trigger of teststand
+        MinY = cms.double(177.50), # Trigger of teststand
+        MaxY = cms.double(222.50), # Trigger of teststand
         #MinY = cms.double(0.0), # Sector
         #MaxY = cms.double(310.0),
 
