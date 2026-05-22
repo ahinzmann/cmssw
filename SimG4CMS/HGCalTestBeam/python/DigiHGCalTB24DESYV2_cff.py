@@ -67,7 +67,7 @@ theDigitizers = cms.PSet(
     hgcalHEback = cms.PSet(
         hgchebackDigitizer     
     ),
-    calotruth = cms.PSet( caloParticles )
+    #calotruth = cms.PSet( caloParticles )
 )
 
 mix = cms.EDProducer("MixingModule",

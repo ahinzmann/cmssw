@@ -5,9 +5,8 @@ saveOnlyClusters=True
 pgun_pos="_random_cosmics_hgcal_xFlat_yFlat_z300_phiFlat_cos2Theta_thrSci0p25_noCluster_time0_son6"
 
 import FWCore.ParameterSet.Config as cms
-from Configuration.Eras.Modifier_hgcaltb_cff import hgcaltb
-
-process = cms.Process('GENSIMDIGIRECO', hgcaltb)
+from Configuration.Eras.Era_Phase2_cff import Phase2
+process = cms.Process('GENSIMDIGIRECO', Phase2)
 
 ###Below line for condor randdom seed vvvvvvvvv
 
@@ -34,19 +33,13 @@ process.load('Geometry.HGCalTBCommonData.testTB24DESYV2_hgcal_XML_cfi')
 process.load('Geometry.HGCalCommonData.hgcalNumberingInitialization_cfi')
 process.load('Geometry.HGCalCommonData.hgcalParametersInitialization_cfi')
 #process.load('Geometry.HcalTestBeamData.hcalTB06Parameters_cff')
-#process.load('Geometry.ForwardCommonData.hfnoseNumberingInitialization_cfi') # for HFnose
-#process.load('Geometry.ForwardCommonData.hfnoseParametersInitialization_cfi') # for HFnose
-#process.load('Geometry.CaloEventSetup.HFNoseTopology_cfi') # for HFnose
 process.load('Geometry.CaloEventSetup.HGCalTopology_cfi')
 process.load('Geometry.CaloEventSetup.CaloTopology_cfi')
 process.load('Geometry.CaloEventSetup.CaloGeometryBuilder_cfi')
 process.CaloGeometryBuilder = cms.ESProducer( "CaloGeometryBuilder",
-   SelectedCalos = cms.vstring("HGCalEESensitive", "HGCalHESiliconSensitive", "HGCalHEScintillatorSensitive")#, "HGCalHFNoseSensitive")
+   SelectedCalos = cms.vstring("HGCalEESensitive", "HGCalHESiliconSensitive", "HGCalHEScintillatorSensitive")
 )
 process.load('Geometry.HGCalGeometry.HGCalGeometryESProducer_cfi')
-#process.HGCalHFNoseGeometryESProducer = cms.ESProducer("HGCalGeometryESProducer",
-#                                              Name = cms.untracked.string("HGCalHFNoseSensitive")
-#                                              ) # for HF nose
 process.load('Configuration.StandardSequences.MagneticField_0T_cff')
 process.load('Configuration.StandardSequences.Generator_cff')
 process.load('GeneratorInterface.Core.generatorSmeared_cfi')
@@ -195,7 +188,7 @@ process.DQMoutput = cms.OutputModule("DQMRootOutputModule",
 # Other statements
 process.genstepfilter.triggerConditions=cms.vstring("generation_step")
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T21', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T35', '')
 
 
 #process.generator = cms.EDProducer("FlatRandomEGunProducer",
@@ -308,7 +301,7 @@ process.VtxSmeared.MinY =  0.0
 process.VtxSmeared.MaxY =  0.0
 process.VtxSmeared.MinT =  0.0
 process.VtxSmeared.MaxT =  0.0
-process.g4SimHits.OnlySDs = ['HGCalSensitiveDetector','HGCScintillatorSensitiveDetector'] #, 'HcalTB06BeamDetector','HFNoseSensitiveDetector']
+process.g4SimHits.OnlySDs = ['HGCalSensitiveDetector','HGCScintillatorSensitiveDetector'] #, 'HcalTB06BeamDetector'
 process.g4SimHits.HGCSD.Detectors = 1
 process.g4SimHits.HGCSD.RejectMouseBite = False
 process.g4SimHits.HGCSD.RotatedWafer    = False
@@ -408,8 +401,8 @@ associatePatAlgosToolsTask(process)
 #print(len(process.hgcalLayerClustersHSci.plugin.dEdXweights))
 #process.HGCalRecHit.layerWeights = process.hgcalLayerClustersHSci.plugin.dEdXweights
 process.mix.digitizers.hgcalHEback.tofDelay=0 # line to adjust the digitizer to adjust for the time of arrival of particles shot from close to the detector
-process.mix.digitizers.hgcalHEback.digiCfg.feCfg.adcThreshold_fC=0.25 #lowering the MIP threshold in digitizer
-process.mix.digitizers.hgcalHEback.digiCfg.feCfg.targetMIPvalue_ADC=15  #increase granularity of the digitiser 
+#process.mix.digitizers.hgcalHEback.digiCfg.feCfg.adcThreshold_fC=0.25 #lowering the MIP threshold in digitizer
+#process.mix.digitizers.hgcalHEback.digiCfg.feCfg.targetMIPvalue_ADC=15  #increase granularity of the digitiser 
 process.mix.digitizers.hgcalHEfront.tofDelay=0 # line to adjust the digitizer to adjust for the time of arrival of particles shot from close to the detector
 process.mix.digitizers.hgcalEE.tofDelay=0 # line to adjust the digitizer to adjust for the time of arrival of particles shot from close to the detector
 process.RandomNumberGeneratorService.generator.initialSeed=int(options.seed)

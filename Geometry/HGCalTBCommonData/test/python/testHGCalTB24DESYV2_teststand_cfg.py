@@ -11,7 +11,8 @@ pgun_pos="_random_cosmics_xFlat45_yFlat45_z400_phiFlat_cos2Theta_noCluster_time0
 #pgun_pos="_200events_x2_y160_z400_digitiser_mipthreshold_granularity30_adjusted"#####
 
 import FWCore.ParameterSet.Config as cms
-from Configuration.Eras.Modifier_hgcaltb_cff import hgcaltb
+from Configuration.Eras.Era_Phase2_cff import Phase2
+process = cms.Process('GENSIMDIGIRECO', Phase2)
 
 process = cms.Process('GENSIMDIGIRECO', hgcaltb)
 
@@ -202,7 +203,7 @@ process.DQMoutput = cms.OutputModule("DQMRootOutputModule",
 # Other statements
 process.genstepfilter.triggerConditions=cms.vstring("generation_step")
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T21', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T35', '')
 
 
 #process.generator = cms.EDProducer("FlatRandomEGunProducer",
@@ -415,8 +416,8 @@ process.hgcalLayerClustersHSci.plugin.dEdXweights = cms.vdouble([1e-10 for i in 
 print(len(process.hgcalLayerClustersHSci.plugin.dEdXweights))
 process.HGCalRecHit.layerWeights = process.hgcalLayerClustersHSci.plugin.dEdXweights
 process.mix.digitizers.hgcalHEback.tofDelay=0 # line to adjust the digitizer to adjust for the time of arrival of particles shot from close to the detector
-process.mix.digitizers.hgcalHEback.digiCfg.feCfg.adcThreshold_fC=0.25 #lowering the MIP threshold in digitizer
-process.mix.digitizers.hgcalHEback.digiCfg.feCfg.targetMIPvalue_ADC=15  #increase granularity of the digitiser 
+#process.mix.digitizers.hgcalHEback.digiCfg.feCfg.adcThreshold_fC=0.25 #lowering the MIP threshold in digitizer
+#process.mix.digitizers.hgcalHEback.digiCfg.feCfg.targetMIPvalue_ADC=15  #increase granularity of the digitiser 
 process.hgcalLayerClustersHSci.plugin.kappa=6 # disable clustering, by treating every hit as seed
 process.hgcalLayerClustersHSci.plugin.deltac=cms.vdouble(0.00001,0.00001,0.00001,0.00001) # disable clustering, by treating every hit as outlier
 process.RandomNumberGeneratorService.generator.initialSeed=int(options.seed)
@@ -425,4 +426,3 @@ print("Using random seed", int(options.seed))
 from SimCalorimetry.HGCalSimProducers.hgcalDigitizer_cfi import *
 #HGCal_setRealisticNoiseSci(process)
 #HGCal_setEndOfLifeNoise(process)
-

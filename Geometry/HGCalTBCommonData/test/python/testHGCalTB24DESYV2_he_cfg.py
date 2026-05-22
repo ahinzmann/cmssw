@@ -5,9 +5,8 @@ saveOnlyClusters=True
 pgun_pos="_random_cosmics_he_xFlat_yFlat_z360_phiFlat_cos2Theta_thrSci0p25_noCluster_time0_son6"
 
 import FWCore.ParameterSet.Config as cms
-from Configuration.Eras.Modifier_hgcaltb_cff import hgcaltb
-
-process = cms.Process('GENSIMDIGIRECO', hgcaltb)
+from Configuration.Eras.Era_Phase2_cff import Phase2
+process = cms.Process('GENSIMDIGIRECO', Phase2)
 
 ###Below line for condor randdom seed vvvvvvvvv
 
@@ -195,7 +194,7 @@ process.DQMoutput = cms.OutputModule("DQMRootOutputModule",
 # Other statements
 process.genstepfilter.triggerConditions=cms.vstring("generation_step")
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T21', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T35', '')
 
 
 #process.generator = cms.EDProducer("FlatRandomEGunProducer",
@@ -412,8 +411,8 @@ associatePatAlgosToolsTask(process)
 #print(len(process.hgcalLayerClustersHSci.plugin.dEdXweights))
 #process.HGCalRecHit.layerWeights = process.hgcalLayerClustersHSci.plugin.dEdXweights
 process.mix.digitizers.hgcalHEback.tofDelay=0 # line to adjust the digitizer to adjust for the time of arrival of particles shot from close to the detector
-process.mix.digitizers.hgcalHEback.digiCfg.feCfg.adcThreshold_fC=0.25 # lowering the MIP threshold in digitizer
-process.mix.digitizers.hgcalHEback.digiCfg.feCfg.targetMIPvalue_ADC=15  #increase granularity of the digitiser 
+#process.mix.digitizers.hgcalHEback.digiCfg.feCfg.adcThreshold_fC=0.25 # lowering the MIP threshold in digitizer
+#process.mix.digitizers.hgcalHEback.digiCfg.feCfg.targetMIPvalue_ADC=15  #increase granularity of the digitiser 
 #print(process.mix.digitizers.hgcalHEfront)
 process.mix.digitizers.hgcalHEfront.tofDelay=0 # line to adjust the digitizer to adjust for the time of arrival of particles shot from close to the detector
 process.mix.digitizers.hgcalEE.tofDelay=0 # line to adjust the digitizer to adjust for the time of arrival of particles shot from close to the detector
@@ -426,7 +425,7 @@ from SimCalorimetry.HGCalSimProducers.hgcalDigitizer_cfi import *
 #HGCal_setRealisticNoiseSci(process)
 #HGCal_setEndOfLifeNoise(process)
 
-print(process.hgcalLayerClustersEE.dumpPython())
+#print(process.hgcalLayerClustersEE.dumpPython())
 #process.hgcalLayerClustersEE.plugin.kappa=0 # disable clustering, by treating every hit as seed
 #process.hgcalLayerClustersHSi.plugin.kappa=0 # disable clustering, by treating every hit as seed
 #process.hgcalLayerClustersHSci.plugin.kappa=0 # disable clustering, by treating every hit as seed

@@ -135,3 +135,6 @@ void FlatRandomAngleEGunProducer::produce(Event& e, const EventSetup& es) {
   }
 }
 
+#include "FWCore/Framework/interface/MakerMacros.h"
+using edm::FlatRandomAngleEGunProducer;
+DEFINE_FWK_MODULE(FlatRandomAngleEGunProducer);
