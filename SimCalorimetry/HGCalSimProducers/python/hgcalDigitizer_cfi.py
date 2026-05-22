@@ -136,16 +136,21 @@ hgchebackDigitizer = cms.PSet(
     useAllChannels    = cms.bool(True),
     verbosity         = cms.untracked.uint32(0),
     digiCfg = cms.PSet(
-        #0 empty digitizer, 1 calice digitizer, 2 realistic digitizer
-        algo          = cms.uint32(2),        
+        #0 empty digitizer, 1 calice digitizer, 2 realistic digitizer, 3 realistic sci /proper calice
+        algo          = cms.uint32(3),        
         noise         = cms.PSet(refToPSet_ = cms.string("HGCAL_noise_heback")), #scales both for scint raddam and sipm dark current
-        keV2MIP       = cms.double(1./675.0),
+        keV2MIP       = cms.double(1./455.0),   #to use the MPV value #cms.double(1./675.0),
         doTimeSamples = cms.bool(False),
-        nPEperMIP = cms.double(21.0),
-        nTotalPE  = cms.double(7500),        
+        nPEperMIP = cms.double(80.0),  # light yield _ id
+        nTotalPE  = cms.double(7500),
+        nTotalPX  = cms.double(39984),
+        SiPM9mmgain4OV12CG = cms.double(0.7),        
         sdPixels  = cms.double(1e-6), # this is additional photostatistics noise (as implemented), not sure why it's here...
         thresholdFollowsMIP = cms.bool(thresholdTracksMIP),
+        maxADC_ = cms.double(1024.0),
         feCfg = hgcROCSettings.clone(
+            fwVersion         = cms.uint32(1),           # 3 = to have NO shaper then in principle none of the other params matter apart from maybe the ADC threshold, 4 = min shaper
+            adcPulse          = cms.vdouble(0.0, 0.0,   1.0,   0.0,  0.0,  0.0),
             adcNbits        = 10,      # standard ROC operations (was 2 bits more up to 11_0_0_pre12)
             adcSaturation_fC = 68.75,  # keep the adc LSB the same (i.e. set saturation one quarter value of pre12)
             tdcSaturation_fC  = 1000,  # allow up to 1000 MIPs as a max range, including ToA mode
@@ -153,7 +158,8 @@ hgchebackDigitizer = cms.PSet(
             adcThreshold_fC = 0.5,     # unchanged with respect to pre12
             tdcOnset_fC       = 55,    # turn on TDC when 80% of the ADC range is reached (one quarter of pre12
             #                                        indicative at this point)
-            tdcForToAOnset_fC = cms.vdouble(12.,12.,12.),  #turn ToA for 20% of the TDC threshold (indicative at this point)
+            tdcForToAOnset_fC = cms.vdouble(12., 12., 12.),  #turn ToA for 20% of the TDC threshold (indicative at this point)
+            
         )
     )
 )
@@ -285,7 +291,7 @@ def HGCal_ignoreNoise(process):
     include all effects except noise impact on leakage current and CCE, and scint
     (see also notes in HGCal_setRealisticStartupNoise)
     """
-    process=HGCal_setRealisticNoiseSi(process,byDose=True,byDoseAlgo=4)
+    #process=HGCal_setRealisticNoiseSi(process,byDose=True,byDoseAlgo=4)
     process=HGCal_setRealisticNoiseSci(process,byDose=True,byDoseAlgo=2+32)
     return process
 
