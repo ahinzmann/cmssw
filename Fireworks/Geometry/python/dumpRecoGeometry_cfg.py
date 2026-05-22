@@ -131,6 +131,56 @@ def recoGeoLoad(score, properties):
        )
        process.load("SimG4CMS.HGCalTestBeam.HGCalTB160XML_cfi")
        
+    elif score == "HGCTB24DESYV2_stack": ## hgcal testbeam
+       process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+       from Configuration.AlCa.GlobalTag import GlobalTag
+       process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T21', '')
+       process.load('Geometry.HGCalTBCommonData.testTB24DESYV2_stack_XML_cfi')
+       process.load('Geometry.HGCalCommonData.hgcalParametersInitialization_cfi')
+       process.load('Geometry.HGCalCommonData.hgcalNumberingInitialization_cfi')
+       process.load('Geometry.HcalTestBeamData.hcalTB06Parameters_cff')
+       #process.load('Geometry.ForwardCommonData.hfnoseNumberingInitialization_cfi') # for HFnose
+       #process.load('Geometry.ForwardCommonData.hfnoseParametersInitialization_cfi') # for HFnose
+       #process.load('Geometry.CaloEventSetup.HFNoseTopology_cfi') # for HFnose
+       process.load('Geometry.CaloEventSetup.HGCalTopology_cfi')
+       process.load('Geometry.CaloEventSetup.CaloTopology_cfi')
+       process.load('Geometry.CaloEventSetup.CaloGeometryBuilder_cfi')
+       process.CaloGeometryBuilder = cms.ESProducer(
+          "CaloGeometryBuilder",
+          SelectedCalos = cms.vstring("HGCalEESensitive", "HGCalHESiliconSensitive", "HGCalHEScintillatorSensitive")#, "HGCalHFNoseSensitive")
+       )
+       process.load('Geometry.HGCalGeometry.HGCalGeometryESProducer_cfi')
+       #process.HGCalHFNoseGeometryESProducer = cms.ESProducer("HGCalGeometryESProducer",
+       #                                       Name = cms.untracked.string("HGCalHFNoseSensitive")
+       #                                       ) # for HF nose
+       options.muon=False
+       options.tracker=False
+
+    elif score == "HGCTB24DESYV2_teststand": ## hgcal teststand
+       process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+       from Configuration.AlCa.GlobalTag import GlobalTag
+       process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T21', '')
+       process.load('Geometry.HGCalTBCommonData.testTB24DESYV2_teststand_XML_cfi')
+       process.load('Geometry.HGCalCommonData.hgcalParametersInitialization_cfi')
+       process.load('Geometry.HGCalCommonData.hgcalNumberingInitialization_cfi')
+       process.load('Geometry.HcalTestBeamData.hcalTB06Parameters_cff')
+       #process.load('Geometry.ForwardCommonData.hfnoseNumberingInitialization_cfi') # for HFnose
+       #process.load('Geometry.ForwardCommonData.hfnoseParametersInitialization_cfi') # for HFnose
+       #process.load('Geometry.CaloEventSetup.HFNoseTopology_cfi') # for HFnose
+       process.load('Geometry.CaloEventSetup.HGCalTopology_cfi')
+       process.load('Geometry.CaloEventSetup.CaloTopology_cfi')
+       process.load('Geometry.CaloEventSetup.CaloGeometryBuilder_cfi')
+       process.CaloGeometryBuilder = cms.ESProducer(
+          "CaloGeometryBuilder",
+          SelectedCalos = cms.vstring("HGCalEESensitive", "HGCalHESiliconSensitive", "HGCalHEScintillatorSensitive")#, "HGCalHFNoseSensitive")
+       )
+       process.load('Geometry.HGCalGeometry.HGCalGeometryESProducer_cfi')
+       #process.HGCalHFNoseGeometryESProducer = cms.ESProducer("HGCalGeometryESProducer",
+       #                                       Name = cms.untracked.string("HGCalHFNoseSensitive")
+       #                                       ) # for HF nose
+       options.muon=False
+       options.tracker=False
+
     else:
       help()
 
