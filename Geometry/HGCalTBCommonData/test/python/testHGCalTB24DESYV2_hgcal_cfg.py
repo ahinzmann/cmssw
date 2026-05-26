@@ -5,8 +5,8 @@ saveOnlyClusters=True
 pgun_pos="_random_cosmics_hgcal_xFlat_yFlat_z300_phiFlat_cos2Theta_thrSci0p25_noCluster_time0_son6"
 
 import FWCore.ParameterSet.Config as cms
-from Configuration.Eras.Era_Phase2_cff import Phase2
-process = cms.Process('GENSIMDIGIRECO', Phase2)
+from Configuration.Eras.Era_Phase2C26I13M9_cff import Phase2C26I13M9
+process = cms.Process('GENSIMDIGIRECO',Phase2C26I13M9)
 
 ###Below line for condor randdom seed vvvvvvvvv
 
@@ -302,9 +302,9 @@ process.VtxSmeared.MaxY =  0.0
 process.VtxSmeared.MinT =  0.0
 process.VtxSmeared.MaxT =  0.0
 process.g4SimHits.OnlySDs = ['HGCalSensitiveDetector','HGCScintillatorSensitiveDetector'] #, 'HcalTB06BeamDetector'
-process.g4SimHits.HGCSD.Detectors = 1
-process.g4SimHits.HGCSD.RejectMouseBite = False
-process.g4SimHits.HGCSD.RotatedWafer    = False
+#process.g4SimHits.HGCSD.Detectors = 1
+#process.g4SimHits.HGCSD.RejectMouseBite = False
+#process.g4SimHits.HGCSD.RotatedWafer    = False
 
 process.g4SimHits.CaloTrkProcessing.TestBeam = True
 process.g4SimHits.HCalSD.ForTBHCAL = True
@@ -373,12 +373,13 @@ process.schedule = cms.Schedule(process.generation_step,
                                 #process.validation_step9,
 				process.endjob_step,
 				process.EDMoutput_step,
-                                process.NANOAODoutput_step,
-                                process.DQMoutput_step
+                                #process.NANOAODoutput_step,
+                                #process.DQMoutput_step
 				)
 # filter all path with the production filter sequence
 for path in process.paths:
-	getattr(process,path)._seq = process.generator * getattr(process,path)._seq 
+    if "generation_step" in path: # Replace with your specific generation path name
+        getattr(process, path)._seq = process.generator * getattr(process, path)._seq
 
 from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
