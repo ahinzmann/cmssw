@@ -307,26 +307,26 @@ process.HGCalUncalibRecHit.HGCEEdigiCollection = cms.InputTag("mix","HGCDigisEE"
 process.HGCalUncalibRecHit.HGCHEBdigiCollection = cms.InputTag("mix","HGCDigisHEback")
 process.HGCalUncalibRecHit.HGCHEFdigiCollection = cms.InputTag("mix","HGCDigisHEfront")
 
-from PhysicsTools.NanoAOD.common_cff import Var
-process.hgcDigiHEbackTable = cms.EDProducer("SimpleHGCDigiFlatTableProducer",
-     src = cms.InputTag("mix","HGCDigisHEback"),
-     cut = cms.string(""), 
-     name = cms.string("HGCDigisHEback"),
-     doc  = cms.string("HGCAL hadronic scintillator digis"),
-     singleton = cms.bool(False), # the number of entries is variable
-     extension = cms.bool(False),
-     variables = cms.PSet(
-         rawId = Var('id().rawId()', 'uint', precision=-1, doc='raw id'),
-         raw = Var('sample(2).raw()', 'uint', doc='raw'),
-         threshold = Var('sample(2).threshold()', 'bool', doc='threshold'),
-         mode = Var('sample(2).mode()', 'bool', doc='mode'),
-         gain = Var('sample(2).gain()', 'uint16', doc='gain'),
-         toa = Var('sample(2).toa()', 'uint16', doc='toa'),
-         data = Var('sample(2).data()', 'uint16', doc='data'),
-         getToAValid = Var('sample(2).getToAValid()', 'bool', doc='getToAValid'),
-     )
-)
-process.hgcDigiHEfrontTable=process.hgcDigiHEbackTable.clone(src = cms.InputTag("mix","HGCDigisHEfront"))
+#from PhysicsTools.NanoAOD.common_cff import Var
+#process.hgcDigiHEbackTable = cms.EDProducer("SimpleHGCDigiFlatTableProducer",
+#     src = cms.InputTag("mix","HGCDigisHEback"),
+#     cut = cms.string(""), 
+#     name = cms.string("HGCDigisHEback"),
+#     doc  = cms.string("HGCAL hadronic scintillator digis"),
+#     singleton = cms.bool(False), # the number of entries is variable
+#     extension = cms.bool(False),
+#     variables = cms.PSet(
+#         rawId = Var('id().rawId()', 'uint', precision=-1, doc='raw id'),
+#         raw = Var('sample(2).raw()', 'uint', doc='raw'),
+#         threshold = Var('sample(2).threshold()', 'bool', doc='threshold'),
+#         mode = Var('sample(2).mode()', 'bool', doc='mode'),
+#         gain = Var('sample(2).gain()', 'uint16', doc='gain'),
+#         toa = Var('sample(2).toa()', 'uint16', doc='toa'),
+#         data = Var('sample(2).data()', 'uint16', doc='data'),
+#         getToAValid = Var('sample(2).getToAValid()', 'bool', doc='getToAValid'),
+#     )
+#)
+#process.hgcDigiHEfrontTable=process.hgcDigiHEbackTable.clone(src = cms.InputTag("mix","HGCDigisHEfront"))
 
 # Path and EndPath definitions
 process.generation_step = cms.Path(process.pgen)
@@ -392,5 +392,5 @@ process.RandomNumberGeneratorService.generator.initialSeed=int(options.seed)
 process.RandomNumberGeneratorService.g4SimHits.initialSeed=int(options.seed)
 print("Using random seed", int(options.seed))
 from SimCalorimetry.HGCalSimProducers.hgcalDigitizer_cfi import *
-#HGCal_setRealisticNoiseSci(process)
+HGCal_setRealisticNoiseSci(process)
 #HGCal_setEndOfLifeNoise(process)

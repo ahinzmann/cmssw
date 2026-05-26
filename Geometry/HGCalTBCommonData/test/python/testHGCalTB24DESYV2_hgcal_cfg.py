@@ -112,7 +112,7 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 #vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(10)    #Number of Events 
+    input = cms.untracked.int32(20)    #Number of Events 
 )
 
 if 'MessageLogger' in process.__dict__:
@@ -410,7 +410,7 @@ process.RandomNumberGeneratorService.generator.initialSeed=int(options.seed)
 process.RandomNumberGeneratorService.g4SimHits.initialSeed=int(options.seed)
 print("Using random seed", int(options.seed))
 from SimCalorimetry.HGCalSimProducers.hgcalDigitizer_cfi import *
-#HGCal_setRealisticNoiseSci(process)
+HGCal_setRealisticNoiseSci(process)
 #HGCal_setEndOfLifeNoise(process)
 process.hgcalLayerClustersEE.plugin.kappa=6 # disable clustering, by treating every hit as seed
 process.hgcalLayerClustersHSi.plugin.kappa=6 # disable clustering, by treating every hit as seed

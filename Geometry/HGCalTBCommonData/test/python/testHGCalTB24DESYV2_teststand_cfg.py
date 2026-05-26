@@ -411,11 +411,13 @@ associatePatAlgosToolsTask(process)
 process.mix.digitizers.hgcalHEback.tofDelay=0 # line to adjust the digitizer to adjust for the time of arrival of particles shot from close to the detector
 process.mix.digitizers.hgcalHEback.digiCfg.feCfg.adcThreshold_fC=0.25 #lowering the MIP threshold in digitizer
 #process.mix.digitizers.hgcalHEback.digiCfg.feCfg.targetMIPvalue_ADC=15  #increase granularity of the digitiser 
+#process.mix.digitizers.hgcalHEback.digiCfg.algo=2 # use default (not Darias digitizer)
+#process.mix.digitizers.hgcalHEback.digiCfg.keV2MIP=1./675.0 # use default (not Darias digitizer)
 process.hgcalLayerClustersHSci.plugin.kappa=6 # disable clustering, by treating every hit as seed
 process.hgcalLayerClustersHSci.plugin.deltac=cms.vdouble(0.00001,0.00001,0.00001,0.00001) # disable clustering, by treating every hit as outlier
 process.RandomNumberGeneratorService.generator.initialSeed=int(options.seed)
 process.RandomNumberGeneratorService.g4SimHits.initialSeed=int(options.seed)
 print("Using random seed", int(options.seed))
 from SimCalorimetry.HGCalSimProducers.hgcalDigitizer_cfi import *
-#HGCal_setRealisticNoiseSci(process)
+HGCal_setRealisticNoiseSci(process)
 #HGCal_setEndOfLifeNoise(process)
