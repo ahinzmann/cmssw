@@ -1,6 +1,6 @@
 particle="muon"
 particleEnergy=5
-saveOnlyClusters=True
+saveOnlyClusters=False
 
 pgun_pos="_random_cosmics_xFlat45_yFlat45_z400_phiFlat_cos2Theta_noCluster_time0_son6_trigtime"
 #pgun_pos="_random_cosmics_xFlat_yFlat310_z300_phiFlat_cos2Theta"
@@ -39,9 +39,6 @@ process.load('Geometry.HGCalTBCommonData.testTB24DESYV2_teststand_XML_cfi')
 process.load('Geometry.HGCalCommonData.hgcalNumberingInitialization_cfi')
 process.load('Geometry.HGCalCommonData.hgcalParametersInitialization_cfi')
 #process.load('Geometry.HcalTestBeamData.hcalTB06Parameters_cff')
-#process.load('Geometry.ForwardCommonData.hfnoseNumberingInitialization_cfi') # for HFnose
-#process.load('Geometry.ForwardCommonData.hfnoseParametersInitialization_cfi') # for HFnose
-#process.load('Geometry.CaloEventSetup.HFNoseTopology_cfi') # for HFnose
 process.load('Geometry.CaloEventSetup.HGCalTopology_cfi')
 process.load('Geometry.CaloEventSetup.CaloTopology_cfi')
 process.load('Geometry.CaloEventSetup.CaloGeometryBuilder_cfi')
@@ -49,9 +46,6 @@ process.CaloGeometryBuilder = cms.ESProducer( "CaloGeometryBuilder",
    SelectedCalos = cms.vstring("HGCalEESensitive", "HGCalHESiliconSensitive", "HGCalHEScintillatorSensitive")#, "HGCalHFNoseSensitive")
 )
 process.load('Geometry.HGCalGeometry.HGCalGeometryESProducer_cfi')
-#process.HGCalHFNoseGeometryESProducer = cms.ESProducer("HGCalGeometryESProducer",
-#                                              Name = cms.untracked.string("HGCalHFNoseSensitive")
-#                                              ) # for HF nose
 process.load('Configuration.StandardSequences.MagneticField_0T_cff')
 process.load('Configuration.StandardSequences.Generator_cff')
 process.load('GeneratorInterface.Core.generatorSmeared_cfi')
@@ -124,7 +118,7 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 #vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(50)    #Number of Events 
+    input = cms.untracked.int32(20)    #Number of Events 
 )
 
 if 'MessageLogger' in process.__dict__:
@@ -314,7 +308,7 @@ process.VtxSmeared.MinY =  0.0
 process.VtxSmeared.MaxY =  0.0
 process.VtxSmeared.MinT =  0.0
 process.VtxSmeared.MaxT =  0.0
-process.g4SimHits.OnlySDs = ['HGCalSensitiveDetector','HGCScintillatorSensitiveDetector'] #, 'HcalTB06BeamDetector','HFNoseSensitiveDetector'
+process.g4SimHits.OnlySDs = ['HGCalSensitiveDetector','HGCScintillatorSensitiveDetector'] #, 'HcalTB06BeamDetector','HFNoseSensitiveDetector']
 process.g4SimHits.HGCSD.Detectors = 1
 process.g4SimHits.HGCSD.RejectMouseBite = False
 process.g4SimHits.HGCSD.RotatedWafer    = False
@@ -410,12 +404,12 @@ associatePatAlgosToolsTask(process)
 #radiation length: FromChrisdEdx['StainlessSteel'] = 1.14 in MeV/mm from https://github.com/cms-sw/cmssw/blob/master/SimTracker/TrackerMaterialAnalysis/test/dEdxWeights.ipynb
 # time layer thickness 16mm
 # --> dE=18.24 MeV
-print(len(process.hgcalLayerClustersHSci.plugin.dEdXweights))
-process.hgcalLayerClustersHSci.plugin.dEdXweights = cms.vdouble([1e-10 for i in range(51-15)]+[18.24 for i in range(15)]) # last 14 layers in HB
-print(len(process.hgcalLayerClustersHSci.plugin.dEdXweights))
-process.HGCalRecHit.layerWeights = process.hgcalLayerClustersHSci.plugin.dEdXweights
+#print(len(process.hgcalLayerClustersHSci.plugin.dEdXweights))
+#process.hgcalLayerClustersHSci.plugin.dEdXweights = cms.vdouble([1e-10 for i in range(51-15)]+[18.24 for i in range(15)]) # last 14 layers in HB
+#print(len(process.hgcalLayerClustersHSci.plugin.dEdXweights))
+#process.HGCalRecHit.layerWeights = process.hgcalLayerClustersHSci.plugin.dEdXweights
 process.mix.digitizers.hgcalHEback.tofDelay=0 # line to adjust the digitizer to adjust for the time of arrival of particles shot from close to the detector
-#process.mix.digitizers.hgcalHEback.digiCfg.feCfg.adcThreshold_fC=0.25 #lowering the MIP threshold in digitizer
+process.mix.digitizers.hgcalHEback.digiCfg.feCfg.adcThreshold_fC=0.25 #lowering the MIP threshold in digitizer
 #process.mix.digitizers.hgcalHEback.digiCfg.feCfg.targetMIPvalue_ADC=15  #increase granularity of the digitiser 
 process.hgcalLayerClustersHSci.plugin.kappa=6 # disable clustering, by treating every hit as seed
 process.hgcalLayerClustersHSci.plugin.deltac=cms.vdouble(0.00001,0.00001,0.00001,0.00001) # disable clustering, by treating every hit as outlier

@@ -33,9 +33,6 @@ process.load('Geometry.HGCalTBCommonData.testTB24DESYV2_heback_XML_cfi')
 process.load('Geometry.HGCalCommonData.hgcalNumberingInitialization_cfi')
 process.load('Geometry.HGCalCommonData.hgcalParametersInitialization_cfi')
 #process.load('Geometry.HcalTestBeamData.hcalTB06Parameters_cff')
-#process.load('Geometry.ForwardCommonData.hfnoseNumberingInitialization_cfi') # for HFnose
-#process.load('Geometry.ForwardCommonData.hfnoseParametersInitialization_cfi') # for HFnose
-#process.load('Geometry.CaloEventSetup.HFNoseTopology_cfi') # for HFnose
 process.load('Geometry.CaloEventSetup.HGCalTopology_cfi')
 process.load('Geometry.CaloEventSetup.CaloTopology_cfi')
 process.load('Geometry.CaloEventSetup.CaloGeometryBuilder_cfi')
@@ -43,9 +40,6 @@ process.CaloGeometryBuilder = cms.ESProducer( "CaloGeometryBuilder",
    SelectedCalos = cms.vstring("HGCalEESensitive", "HGCalHESiliconSensitive", "HGCalHEScintillatorSensitive")#, "HGCalHFNoseSensitive")
 )
 process.load('Geometry.HGCalGeometry.HGCalGeometryESProducer_cfi')
-#process.HGCalHFNoseGeometryESProducer = cms.ESProducer("HGCalGeometryESProducer",
-#                                              Name = cms.untracked.string("HGCalHFNoseSensitive")
-#                                              ) # for HF nose
 process.load('Configuration.StandardSequences.MagneticField_0T_cff')
 process.load('Configuration.StandardSequences.Generator_cff')
 process.load('GeneratorInterface.Core.generatorSmeared_cfi')
@@ -118,7 +112,7 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 #vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1000)    #Number of Events 
+    input = cms.untracked.int32(10)    #Number of Events 
 )
 
 if 'MessageLogger' in process.__dict__:
@@ -329,26 +323,26 @@ process.HGCalUncalibRecHit.HGCEEdigiCollection = cms.InputTag("mix","HGCDigisEE"
 process.HGCalUncalibRecHit.HGCHEBdigiCollection = cms.InputTag("mix","HGCDigisHEback")
 process.HGCalUncalibRecHit.HGCHEFdigiCollection = cms.InputTag("mix","HGCDigisHEfront")
 
-from PhysicsTools.NanoAOD.common_cff import Var
-process.hgcDigiHEbackTable = cms.EDProducer("SimpleHGCDigiFlatTableProducer",
-     src = cms.InputTag("mix","HGCDigisHEback"),
-     cut = cms.string(""), 
-     name = cms.string("HGCDigisHEback"),
-     doc  = cms.string("HGCAL hadronic scintillator digis"),
-     singleton = cms.bool(False), # the number of entries is variable
-     extension = cms.bool(False),
-     variables = cms.PSet(
-         rawId = Var('id().rawId()', 'uint', precision=-1, doc='raw id'),
-         raw = Var('sample(2).raw()', 'uint', doc='raw'),
-         threshold = Var('sample(2).threshold()', 'bool', doc='threshold'),
-         mode = Var('sample(2).mode()', 'bool', doc='mode'),
-         gain = Var('sample(2).gain()', 'uint16', doc='gain'),
-         toa = Var('sample(2).toa()', 'uint16', doc='toa'),
-         data = Var('sample(2).data()', 'uint16', doc='data'),
-         getToAValid = Var('sample(2).getToAValid()', 'bool', doc='getToAValid'),
-     )
-)
-process.hgcDigiHEfrontTable=process.hgcDigiHEbackTable.clone(src = cms.InputTag("mix","HGCDigisHEfront"))
+#from PhysicsTools.NanoAOD.common_cff import Var
+#process.hgcDigiHEbackTable = cms.EDProducer("SimpleHGCDigiFlatTableProducer",
+#     src = cms.InputTag("mix","HGCDigisHEback"),
+#     cut = cms.string(""), 
+#     name = cms.string("HGCDigisHEback"),
+#     doc  = cms.string("HGCAL hadronic scintillator digis"),
+#     singleton = cms.bool(False), # the number of entries is variable
+#     extension = cms.bool(False),
+#     variables = cms.PSet(
+#         rawId = Var('id().rawId()', 'uint', precision=-1, doc='raw id'),
+#         raw = Var('sample(2).raw()', 'uint', doc='raw'),
+#         threshold = Var('sample(2).threshold()', 'bool', doc='threshold'),
+#         mode = Var('sample(2).mode()', 'bool', doc='mode'),
+#         gain = Var('sample(2).gain()', 'uint16', doc='gain'),
+#         toa = Var('sample(2).toa()', 'uint16', doc='toa'),
+#         data = Var('sample(2).data()', 'uint16', doc='data'),
+#         getToAValid = Var('sample(2).getToAValid()', 'bool', doc='getToAValid'),
+#     )
+#)
+#process.hgcDigiHEfrontTable=process.hgcDigiHEbackTable.clone(src = cms.InputTag("mix","HGCDigisHEfront"))
 
 # Path and EndPath definitions
 process.generation_step = cms.Path(process.pgen)
@@ -416,9 +410,5 @@ print("Using random seed", int(options.seed))
 from SimCalorimetry.HGCalSimProducers.hgcalDigitizer_cfi import *
 #HGCal_setRealisticNoiseSci(process)
 #HGCal_setEndOfLifeNoise(process)
-process.hgcalLayerClustersEE.plugin.kappa=6 # disable clustering, by treating every hit as seed
-process.hgcalLayerClustersHSi.plugin.kappa=6 # disable clustering, by treating every hit as seed
 process.hgcalLayerClustersHSci.plugin.kappa=6 # disable clustering, by treating every hit as seed
 process.hgcalLayerClustersHSci.plugin.deltac=cms.vdouble(0.00001,0.00001,0.00001,0.00001) # disable clustering, by treating every hit as outlier
-process.hgcalLayerClustersHSi.plugin.deltac=cms.vdouble(0.00001,0.00001,0.00001,0.00001) # disable clustering, by treating every hit as outlier
-process.hgcalLayerClustersEE.plugin.deltac=cms.vdouble(0.00001,0.00001,0.00001,0.00001) # disable clustering, by treating every hit as outlier

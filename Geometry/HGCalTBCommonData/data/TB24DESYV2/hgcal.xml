@@ -2,16 +2,16 @@
 <DDDefinition>
 
 <ConstantsSection label="hgcal.xml" eval="true">
-  <Constant name="WaferSize"             value="167.44*mm"/>
+  <Constant name="WaferSize"             value="167.64*mm"/>
   <Constant name="WaferSizeNominal"      value="167.4408*mm"/>
   <Constant name="WaferThickness"        value="0.30*mm"/>
   <Constant name="WaferThicknessFine"    value="0.30*mm"/>
   <Constant name="WaferThicknessCoarse1" value="0.20*mm"/>
   <Constant name="WaferThicknessCoarse2" value="0.30*mm"/>
-  <Constant name="SensorSeparation"      value="0.20*mm"/>
-  <Constant name="SensorSizeOffset"      value="0.87*mm"/>
-  <Constant name="GuardRingOffset"       value="0.8985*mm"/>
-  <Constant name="MouseBite"             value="5.834*mm"/>
+  <Constant name="SensorSeparation"      value="0.0*mm"/>
+  <Constant name="SensorSizeOffset"      value="0.0*mm"/>
+  <Constant name="GuardRingOffset"       value="0.0*mm"/>
+  <Constant name="MouseBite"             value="0.0*mm"/>
   <Constant name="UseOffset"             value="1"/>
   <Constant name="ModuleThicknessEE"     value="8.485*mm"/>
   <Constant name="ModuleThicknessHE"     value="8.135*mm"/>
@@ -129,7 +129,7 @@
   <Constant name="zHGCalHEmix3"          value="[zHGCal8]"/>
   <Constant name="zHGCalHEmix4"          value="[zHGCal10]"/>
   <Constant name="zHGCalHEmix5"          value="[zHGCal11]"/>
-  <Constant name="zHGCalHEmix6"          value="[zHGCal12]"/>
+  <Constant name="zHGCalHEmix6"          value="6000*mm"/>
   <Constant name="rMinHGCalHEmix1"       value="[rMinHGCal6]"/>
   <Constant name="rMinHGCalHEmix2"       value="[rMinHGCal8]"/>
   <Constant name="rMaxHGCalHEmix1"       value="[rMaxHGCal6]"/>

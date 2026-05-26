@@ -118,7 +118,7 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 #vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1000)    #Number of Events 
+    input = cms.untracked.int32(10)    #Number of Events 
 )
 
 if 'MessageLogger' in process.__dict__:
