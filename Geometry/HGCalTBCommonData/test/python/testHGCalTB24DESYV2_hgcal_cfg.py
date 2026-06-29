@@ -1,6 +1,6 @@
 particle="muon"
 particleEnergy=5
-saveOnlyClusters=True
+saveOnlyClusters=False
 
 pgun_pos="_random_cosmics_hgcal_xFlat_yFlat_z300_phiFlat_cos2Theta_thrSci0p25_noCluster_time0_son6"
 

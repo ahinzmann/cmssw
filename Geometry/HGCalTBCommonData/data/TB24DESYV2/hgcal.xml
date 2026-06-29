@@ -2,16 +2,16 @@
 <DDDefinition>
 
 <ConstantsSection label="hgcal.xml" eval="true">
-  <Constant name="WaferSize"             value="167.64*mm"/>
+  <Constant name="WaferSize"             value="167.44*mm"/>
   <Constant name="WaferSizeNominal"      value="167.4408*mm"/>
   <Constant name="WaferThickness"        value="0.30*mm"/>
   <Constant name="WaferThicknessFine"    value="0.30*mm"/>
   <Constant name="WaferThicknessCoarse1" value="0.20*mm"/>
   <Constant name="WaferThicknessCoarse2" value="0.30*mm"/>
-  <Constant name="SensorSeparation"      value="0.0*mm"/>
-  <Constant name="SensorSizeOffset"      value="0.0*mm"/>
-  <Constant name="GuardRingOffset"       value="0.0*mm"/>
-  <Constant name="MouseBite"             value="0.0*mm"/>
+  <Constant name="SensorSeparation"      value="0.20*mm"/>
+  <Constant name="SensorSizeOffset"      value="0.87*mm"/>
+  <Constant name="GuardRingOffset"       value="0.8985*mm"/>
+  <Constant name="MouseBite"             value="5.834*mm"/>
   <Constant name="UseOffset"             value="1"/>
   <Constant name="ModuleThicknessEE"     value="8.485*mm"/>
   <Constant name="ModuleThicknessHE"     value="8.135*mm"/>
@@ -185,7 +185,7 @@
     <ZSection z="[zHGCal13]"  rMin="[rMinHGCal7]" rMax="[rMaxHGCal12S]"/>
   </Polycone>
   <Polycone name="HGCal" startPhi="0*deg" deltaPhi="360*deg">
-    <ZSection z="[zHGCal0]"   rMin="[rMinHGCal1]"   rMax="10*m"/>
+    <ZSection z="[zHGCal1]"   rMin="[rMinHGCal1]"   rMax="10*m"/>
     <ZSection z="[zHGCal3]"   rMin="[rMinHGCal1]"   rMax="[rMaxHGCal3]"/>
     <ZSection z="[zHGCal3]"   rMin="[rMinHGCal3]"   rMax="[rMaxHGCal3]"/>
     <ZSection z="[zHGCal5]"   rMin="[rMinHGCal3]"   rMax="[rMaxHGCal5]"/>
