@@ -604,6 +604,7 @@ CaloTruthAccumulator::CaloTruthAccumulator(const edm::ParameterSet &config,
   iC.consumes<std::vector<SimTrack>>(simTrackLabel_);
   iC.consumes<std::vector<SimVertex>>(simVertexLabel_);
   iC.consumes<std::vector<int>>(genParticleLabel_);
+  iC.consumes<std::vector<reco::GenParticle>>(genParticleLabel_);
   iC.consumes<std::vector<int>>(hepMCproductLabel_);
 
   // Fill the collection tags
