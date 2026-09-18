@@ -35,11 +35,11 @@ process.load('Geometry.HGCalCommonData.hgcalParametersInitialization_cfi')
 #process.load('Geometry.HcalTestBeamData.hcalTB06Parameters_cff')
 process.load('Geometry.CaloEventSetup.HGCalTopology_cfi')
 process.load('Geometry.CaloEventSetup.CaloTopology_cfi')
-process.load('Geometry.CaloEventSetup.CaloGeometryBuilder_cfi')
+process.load('Geometry.CaloEventSetup.CaloGeometryBuilder_cff')
 process.CaloGeometryBuilder = cms.ESProducer( "CaloGeometryBuilder",
    SelectedCalos = cms.vstring("HGCalEESensitive", "HGCalHESiliconSensitive", "HGCalHEScintillatorSensitive")#, "HGCalHFNoseSensitive")
 )
-process.load('Geometry.HGCalGeometry.HGCalGeometryESProducer_cfi')
+process.load('Geometry.HGCalGeometry.hgcalGeometryESProducer_cff')
 process.load('Configuration.StandardSequences.MagneticField_0T_cff')
 process.load('Configuration.StandardSequences.Generator_cff')
 process.load('GeneratorInterface.Core.generatorSmeared_cfi')
@@ -349,7 +349,7 @@ process.generation_step = cms.Path(process.pgen)
 process.simulation_step = cms.Path(process.psim)
 process.genfiltersummary_step = cms.EndPath(process.genFilterSummary)
 process.digitisation_step = cms.Path(process.mix)
-process.reconstruction_step = cms.Path(cms.Sequence(process.HGCalUncalibRecHit*process.HGCalRecHit*process.recHitMapProducer*process.hgcalLayerClustersEE*process.hgcalLayerClustersHSi*process.hgcalLayerClustersHSci*process.hgcalMergeLayerClusters*process.hgcalMultiClusters))
+#process.reconstruction_step = cms.Path(cms.Sequence(process.HGCalUncalibRecHit*process.HGCalRecHit*process.recHitMapProducer*process.hgcalLayerClustersEE*process.hgcalLayerClustersHSi*process.hgcalLayerClustersHSci*process.hgcalMergeLayerClusters*process.hgcalMultiClusters))
 process.reconstruction_short_step = cms.Path(cms.Sequence(process.HGCalUncalibRecHit*process.HGCalRecHit*process.hgcalLayerClustersEE*process.hgcalLayerClustersHSi*process.hgcalLayerClustersHSci*process.hgcalMergeLayerClusters))
 #process.hgcalnano_step = cms.Path(cms.Sequence(process.hgcDigiHEbackTable*process.hgcHEbackRecHitsTable))#*cms.Sequence(process.hgcRecHitsTask))#*cms.Sequence(process.hgcCMDigiTable*process.unpackerFlagsTable))#*cms.Sequence(process.hgcSoaDigiTable))
 #process.analysis_step = cms.Path(process.HGCalTB23Analyzer)
@@ -365,8 +365,8 @@ process.schedule = cms.Schedule(process.generation_step,
 				process.genfiltersummary_step,
 				process.simulation_step,
 				process.digitisation_step,
-				#process.reconstruction_short_step,
-				process.reconstruction_step,
+				process.reconstruction_short_step,
+				#process.reconstruction_step,
 				#process.hgcalnano_step,
 			        #process.analysis_step,
                                 #process.prevalidation_step7,

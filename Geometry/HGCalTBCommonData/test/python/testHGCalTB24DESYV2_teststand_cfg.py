@@ -2,7 +2,7 @@ particle="muon"
 particleEnergy=5
 saveOnlyClusters=False
 
-pgun_pos="_random_cosmics_teststand_xFlat45_yFlat45_z400_phiFlat_cos2Theta_noCluster_time0_son6_trigtime"
+pgun_pos="_teststand_2026Sep18"
 #pgun_pos="_random_cosmics_xFlat_yFlat310_z300_phiFlat_cos2Theta"
 
 #pgun_pos="_testcosmic_500events_x2_y160_z400_digitiser_mipthreshold_granularity15_adjusted"
@@ -45,7 +45,7 @@ process.load('Geometry.CaloEventSetup.CaloGeometryBuilder_cfi')
 process.CaloGeometryBuilder = cms.ESProducer( "CaloGeometryBuilder",
    SelectedCalos = cms.vstring("HGCalEESensitive", "HGCalHESiliconSensitive", "HGCalHEScintillatorSensitive")#, "HGCalHFNoseSensitive")
 )
-process.load('Geometry.HGCalGeometry.HGCalGeometryESProducer_cfi')
+process.load('Geometry.HGCalGeometry.hgcalGeometryESProducer_cff')
 process.load('Configuration.StandardSequences.MagneticField_0T_cff')
 process.load('Configuration.StandardSequences.Generator_cff')
 process.load('GeneratorInterface.Core.generatorSmeared_cfi')
@@ -356,7 +356,7 @@ process.generation_step = cms.Path(process.pgen)
 process.simulation_step = cms.Path(process.psim)
 process.genfiltersummary_step = cms.EndPath(process.genFilterSummary)
 process.digitisation_step = cms.Path(process.mix)
-process.reconstruction_step = cms.Path(cms.Sequence(process.HGCalUncalibRecHit*process.HGCalRecHit*process.recHitMapProducer*process.hgcalLayerClustersEE*process.hgcalLayerClustersHSi*process.hgcalLayerClustersHSci*process.hgcalMergeLayerClusters*process.hgcalMultiClusters))
+#process.reconstruction_step = cms.Path(cms.Sequence(process.HGCalUncalibRecHit*process.HGCalRecHit*process.recHitMapProducer*process.hgcalLayerClustersEE*process.hgcalLayerClustersHSi*process.hgcalLayerClustersHSci*process.hgcalMergeLayerClusters*process.hgcalMultiClusters))
 process.reconstruction_short_step = cms.Path(cms.Sequence(process.HGCalUncalibRecHit*process.HGCalRecHit*process.hgcalLayerClustersEE*process.hgcalLayerClustersHSi*process.hgcalLayerClustersHSci*process.hgcalMergeLayerClusters))
 #process.hgcalnano_step = cms.Path(cms.Sequence(process.hgcDigiHEbackTable*process.hgcHEbackRecHitsTable))#*cms.Sequence(process.hgcRecHitsTask))#*cms.Sequence(process.hgcCMDigiTable*process.unpackerFlagsTable))#*cms.Sequence(process.hgcSoaDigiTable))
 #process.analysis_step = cms.Path(process.HGCalTB23Analyzer)
@@ -372,8 +372,8 @@ process.schedule = cms.Schedule(process.generation_step,
 				process.genfiltersummary_step,
 				process.simulation_step,
 				process.digitisation_step,
-				#process.reconstruction_short_step,
-				process.reconstruction_step,
+				process.reconstruction_short_step,
+				#process.reconstruction_step,
 				#process.hgcalnano_step,
 			        #process.analysis_step,
                                 #process.prevalidation_step7,
@@ -459,7 +459,7 @@ olddigi = cms.PSet(
     hitsProducer      = cms.string("g4SimHits"), ###
 )
 ### END Old digitizer
-process.mix.digitizers.hgcalHEback = olddigi
+#process.mix.digitizers.hgcalHEback = olddigi
 
 process.mix.digitizers.hgcalHEback.tofDelay=0 # line to adjust the digitizer to adjust for the time of arrival of particles shot from close to the detector
 process.mix.digitizers.hgcalHEback.digiCfg.feCfg.adcThreshold_fC=0.25 #lowering the MIP threshold in digitizer
@@ -470,5 +470,5 @@ process.RandomNumberGeneratorService.generator.initialSeed=int(options.seed)
 process.RandomNumberGeneratorService.g4SimHits.initialSeed=int(options.seed)
 print("Using random seed", int(options.seed))
 from SimCalorimetry.HGCalSimProducers.hgcalDigitizer_cfi import *
-#HGCal_setRealisticNoiseSci(process)
+HGCal_setRealisticNoiseSci(process)
 #HGCal_setEndOfLifeNoise(process)

@@ -134,7 +134,7 @@ def recoGeoLoad(score, properties):
     elif score == "HGCTB24DESYV2_stack": ## hgcal testbeam
        process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
        from Configuration.AlCa.GlobalTag import GlobalTag
-       process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T21', '')
+       process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T35', '')
        process.load('Geometry.HGCalTBCommonData.testTB24DESYV2_stack_XML_cfi')
        process.load('Geometry.HGCalCommonData.hgcalParametersInitialization_cfi')
        process.load('Geometry.HGCalCommonData.hgcalNumberingInitialization_cfi')
@@ -149,7 +149,7 @@ def recoGeoLoad(score, properties):
           "CaloGeometryBuilder",
           SelectedCalos = cms.vstring("HGCalEESensitive", "HGCalHESiliconSensitive", "HGCalHEScintillatorSensitive")#, "HGCalHFNoseSensitive")
        )
-       process.load('Geometry.HGCalGeometry.HGCalGeometryESProducer_cfi')
+       process.load('Geometry.HGCalGeometry.hgcalGeometryESProducer_cff')
        #process.HGCalHFNoseGeometryESProducer = cms.ESProducer("HGCalGeometryESProducer",
        #                                       Name = cms.untracked.string("HGCalHFNoseSensitive")
        #                                       ) # for HF nose
@@ -159,7 +159,7 @@ def recoGeoLoad(score, properties):
     elif score == "HGCTB24DESYV2_teststand": ## hgcal teststand
        process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
        from Configuration.AlCa.GlobalTag import GlobalTag
-       process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T21', '')
+       process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T35', '')
        process.load('Geometry.HGCalTBCommonData.testTB24DESYV2_teststand_XML_cfi')
        process.load('Geometry.HGCalCommonData.hgcalParametersInitialization_cfi')
        process.load('Geometry.HGCalCommonData.hgcalNumberingInitialization_cfi')
@@ -174,7 +174,7 @@ def recoGeoLoad(score, properties):
           "CaloGeometryBuilder",
           SelectedCalos = cms.vstring("HGCalEESensitive", "HGCalHESiliconSensitive", "HGCalHEScintillatorSensitive")#, "HGCalHFNoseSensitive")
        )
-       process.load('Geometry.HGCalGeometry.HGCalGeometryESProducer_cfi')
+       process.load('Geometry.HGCalGeometry.hgcalGeometryESProducer_cff')
        #process.HGCalHFNoseGeometryESProducer = cms.ESProducer("HGCalGeometryESProducer",
        #                                       Name = cms.untracked.string("HGCalHFNoseSensitive")
        #                                       ) # for HF nose
