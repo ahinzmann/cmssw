@@ -27,6 +27,7 @@ options.parseArguments()
 #process.mix.digitizers.hgchebackDigitizer.digiCfg.algo=0
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
+process.MessageLogger.cerr.FwkReport.reportEvery = 1
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('SimGeneral.HepPDTESSource.pythiapdt_cfi')
 process.load('Configuration.EventContent.EventContent_cff')
@@ -382,7 +383,7 @@ associatePatAlgosToolsTask(process)
 # time layer thickness 16mm
 # --> dE=18.24 MeV
 print(len(process.hgcalLayerClustersHSci.plugin.dEdXweights))
-process.hgcalLayerClustersHSci.plugin.dEdXweights = cms.vdouble([1e-10 for i in range(51-15)]+[18.24 for i in range(15)]) # last 14 layers in HB
+process.hgcalLayerClustersHSci.plugin.dEdXweights = cms.vdouble([1e-10 for i in range(51-15)]+[18.24 for i in range(16)]) # last 15 layers in HB
 print(len(process.hgcalLayerClustersHSci.plugin.dEdXweights))
 process.HGCalRecHit.layerWeights = process.hgcalLayerClustersHSci.plugin.dEdXweights
 
