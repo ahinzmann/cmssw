@@ -172,7 +172,6 @@ HGCalSciNoiseMap::SiPMonTileCharacteristics HGCalSciNoiseMap::scaleByDose_Daria(
                                                                           GainRange_t gainPreChoice) {
   int layer = cellId.layer();
   bool hasDoseMap(!(getDoseMap().empty()));
-  if (layer>=21) edm::LogWarning("Andreas") << "layer " << layer;
 
   //LIGHT YIELD
   double lyScaleFactor(1.f);

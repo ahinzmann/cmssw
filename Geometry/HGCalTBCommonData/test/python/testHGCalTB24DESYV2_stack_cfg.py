@@ -1,5 +1,5 @@
 particle="electron"
-particleEnergy=20
+particleEnergy=100
 
 pgun_pos="_cernstack_2026Sep18"
 
