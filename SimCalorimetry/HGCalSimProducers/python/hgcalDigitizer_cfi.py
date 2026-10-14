@@ -136,26 +136,26 @@ hgchebackDigitizer = cms.PSet(
     useAllChannels    = cms.bool(True),
     verbosity         = cms.untracked.uint32(0),
     digiCfg = cms.PSet(
-        #0 empty digitizer, 1 calice digitizer, 2 realistic digitizer, 3 realistic sci /proper calice
-        algo          = cms.uint32(3),        
+        #0 empty digitizer, 1 calice digitizer, 2 realistic digitizer, 3 new realistic sci digitizer
+        algo          = cms.uint32(3),
         noise         = cms.PSet(refToPSet_ = cms.string("HGCAL_noise_heback")), #scales both for scint raddam and sipm dark current
-        keV2MIP       = cms.double(1./455.0),   #to use the MPV value #cms.double(1./675.0),
+        keV2MIP       = cms.double(1./455.0),  # using MIP MPV value (not mean 1/675.0)
         doTimeSamples = cms.bool(False),
-        nPEperMIP = cms.double(80.0),  # light yield _ id
-        nTotalPE  = cms.double(7500),
-        nTotalPX  = cms.double(39984),
-        SiPM9mmgain4OV12CG = cms.double(0.7),        
-        sdPixels  = cms.double(1e-6), # this is additional photostatistics noise (as implemented), not sure why it's here...
+        nPEperMIP = cms.double(80.0), # reference light yield (is scaled depending on tile type and size)
+        nTotalPE  = cms.double(39770), # 39770 is number of pixels for 9 mm^2 SiPM (for 4 mm^2 SiPM it is 17459, for 2 mm^2 SiPM it is 8649)
+        gain      = cms.double(0.7), # SiPM gain in ADC; Gain of 0.7 is for ConvGain 4, Overvoltage 2V
+        sigma     = cms.double(1e-6), # sigma for light yield for new realistic sci digitizer
         thresholdFollowsMIP = cms.bool(thresholdTracksMIP),
-        maxADC_ = cms.double(1024.0),
         feCfg = hgcROCSettings.clone(
-            fwVersion         = cms.uint32(1),           # 3 = to have NO shaper then in principle none of the other params matter apart from maybe the ADC threshold, 4 = min shaper
+            fwVersion         = cms.uint32(1),  # UPD: version 1 is Simple Shaper, but this parameter is not used at the moment and the shaper version is called explicitely in the code
+            ### no shaping done for now, calculated ADC value fully placed in second sample 
             adcPulse          = cms.vdouble(0.0, 0.0,   1.0,   0.0,  0.0,  0.0),
+            ####
             adcNbits        = 10,      # standard ROC operations (was 2 bits more up to 11_0_0_pre12)
             adcSaturation_fC = 68.75,  # keep the adc LSB the same (i.e. set saturation one quarter value of pre12)
-            tdcSaturation_fC  = 1000,  # allow up to 1000 MIPs as a max range, including ToA mode
-            targetMIPvalue_ADC   = 15, # to be used for HGCROC gain proposal
-            adcThreshold_fC = 0.5,     # unchanged with respect to pre12
+            tdcSaturation_fC  = 10000,  # allow up to 1000 MIPs as a max range, including ToA mode
+            targetMIPvalue_ADC   = 15, # to be used for HGCROC gain proposal # UPD: not used in the updated sci digitiser, incorrect assumption about the MIP equalisation
+            adcThreshold_fC = 0.5,     # unchanged with respect to pre12 # UPD: used as vanilla threshold in units of MIPs
             tdcOnset_fC       = 55,    # turn on TDC when 80% of the ADC range is reached (one quarter of pre12
             #                                        indicative at this point)
             tdcForToAOnset_fC = cms.vdouble(12., 12., 12.),  #turn ToA for 20% of the TDC threshold (indicative at this point)
@@ -322,7 +322,7 @@ def HGCal_useCaching(process):
     process=HGCal_setRealisticNoiseSci(process,byDose=True,byDoseAlgo=2)
     return process
 
-doseMap = cms.string("SimCalorimetry/HGCalSimProducers/data/doseParams_3000fb_fluka-3.7.20.txt")
+doseMap = cms.string("SimCalorimetry/HGCalSimProducers/data/doseParams_3000fb_fluka-6.2.0.1.txt")# SimCalorimetry/HGCalSimProducers/data/doseParams_3000fb_fluka-3.7.20.txt")
 
 def HGCal_setRealisticNoiseSi(process,byDose=True,byDoseAlgo=0,byDoseMap=doseMap,byDoseFactor=1):
     process.HGCAL_noise_fC = cms.PSet(
@@ -342,8 +342,6 @@ def HGCal_setRealisticNoiseSi(process,byDose=True,byDoseAlgo=0,byDoseMap=doseMap
     process.HGCAL_noises = cms.PSet(
         values = cms.vdouble([x for x in endOfLifeNoises])  
         )
-    #target the PSets just attached to the process: the module-level objects of
-    #the same names are not the ones the digitizers resolve on a loaded process
     phase2_hgcalV19.toModify(process.HGCAL_noise_fC, values = [x*fC_per_ele for x in endOfLifeNoises_v19] ) #120,200,300,HD200 um, to be deprecated
     phase2_hgcalV19.toModify(process.HGCAL_chargeCollectionEfficiencies, values = endOfLifeCCEs_v19)
     phase2_hgcalV19.toModify(process.HGCAL_noises, values = [x for x in endOfLifeNoises_v19])
@@ -366,9 +364,9 @@ def HFNose_setRealisticNoiseSi(process,byDose=True,byDoseAlgo=0,byDoseMap=doseMa
 
 def HGCal_setRealisticNoiseSci(process,
                                byDose=True,
-                               byDoseAlgo=2,
+                               byDoseAlgo=0, #2,
                                byDoseMap=doseMap,
-                               byDoseSipmMap=cms.string("SimCalorimetry/HGCalSimProducers/data/sipmParams_geom-10.txt"),
+                               byDoseSipmMap=cms.string("SimCalorimetry/HGCalSimProducers/data/sipmParams_geom-10.txt"),  #sipmParams_all4mm2.txt
                                byDoseFactor=1,
                                referenceIdark=0.25,
                                referenceXtalk=-1):
@@ -405,8 +403,8 @@ def HGCal_disableNoise(process):
         values = cms.vdouble(0,0,0,0) #HD 120, LD 200, LD 300, HD 200
     )
 
-    phase2_hgcalV19.toModify(HGCAL_noise_fC, values = [0.,0.,0.,0.])
-    phase2_hgcalV19.toModify(HGCAL_noises, values = [0.,0.,0.,0.])
+    phase2_hgcalV19.toModify(process.HGCAL_noise_fC, values = [0.,0.,0.,0.])
+    phase2_hgcalV19.toModify(process.HGCAL_noises, values = [0.,0.,0.,0.])
     return process
 
 from Configuration.Eras.Modifier_phase2_hgcalV10_cff import phase2_hgcalV10

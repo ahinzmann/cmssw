@@ -1,7 +1,7 @@
 particle="electron"
-particleEnergy=100
+particleEnergy=20
 
-pgun_pos="_cernstack_2026Sep18"
+pgun_pos="_cernstack_2026Oct14v2"
 
 #pgun_pos="_200events_x2_y160_z400_digitiser_mipthreshold_granularity30_adjusted"#####
 
@@ -231,10 +231,10 @@ process.generator = cms.EDProducer("FlatRandomAngleEGunProducer",
         MaxPhi = cms.double(0.0),
         #XCoordinates = cms.vdouble(2.0),  # X positions, old interface
         #YCoordinates = cms.vdouble(160.0),  # Y positions, old interface
-        MinX = cms.double(2), # new interface
-        MaxX = cms.double(2), # new interface
-        MinY = cms.double(160), # new interface
-        MaxY = cms.double(160), # new interface
+        MinX = cms.double(1.8), # new interface
+        MaxX = cms.double(2.2), # new interface
+        MinY = cms.double(158), # new interface
+        MaxY = cms.double(162), # new interface
         #ParticlesPerPosition = cms.int32(500),  # Number of particles at each position
         ZPosition = cms.double(400.0),
         PartID = cms.vint32((13 if particle == "muon" else 11))  # Particle ID
@@ -387,60 +387,12 @@ process.hgcalLayerClustersHSci.plugin.dEdXweights = cms.vdouble([1e-10 for i in 
 print(len(process.hgcalLayerClustersHSci.plugin.dEdXweights))
 process.HGCalRecHit.layerWeights = process.hgcalLayerClustersHSci.plugin.dEdXweights
 
-### OLD DIGITIZER
-from SimCalorimetry.HGCalSimProducers.hgcROCParameters_cfi import hgcROCSettings
-olddigi = cms.PSet(
-    accumulatorType   = cms.string("HGCDigiProducer"),
-    hitCollection = cms.string("HGCHitsHEback"),
-    digitizer         = cms.string("HGCHEbackDigitizer"),
-    NoiseGeneration_Method = cms.bool(True),
-    maxSimHitsAccTime = cms.uint32(100),
-    bxTime            = cms.double(25),
-    tofDelay          = cms.double(1),
-    geometryType      = cms.uint32(0),
-    digitizationType  = cms.uint32(1),
-    makeDigiSimLinks  = cms.bool(False),
-    premixStage1      = cms.bool(False),
-    premixStage1MinCharge = cms.double(0),
-    premixStage1MaxCharge = cms.double(1e6),
-    useAllChannels    = cms.bool(True),
-    verbosity         = cms.untracked.uint32(0),
-    digiCfg = cms.PSet(
-        #0 empty digitizer, 1 calice digitizer, 2 realistic digitizer
-        algo          = cms.uint32(2),
-        scaleByTileArea= cms.bool(False),
-        scaleBySipmArea= cms.bool(False),
-        sipmMap       = cms.string("SimCalorimetry/HGCalSimProducers/data/sipmParams_geom-10.txt"),
-        noise         = cms.PSet(refToPSet_ = cms.string("HGCAL_noise_heback")), #scales both for scint raddam and sipm dark current
-        keV2MIP       = cms.double(1./675.0),
-        doTimeSamples = cms.bool(False),
-        nPEperMIP = cms.double(21.0),
-        nTotalPE  = cms.double(7500),
-        xTalk     = cms.double(0.01),
-        sdPixels  = cms.double(1e-6), # this is additional photostatistics noise (as implemented), not sure why it's here...
-        thresholdFollowsMIP = cms.bool(True),
-        feCfg = hgcROCSettings.clone(
-            adcNbits        = 10,      # standard ROC operations (was 2 bits more up to 11_0_0_pre12)
-            adcSaturation_fC = 68.75,  # keep the adc LSB the same (i.e. set saturation one quarter value of pre12)
-            tdcSaturation_fC  = 1000,  # allow up to 1000 MIPs as a max range, including ToA mode
-            targetMIPvalue_ADC   = 15, # to be used for HGCROC gain proposal
-            adcThreshold_fC = 0.5,     # unchanged with respect to pre12
-            tdcOnset_fC       = 55,    # turn on TDC when 80% of the ADC range is reached (one quarter of pre12
-            #                                        indicative at this point)
-            tdcForToAOnset_fC = cms.vdouble(12.,12.,12.,12.),  #turn ToA for 20% of the TDC threshold (indicative at this point)
-        ),
-        nTotalPX  = cms.double(39984), ###
-        SiPM9mmgain4OV12CG = cms.double(0.7), ###
-        maxADC_ = cms.double(1024.0), ###
-    ),
-    digiCollection = cms.string("HGCDigisHEback"), ###
-    hitsProducer      = cms.string("g4SimHits"), ###
-)
-### END Old digitizer
-#process.mix.digitizers.hgcalHEback = olddigi
-
 process.mix.digitizers.hgcalHEback.tofDelay=0 # line to adjust the digitizer to adjust for the time of arrival of particles shot from close to the detector
-process.mix.digitizers.hgcalHEback.digiCfg.feCfg.adcThreshold_fC=0.25 #lowering the MIP threshold in digitizer
+process.mix.digitizers.hgcalHEback.digiCfg.feCfg.adcThreshold_fC=0.5 # MIP threshold in digitizer
+process.mix.digitizers.hgcalHEback.digiCfg.sigma=0.05 # sdPixels parameter name used instead of creating a new called sigma for simplicity TODO: fix
+process.mix.digitizers.hgcalHEback.digiCfg.gain=1.47 # Gain of 0.7 is for ConvGain 4, Overvoltage 2V. For testbeam 2mm^2 the gain should be 2.08. For testbeam 4mm^2 the gain should be 1.47
+process.mix.digitizers.hgcalHEback.digiCfg.nTotalPE=17500 #cms.double(39984), # UPD: number of pixels for 9 mm^2 SiPM, for 4 mm^2 SiPM 17500
+
 #process.mix.digitizers.hgcalHEback.digiCfg.feCfg.targetMIPvalue_ADC=15  #increase granularity of the digitiser 
 process.hgcalLayerClustersHSci.plugin.kappa=6 # disable clustering, by treating every hit as seed
 process.hgcalLayerClustersHSci.plugin.deltac=cms.vdouble(0.00001,0.00001,0.00001,0.00001) # disable clustering, by treating every hit as outlier
@@ -448,5 +400,5 @@ process.RandomNumberGeneratorService.generator.initialSeed=int(options.seed)
 process.RandomNumberGeneratorService.g4SimHits.initialSeed=int(options.seed)
 print("Using random seed", int(options.seed))
 from SimCalorimetry.HGCalSimProducers.hgcalDigitizer_cfi import *
-HGCal_setRealisticNoiseSci(process)
+#HGCal_setRealisticNoiseSci(process)
 #HGCal_setEndOfLifeNoise(process)

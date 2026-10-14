@@ -27,17 +27,11 @@ double HGCalRadiationMap::computeRadius(const HGCScintillatorDetId& cellId) {
 //
 GlobalPoint HGCalRadiationMap::computePos(const HGCScintillatorDetId& cellId) {
   GlobalPoint global = geom()->getPosition(cellId);
-  //global.X = global.x();
-  //global.Y = global.y();
-  //global.Z = global.z();
   return global;
 }
 
 double HGCalRadiationMap::computeArea(const HGCScintillatorDetId& cellId) {
   double area = geom()->getArea(cellId);
-  //global.X = global.x();
-  //global.Y = global.y();
-  //global.Z = global.z();
   return area;
 }
 

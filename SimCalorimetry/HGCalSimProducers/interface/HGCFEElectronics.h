@@ -101,8 +101,7 @@ public:
   };
 
   void generateTimeOffset(CLHEP::HepRandomEngine* engine) {
-    const size_t n = std::min(eventTimeOffset_ns_.size(), jitterConstant_ns_.size());
-    for (size_t i = 0; i < n; i++)
+    for (int i = 0; i < 3; i++)
       eventTimeOffset_ns_[i] = CLHEP::RandGaussQ::shoot(engine, 0, jitterConstant_ns_[i]);
   };
 

@@ -252,7 +252,11 @@ void HGCFEElectronics<DFr>::runTrivialShaper(
   }
 }
 
-//
+// Updated shaper for the updated realistic sci digitiser
+// No pulse shape at the moment (10/2026), just 0 0 1 0 0 (1 for sample [2])
+// ADCs are passed
+// "Trivial" TOT implementation done
+// ****************************************************************************************
 template <class DFr>
 void HGCFEElectronics<DFr>::runSimpleShaper(DFr& dataFrame,
                                             HGCSimHitData& chargeColl,
@@ -269,12 +273,14 @@ void HGCFEElectronics<DFr>::runSimpleShaper(DFr& dataFrame,
     if (charge == 0.f)
       continue;
 
+/*
 #ifdef EDM_ML_DEBUG
     debug |= (charge > adcThreshold_fC_);
 #endif
+*/
 
-    if (debug)
-      edm::LogVerbatim("HGCFE") << "\t Redistributing SARS ADC" << charge << " @ " << it;
+//    if (debug)
+//      edm::LogVerbatim("HGCFE") << "\t Redistributing SARS ADC" << charge << " @ " << it;
 
     for (int ipulse = -2; ipulse < (int)(adcPulse.size()) - 2; ipulse++) {
       if (it + ipulse < 0)
@@ -292,16 +298,40 @@ void HGCFEElectronics<DFr>::runSimpleShaper(DFr& dataFrame,
       edm::LogVerbatim("HGCFE") << std::endl;
   }
 
-  for (int it = 0; it < (int)(newCharge_.size()); it++) {
-    //brute force saturation, maybe could to better with an exponential like saturation
-    const uint32_t adc = std::floor(std::min(newCharge_[it], maxADC) / lsbADC);
-    HGCSample newSample;
-    newSample.set(adc > thrADC, false, gainIdx, 0, adc);
-    dataFrame.setSample(it, newSample);
 
-    if (debug)
-      edm::LogVerbatim("HGCFE") << adc << " (" << std::min(newCharge_[it], maxADC) << "/" << lsbADC << " ) ";
+  for (int it = 0; it < (int)(newCharge_.size()); it++) {
+  const uint32_t adc = std::floor(newCharge_[it]);
+  HGCSample newSample;
+
+// ratio between ADC bins and TDC bins is approx 3, which is used here for the "trivial tot":
+// if the signal is outside the dynamic range of the ADC, then setMode(1) and set the sample to adc/3, provided adc/3 is within tdc range (less than 4095)
+// setMode used, since some tot flag is needed and this seems to be the one available in the structure of these sample. TODO: check if its ok / introduce new
+// setting the digi value to integer adc/3 and making sure it is know via the setMode 1
+// this way in analysis this can be used as a flag and the digi multiplied by 3 (to emulate TOT to ADC conversion)
+// !!!! at the moment (10/2026) this is only compatible with the separate analysis of the digis
+// TODO: need to make necessary changes, such that this works properly with the rest of the CMSSW reconstruction chain
+
+// Important note: a strange behaviour of the <sample>.set() was observed: if the value exceeded the 4095 by n (0 < n < 4095), the value of the sample (the data) was set to n;
+// when the value exceeded 4095 by i*n, the value of the sample (the data) was also set to n;
+// A specific example: if adc = 4096, newSample.set(x, x, x, x, adc).data() would be 0;  for adc = 4196, the .data() would be 100; for adc = 8192 (2*4096) the .data() was 0 again;
+// for adc = 5953, .data() was 1857 = 5953-4096 and so on. TODO: to be communicated to the cmssw development group. For the below implementation this is not an issue for now.
+
+  float adcToTOTswitch=3.0;
+  adcToTOTswitch=2.5; // TESTBEAM
+  if (adc >= maxADC && adc/adcToTOTswitch < 4095){
+  	newSample.set(true, true, gainIdx, 0, adc/adcToTOTswitch);
+  	dataFrame.setSample(it, newSample);
   }
+  else if (adc >= maxADC && adc/adcToTOTswitch >= 4095){
+  	newSample.set(true, true, gainIdx, 0, 4095);  // if the signal is out of the TDC dynamic range, set the value to the maximum
+ 	dataFrame.setSample(it, newSample);
+  }
+  else {
+  	newSample.set(adc > thrADC, false, gainIdx, 0, adc);
+  	dataFrame.setSample(it, newSample);
+  }
+}
+
 
   if (debug) {
     std::ostringstream msg;
@@ -309,6 +339,7 @@ void HGCFEElectronics<DFr>::runSimpleShaper(DFr& dataFrame,
     edm::LogVerbatim("HGCFE") << msg.str();
   }
 }
+// ****************************************************************************************
 
 
 //
