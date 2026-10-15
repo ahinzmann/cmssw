@@ -16,7 +16,7 @@
 #include <fstream>
 #include <iostream>
 
-//#define EDM_ML_DEBUG
+#define EDM_ML_DEBUG
 
 HGCalNumberingScheme::HGCalNumberingScheme(const HGCalDDDConstants& hgc,
                                            const DetId::Detector& det,
@@ -163,6 +163,10 @@ uint32_t HGCalNumberingScheme::getUnitID(int layer, int module, int cell, int iz
 #endif
     }
   } else if (hgcons_.tileTrapezoid()) {
+#ifdef EDM_ML_DEBUG
+    edm::LogVerbatim("HGCSim") << "Trapezoid Position Layer " << layer << " Position " << pos.x() << ":" << pos.y()
+                               << ":" << pos.z();
+#endif
     std::array<int, 3> id = hgcons_.assignCellTrap(pos.x(), pos.y(), pos.z(), layer, false);
 #ifdef EDM_ML_DEBUG
     edm::LogVerbatim("HGCSim") << "Trapezoid Position Layer " << layer << " Position " << pos.x() << ":" << pos.y()

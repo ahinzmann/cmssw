@@ -24,7 +24,6 @@
   <Constant name="NPhiBinBHFine"         value="288"/>
   <Constant name="NPhiBinBH"             value="288"/>
   <Constant name="FirstMixedLayer"       value="8"/>
-  <Constant name="FirstMixedCoarseLayer" value="12"/>
   <Constant name="LayerRotation"         value="-30*deg"/>
   <Constant name="CalibCellRHD"          value="2.04*mm"/>
   <Constant name="CalibCellRLD"          value="3.05*mm"/>
@@ -195,8 +194,8 @@
     <ZSection z="[zHGCal8]"   rMin="[rMinHGCal7]"   rMax="[rMaxHGCal8]"/>
     <ZSection z="[zHGCal10]"  rMin="[rMinHGCal7]"   rMax="[rMaxHGCal10]"/>
     <ZSection z="[zHGCal11]"  rMin="[rMinHGCal7]"   rMax="[rMaxHGCal10]"/>
-    <ZSection z="[zHGCal11]"  rMin="[rMinHGCal7]"   rMax="[rMaxHGCal11]"/>
-    <ZSection z="[zHGCal13]"  rMin="[rMinHGCal7]"   rMax="[rMaxHGCal11]"/>
+    <ZSection z="[zHGCal11]"  rMin="[rMinHGCal7]"   rMax="[rMaxHGCal12]"/>
+    <ZSection z="[zHGCal13]"  rMin="[rMinHGCal7]"   rMax="[rMaxHGCal12]"/>
   </Polycone>
   <Polycone name="HGCalEE" startPhi="0*deg" deltaPhi="360*deg">
     <ZSection z="[zHGCalEE1]" rMin="[rMinHGCalEE1]"  rMax="[rMaxHGCalEE1]"/>
