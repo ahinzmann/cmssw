@@ -71,7 +71,10 @@ public:
         // need to increment by one so TDC doesn't overlap with ADC last bin
         // LG (11/04/2016):
         // offset the TDC upwards to reflect the bin center
-        amplitude_ = (std::floor(tdcOnsetfC_ / adcLSB_) + 1.0) * adcLSB_ + (double(sample.data()) + 0.5) * tdcLSB_;
+        if (dataFrame.id().det() == DetId::HGCalHSc) {
+          amplitude_ = double(sample.data()) * adcLSB_ * 2.5; // TESTBEAM TOT
+        } else
+          amplitude_ = (std::floor(tdcOnsetfC_ / adcLSB_) + 1.0) * adcLSB_ + (double(sample.data()) + 0.5) * tdcLSB_;
       } else {
         amplitude_ = double(sample.data()) * adcLSB_;  // why do we not have +0.5 here ?
       }  //isSiFESim_

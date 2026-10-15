@@ -330,7 +330,7 @@ void HGCHEbackDigitizer::runRealisticSciDigitizer(std::unique_ptr<HGCalDigiColle
     adcLsb = 1;
     maxADC = 1024 - pedestal; // UPD: max ADC not 1024, since some of it will be taken by the pedestal, recalculating.
     if ((scId.layer()==7+4) || (scId.layer()==7+7) || (scId.layer()==7+8)) { // TESTBEAM
-      gainValue=2.08;
+      gainValue=1.84;
       nTotalPx=8649;
     } else {
       gainValue=1.47;
