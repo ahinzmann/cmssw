@@ -1,7 +1,7 @@
 particle="electron"
 particleEnergy=20
 
-pgun_pos="_cernstack_2026Oct15"
+pgun_pos="_cernstack_2026Oct15v2"
 
 #pgun_pos="_200events_x2_y160_z400_digitiser_mipthreshold_granularity30_adjusted"#####
 
