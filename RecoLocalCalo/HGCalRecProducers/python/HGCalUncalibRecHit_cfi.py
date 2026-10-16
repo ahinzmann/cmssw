@@ -50,7 +50,7 @@ HGCalUncalibRecHit = HGCalUncalibRecHitProducer.clone(
         tdcOnset      = hgchebackDigitizer.digiCfg.feCfg.tdcOnset_fC,
         toaLSB_ns     = hgchebackDigitizer.digiCfg.feCfg.toaLSB_ns,
         tofDelay      = hgchebackDigitizer.tofDelay,
-        fCPerMIP      = cms.vdouble(1.0,hgchebackDigitizer.digiCfg.gain.value(),hgchebackDigitizer.digiCfg.nTotalPE.value())
+        fCPerMIP      = cms.vdouble(1.0,1.0,1.0)
         ),
 
     HGCHFNoseConfig = cms.PSet(

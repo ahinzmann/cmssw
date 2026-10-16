@@ -340,8 +340,10 @@ double HGCalSciNoiseMap::LYByTileArea(const HGCScintillatorDetId& cellId, const 
   // lyVsize(tile type (1==cast, 2 == molded), "phase" = 10 or 0 (pre-series or production), tile edge, sipm area (2 or 4 or 9 [mm^2]), overvoltage (e.g. 4 [V]))
   
   // ly = lyVsize(cellId.type(),0,edge,9,2); // HGCAL
-  if ((cellId.layer()==7+4) || (cellId.layer()==7+7) || (cellId.layer()==7+8)) // CERN stack FNAL layers
+  if ((cellId.layer()==7+4) || (cellId.layer()==7+7) || (cellId.layer()==7+8)) // CERN stack FNAL layers with 2mm2
     ly = lyVsize(2,10,edge,2,4);
+  else if ((cellId.layer()==7+9) && ((cellId.ring()==16+3) || (cellId.ring()==16+4))) // CERN stack cast tiles
+    ly = lyVsize(1,10,edge,4,4);
   else
     ly = lyVsize(2,10,edge,4,4);
 

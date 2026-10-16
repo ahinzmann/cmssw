@@ -117,8 +117,10 @@ return LYi;
   	constexpr double factor = 2 * M_PI * 1. / 288.; // 1.25 degrees
   	double edge = 10*(radius * factor);
         double ly;
-        if ((scId.layer()==7+4) || (scId.layer()==7+7) || (scId.layer()==7+8)) // CERN stack FNAL layers
+        if ((scId.layer()==7+4) || (scId.layer()==7+7) || (scId.layer()==7+8)) // CERN stack FNAL layers with 2mm2
           ly = lyVsize(2,10,edge,2,4);
+        else if ((scId.layer()==7+9) && ((scId.ring()==16+3) || (scId.ring()==16+4))) // CERN stack cast tiles
+          ly = lyVsize(1,10,edge,4,4);
         else
           ly = lyVsize(2,10,edge,4,4);
         double expadc=gain*ly;
