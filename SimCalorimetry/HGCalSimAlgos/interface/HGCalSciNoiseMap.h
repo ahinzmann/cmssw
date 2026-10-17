@@ -57,13 +57,12 @@ public:
                                         const double,
                                         const int aimMIPtoADC = 15,
                                         const GainRange_t gainPreChoice = GainRange_t::AUTO);
-
-  // new after 09/2026, copy of scaleByDose with modifications
-  SiPMonTileCharacteristics scaleByDose_update(const HGCScintillatorDetId &,
+  static float lyVsize(int, int, float, float, float);
+  SiPMonTileCharacteristics scaleByDoseLy(const HGCScintillatorDetId &,
                                         const double,
                                         const double,
                                         const double,
-                                        const int aimMIPtoADC = 15, // not used, not accurate
+                                        const double,
                                         const GainRange_t gainPreChoice = GainRange_t::AUTO);
 
   void setDoseMap(const std::string &, const unsigned int);

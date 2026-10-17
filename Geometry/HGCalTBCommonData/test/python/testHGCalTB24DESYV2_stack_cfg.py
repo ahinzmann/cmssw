@@ -1,7 +1,9 @@
 particle="electron"
 particleEnergy=20
+#particle="piminus"
+#particleEnergy=100
 
-pgun_pos="_cernstack_2026Oct16"
+pgun_pos="_cernstack_2026Oct16v2"
 
 #pgun_pos="_200events_x2_y160_z400_digitiser_mipthreshold_granularity30_adjusted"#####
 
@@ -240,7 +242,7 @@ process.generator = cms.EDProducer("FlatRandomAngleEGunProducer",
         MaxY = cms.double(162), # new interface
         #ParticlesPerPosition = cms.int32(500),  # Number of particles at each position
         ZPosition = cms.double(400.0),
-        PartID = cms.vint32((13 if particle == "muon" else 11))  # Particle ID
+        PartID = cms.vint32((-211 if particle == "piminus" else (13 if particle == "muon" else 11)))  # Particle ID
     ),
     Verbosity = cms.untracked.int32(1),
     firstRun = cms.untracked.uint32(1),

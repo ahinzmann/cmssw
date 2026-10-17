@@ -59,36 +59,6 @@ public:
 	return ans;
   }
 
-float pde(float ov){
-float pdei;
-pdei = (-0.72*ov*ov)+(10.0*ov)+4.41;
-return pdei;
-}
-
-float lyVsize(int type, int phase, float edge, float sipm=4.0, float ov=4.0){
-
-//type = Cast or Molded; Molded = 2, Cast = 1 (??) // Should be like that in CMSSW
-//phase = 10 = pre-series, 0 = production // Daria's addition to create a single map for the function parameters
-
-// Values A and C parameters for LY function for production tiles if 2 and 1, 12 and 11 if pre-series (by adding 10):
-std::map<int, std::vector<float>> LY_params{{2, {2066.53, -7.6}},{1, {1378.53, 32.34}}, {12, {1854.5, -6.52}},{11, {1110.5, 54.8}}};
-
-
-float LYi, sipmfactor, ovfactor, A, c;
-int key;
-sipmfactor = sipm/4;  // ratio between SiPM areas in mm^2, nominal is 4 mm^2 
-ovfactor = pde(ov)/pde(4); // ratio of PDE at a given overvoltage and nominal (4V)
-
-key = type+phase;
-std::vector<float>Z = LY_params.at(key);
-A = Z[0];
-c = Z[1];
-LYi = ((A/edge) + c)*sipmfactor*ovfactor;
-//std::cout << "A: " << A << " c: " << c << std::endl;
-
-return LYi;
-}
-
   /// Compute HGCUncalibratedRecHit from DataFrame
   virtual HGCUncalibratedRecHit makeRecHit(const C& dataFrame, const bool computeLocalTime) {
     double amplitude_(-1.), pedestal_(-1.), jitter_(-99.), chi2_(-1.);
@@ -112,17 +82,14 @@ return LYi;
           gain=1.47;
           nTotalPx=17459;
         }
-        GlobalPoint global = geom_->getPosition(scId);
-        double radius = std::sqrt(std::pow(global.x(), 2) + std::pow(global.y(), 2));
-  	constexpr double factor = 2 * M_PI * 1. / 288.; // 1.25 degrees
-  	double edge = 10*(radius * factor);
+  	double edge = geom_->edge(scId);
         double ly;
         if ((scId.layer()==7+4) || (scId.layer()==7+7) || (scId.layer()==7+8)) // CERN stack FNAL layers with 2mm2
-          ly = lyVsize(2,10,edge,2,4);
+          ly = HGCalSciNoiseMap::lyVsize(2,10,edge,2,4);
         else if ((scId.layer()==7+9) && ((scId.ring()==16+3) || (scId.ring()==16+4))) // CERN stack cast tiles
-          ly = lyVsize(1,10,edge,4,4);
+          ly = HGCalSciNoiseMap::lyVsize(1,10,edge,4,4);
         else
-          ly = lyVsize(2,10,edge,4,4);
+          ly = HGCalSciNoiseMap::lyVsize(2,10,edge,4,4);
         double expadc=gain*ly;
         double adcs=sample.data();
         if (sample.mode())

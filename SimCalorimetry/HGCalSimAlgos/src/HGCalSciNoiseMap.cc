@@ -198,11 +198,11 @@ double HGCalSciNoiseMap::scaleByTileArea(const HGCScintillatorDetId& cellId, con
 // Updated digitiser functions (from 09/2026) *******************************************************************************************************************
 // updated start
 
-HGCalSciNoiseMap::SiPMonTileCharacteristics HGCalSciNoiseMap::scaleByDose_update(const HGCScintillatorDetId& cellId,
+HGCalSciNoiseMap::SiPMonTileCharacteristics HGCalSciNoiseMap::scaleByDoseLy(const HGCScintillatorDetId& cellId,
                                                                           const double radius,
+                                                                          const double edge,
                                                                           const double rawID,
                                                                           const double LYsigma,
-                                                                          int aimMIPtoADC, // unused in the update
                                                                           GainRange_t gainPreChoice) {
   int layer = cellId.layer();
   bool hasDoseMap(!(getDoseMap().empty()));
@@ -253,7 +253,22 @@ HGCalSciNoiseMap::SiPMonTileCharacteristics HGCalSciNoiseMap::scaleByDose_update
   double sipmAreaSF = sipm.first;
   HGCalSciNoiseMap::GainRange_t gain = sipm.second;
 
-  lyScaleFactor *= LYByTileArea(cellId, radius, rawID, LYsigma);
+  // LY scale factor
+  CLHEP::HepRandom::setTheSeed(rawID); // seeded RNG with tile id as the seed, to be used when a mean value for LY for a given tile size is provided;
+				       // this allows to generate a unique LY for all tiles based on measured mean LY and standard deviation, constant for all events
+  double var = CLHEP::RandGauss::shoot(1,LYsigma);
+  // using the calculated tile edge to calculate the mean value for the light yield based on parametrisation for various materials
+  // Formulas for 9 mm^2 SiPMs, and SiPM overvoltage of 2V
+  // lyVsize(tile type (1==cast, 2 == molded), "phase" = 10 or 0 (pre-series or production), tile edge, sipm area (2 or 4 or 9 [mm^2]), overvoltage (e.g. 4 [V]))
+  double ly(0);// = lyVsize(cellId.type(),0,edge,9,2); // HGCAL
+  if ((cellId.layer()==7+4) || (cellId.layer()==7+7) || (cellId.layer()==7+8)) // CERN stack FNAL layers with 2mm2
+    ly = lyVsize(2,10,edge,2,4);
+  else if ((cellId.layer()==7+9) && ((cellId.ring()==16+3) || (cellId.ring()==16+4))) // CERN stack cast tiles
+    ly = lyVsize(1,10,edge,4,4);
+  else
+    ly = lyVsize(2,10,edge,4,4);
+  // returning the mean value for a given tile size multiplied by the random modifier dependant on the given tile id = LY of that specific tile
+  lyScaleFactor *= ly * var;
   noise *= sqrt(sipmAreaSF);
 
   //final signal depending on scintillator type
@@ -274,18 +289,17 @@ HGCalSciNoiseMap::SiPMonTileCharacteristics HGCalSciNoiseMap::scaleByDose_update
   return sipmChar;
 }
 
-// new function in the update
-// getting tile light yield based on its edge length, LY v edge as formulas, parametrisation from production measurements in DESY's LY test stand
-
 // SiPM Photo Detection Efficiency (PDE) function. The LY is dependant on overvoltage through PDE, hense needed for calculation if a different OV is used (HGCROC settings)
 
-float pde(float ov){
+float pde(float ov) {
 float pdei;
 pdei = (-0.72*ov*ov)+(10.0*ov)+4.41;
 return pdei;
 }
 
-float lyVsize(int type, int phase, float edge, float sipm=4.0, float ov=4.0){
+// getting tile light yield based on its edge length, LY v edge as formulas, parametrisation from production measurements in DESY's LY test stand
+
+float HGCalSciNoiseMap::lyVsize(int type, int phase, float edge, float sipm=4.0, float ov=4.0) {
 
 //type = Cast or Molded; Molded = 2, Cast = 1 (??) // Should be like that in CMSSW
 //phase = 10 = pre-series, 0 = production // Daria's addition to create a single map for the function parameters
@@ -308,51 +322,6 @@ LYi = ((A/edge) + C)*sipmfactor*ovfactor;
 
 return LYi;
 }
-
-double HGCalSciNoiseMap::LYByTileArea(const HGCScintillatorDetId& cellId, const double radius, const long long int rawID, const double sigma) {
-  double ly(80.);
-
-  //if (ignoreTileArea_)
-  //  return ly;
-
-  [[clang::suppress]]
-  double edge(refEdge_);  //start with reference 3cm of edge
-
-  CLHEP::HepRandom::setTheSeed(rawID); // seeded RNG with tile id as the seed, to be used when a mean value for LY for a given tile size is provided;
-				       // this allows to generate a unique LY for all tiles based on measured mean LY and standard deviation, constant for all events
-  double var = CLHEP::RandGauss::shoot(1,sigma);
-
-  // Calculating tile edge based on its position (radius) and the granularity
-  if (cellId.granularity() == 1) // High density tiles
-  	{
-  	constexpr double factor = 2 * M_PI * 1. / 432.; // ~0.83 degrees
-  	edge = 10*(radius * factor);
-  	}
-  else
-  	{
-  	constexpr double factor = 2 * M_PI * 1. / 288.; // 1.25 degrees
-  	edge = 10*(radius * factor);
-  	}
-
-  // using the calculated tile edge to calculate the mean value for the light yield based on parametrisation for various materials
-  // Formulas for 9 mm^2 SiPMs, and SiPM overvoltage of 2V
-  
-  // lyVsize(tile type (1==cast, 2 == molded), "phase" = 10 or 0 (pre-series or production), tile edge, sipm area (2 or 4 or 9 [mm^2]), overvoltage (e.g. 4 [V]))
-  
-  // ly = lyVsize(cellId.type(),0,edge,9,2); // HGCAL
-  if ((cellId.layer()==7+4) || (cellId.layer()==7+7) || (cellId.layer()==7+8)) // CERN stack FNAL layers with 2mm2
-    ly = lyVsize(2,10,edge,2,4);
-  else if ((cellId.layer()==7+9) && ((cellId.ring()==16+3) || (cellId.ring()==16+4))) // CERN stack cast tiles
-    ly = lyVsize(1,10,edge,4,4);
-  else
-    ly = lyVsize(2,10,edge,4,4);
-
-  // returning the mean value for a given tile size multiplied by the random modifier dependant on the given tile id = LY of that specific tile
-  return ly * var;
-}
-// updated end
-// ********************************************************************************************************************************************************************
-
 
 // !!! outdated functions, unused in updated digitiser, not checked for correctness -----------------------------------------------------------------------------------
 // outdated start
