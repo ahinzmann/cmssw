@@ -317,11 +317,11 @@ double HGCalGeometry::getArea(const DetId& detid) const {
 double HGCalGeometry::edge(const HGCScintillatorDetId& detid) const {
   // Calculating tile edge based on its position (radius) and the granularity
   double factor(0);
-  if (detid.granularity() == 1) // High density tiles
-   factor = 2 * M_PI * 1. / 432.; // ~0.83 degrees
+  if (detid.granularity() == 1)     // High density tiles
+    factor = 2 * M_PI * 1. / 432.;  // ~0.83 degrees
   else
-   factor = 2 * M_PI * 1. / 288.; // 1.25 degrees
-  return 10*(getPosition(detid).perp() * factor);
+    factor = 2 * M_PI * 1. / 288.;  // 1.25 degrees
+  return 10 * (getPosition(detid).perp() * factor);
 }
 
 HGCalGeometry::CornersVec HGCalGeometry::getCorners(const DetId& detid) const {

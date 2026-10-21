@@ -18,10 +18,8 @@ HGCalSciNoiseMap::HGCalSciNoiseMap()
       refDarkCurrent_(0.5),
       aimMIPtoADC_(15),
       maxSiPMPE_(8888) {
-
-
-// !!! outdated version of the scaling, old LY values, no high density tiles, incorrect assumptions about gain adjustments -----------------------------------------------
-// outdated start
+  // !!! outdated version of the scaling, old LY values, no high density tiles, incorrect assumptions about gain adjustments -----------------------------------------------
+  // outdated start
 
   //number of photo electrons per MIP per scintillator type (irradiated, based on testbeam results)
   //reference is a 30*30 mm^2 tile and 2 mm^2 SiPM (with 15um pixels), at the 2 V over-voltage
@@ -35,7 +33,6 @@ HGCalSciNoiseMap::HGCalSciNoiseMap()
   //for the MIP peak to be close to N ADC counts (similar to Si) or applying other specific criteria
   fscADCPerGain_[GAIN_2] = nPEperMIP_[CAST] * 1024. / aimMIPtoADC_;      //2 mm^2  SiPM
   fscADCPerGain_[GAIN_4] = 2 * nPEperMIP_[CAST] * 1024. / aimMIPtoADC_;  //4mm^2   SiPM
-  
 
   //lsb: adc has 10 bits -> 1024 counts at max
   for (size_t i = 0; i < GAINRANGE_N; i++)
@@ -98,8 +95,6 @@ std::unordered_map<int, float> HGCalSciNoiseMap::readSipmPars(const std::string&
 //
 // unused in updated digitiser
 void HGCalSciNoiseMap::setReferenceDarkCurrent(double idark) { refDarkCurrent_ = idark; }
-
-
 
 HGCalSciNoiseMap::SiPMonTileCharacteristics HGCalSciNoiseMap::scaleByDose(const HGCScintillatorDetId& cellId,
                                                                           const double radius,
@@ -193,17 +188,15 @@ double HGCalSciNoiseMap::scaleByTileArea(const HGCScintillatorDetId& cellId, con
 // outdated end
 // -------------------------------------------------------------------------------------------------------------------------------------------------------------- !!!
 
-
-
 // Updated digitiser functions (from 09/2026) *******************************************************************************************************************
 // updated start
 
 HGCalSciNoiseMap::SiPMonTileCharacteristics HGCalSciNoiseMap::scaleByDoseLy(const HGCScintillatorDetId& cellId,
-                                                                          const double radius,
-                                                                          const double edge,
-                                                                          const double rawID,
-                                                                          const double LYsigma,
-                                                                          GainRange_t gainPreChoice) {
+                                                                            const double radius,
+                                                                            const double edge,
+                                                                            const double rawID,
+                                                                            const double LYsigma,
+                                                                            GainRange_t gainPreChoice) {
   int layer = cellId.layer();
   bool hasDoseMap(!(getDoseMap().empty()));
 
@@ -254,19 +247,22 @@ HGCalSciNoiseMap::SiPMonTileCharacteristics HGCalSciNoiseMap::scaleByDoseLy(cons
   HGCalSciNoiseMap::GainRange_t gain = sipm.second;
 
   // LY scale factor
-  CLHEP::HepRandom::setTheSeed(rawID); // seeded RNG with tile id as the seed, to be used when a mean value for LY for a given tile size is provided;
-				       // this allows to generate a unique LY for all tiles based on measured mean LY and standard deviation, constant for all events
-  double var = CLHEP::RandGauss::shoot(1,LYsigma);
+  CLHEP::HepRandom::setTheSeed(
+      rawID);  // seeded RNG with tile id as the seed, to be used when a mean value for LY for a given tile size is provided;
+  // this allows to generate a unique LY for all tiles based on measured mean LY and standard deviation, constant for all events
+  double var = CLHEP::RandGauss::shoot(1, LYsigma);
   // using the calculated tile edge to calculate the mean value for the light yield based on parametrisation for various materials
   // Formulas for 9 mm^2 SiPMs, and SiPM overvoltage of 2V
   // lyVsize(tile type (1==cast, 2 == molded), "phase" = 10 or 0 (pre-series or production), tile edge, sipm area (2 or 4 or 9 [mm^2]), overvoltage (e.g. 4 [V]))
-  double ly(0);// = lyVsize(cellId.type(),0,edge,9,2); // HGCAL
-  if ((cellId.layer()==7+4) || (cellId.layer()==7+7) || (cellId.layer()==7+8)) // CERN stack FNAL layers with 2mm2
-    ly = lyVsize(2,10,edge,2,4);
-  else if ((cellId.layer()==7+9) && ((cellId.ring()==16+3) || (cellId.ring()==16+4))) // CERN stack cast tiles
-    ly = lyVsize(1,10,edge,4,4);
+  double ly(0);  // = lyVsize(cellId.type(),0,edge,9,2); // HGCAL
+  if ((cellId.layer() == 7 + 4) || (cellId.layer() == 7 + 7) ||
+      (cellId.layer() == 7 + 8))  // CERN stack FNAL layers with 2mm2
+    ly = lyVsize(2, 10, edge, 2, 4);
+  else if ((cellId.layer() == 7 + 9) &&
+           ((cellId.ring() == 16 + 3) || (cellId.ring() == 16 + 4)))  // CERN stack cast tiles
+    ly = lyVsize(1, 10, edge, 4, 4);
   else
-    ly = lyVsize(2,10,edge,4,4);
+    ly = lyVsize(2, 10, edge, 4, 4);
   // returning the mean value for a given tile size multiplied by the random modifier dependant on the given tile id = LY of that specific tile
   lyScaleFactor *= ly * var;
   noise *= sqrt(sipmAreaSF);
@@ -279,48 +275,47 @@ HGCalSciNoiseMap::SiPMonTileCharacteristics HGCalSciNoiseMap::scaleByDoseLy(cons
   //**
 
   HGCalSciNoiseMap::SiPMonTileCharacteristics sipmChar;
-  sipmChar.s = S; //unused in the digitiser
+  sipmChar.s = S;  //unused in the digitiser
   sipmChar.lySF = lyScaleFactor;
-  sipmChar.n = noise; //unused in the digitiser
-  sipmChar.gain = gain; //unused in the digitiser
-  sipmChar.thrADC = std::floor(0.5 * S / lsbPerGain_[gain]); //unused in the digitiser, set elsewhere
-  sipmChar.ntotalPE = maxSiPMPE_ * sipmAreaSF; //unused in the digitiser
-  sipmChar.xtalk = refXtalk_; //unused in the digitiser
+  sipmChar.n = noise;                                         //unused in the digitiser
+  sipmChar.gain = gain;                                       //unused in the digitiser
+  sipmChar.thrADC = std::floor(0.5 * S / lsbPerGain_[gain]);  //unused in the digitiser, set elsewhere
+  sipmChar.ntotalPE = maxSiPMPE_ * sipmAreaSF;                //unused in the digitiser
+  sipmChar.xtalk = refXtalk_;                                 //unused in the digitiser
   return sipmChar;
 }
 
 // SiPM Photo Detection Efficiency (PDE) function. The LY is dependant on overvoltage through PDE, hense needed for calculation if a different OV is used (HGCROC settings)
 
 float pde(float ov) {
-float pdei;
-pdei = (-0.72*ov*ov)+(10.0*ov)+4.41;
-return pdei;
+  float pdei;
+  pdei = (-0.72 * ov * ov) + (10.0 * ov) + 4.41;
+  return pdei;
 }
 
 // getting tile light yield based on its edge length, LY v edge as formulas, parametrisation from production measurements in DESY's LY test stand
 
-float HGCalSciNoiseMap::lyVsize(int type, int phase, float edge, float sipm=4.0, float ov=4.0) {
+float HGCalSciNoiseMap::lyVsize(int type, int phase, float edge, float sipm = 4.0, float ov = 4.0) {
+  //type = Cast or Molded; Molded = 2, Cast = 1 (??) // Should be like that in CMSSW
+  //phase = 10 = pre-series, 0 = production // Daria's addition to create a single map for the function parameters
 
-//type = Cast or Molded; Molded = 2, Cast = 1 (??) // Should be like that in CMSSW
-//phase = 10 = pre-series, 0 = production // Daria's addition to create a single map for the function parameters
+  // Values A and C parameters for LY function for production tiles if 2 and 1, 12 and 11 if pre-series (by adding 10):
+  const std::map<int, std::vector<float>> & LY_params{
+      {2, {2066.53, -7.6}}, {1, {1378.53, 32.34}}, {12, {1854.5, -6.52}}, {11, {1110.5, 54.8}}};
 
-// Values A and C parameters for LY function for production tiles if 2 and 1, 12 and 11 if pre-series (by adding 10):
-std::map<int, std::vector<float>> LY_params{{2, {2066.53, -7.6}},{1, {1378.53, 32.34}}, {12, {1854.5, -6.52}},{11, {1110.5, 54.8}}};
+  float LYi, sipmfactor, ovfactor, A, C;
+  int key;
+  sipmfactor = sipm / 4;        // ratio between SiPM areas in mm^2, nominal is 4 mm^2
+  ovfactor = pde(ov) / pde(4);  // ratio of PDE at a given overvoltage and nominal (4V)
 
+  key = type + phase;
+  const std::vector<float>& Z = LY_params.at(key);
+  A = Z[0];
+  C = Z[1];
+  LYi = ((A / edge) + C) * sipmfactor * ovfactor;
+  //std::cout << "A: " << A << " C: " << C << std::endl;
 
-float LYi, sipmfactor, ovfactor, A, C;
-int key;
-sipmfactor = sipm/4;  // ratio between SiPM areas in mm^2, nominal is 4 mm^2 
-ovfactor = pde(ov)/pde(4); // ratio of PDE at a given overvoltage and nominal (4V)
-
-key = type+phase;
-std::vector<float>Z = LY_params.at(key);
-A = Z[0];
-C = Z[1];
-LYi = ((A/edge) + C)*sipmfactor*ovfactor;
-//std::cout << "A: " << A << " C: " << C << std::endl;
-
-return LYi;
+  return LYi;
 }
 
 // !!! outdated functions, unused in updated digitiser, not checked for correctness -----------------------------------------------------------------------------------

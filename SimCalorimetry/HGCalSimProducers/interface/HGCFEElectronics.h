@@ -23,7 +23,7 @@ namespace hgc_digi {
 template <class DFr>
 class HGCFEElectronics {
 public:
-  enum HGCFEElectronicsFirmwareVersion { TRIVIAL, SIMPLE, WITHTOT , NO, MINI};
+  enum HGCFEElectronicsFirmwareVersion { TRIVIAL, SIMPLE, WITHTOT };
   enum HGCFEElectronicsTOTMode { WEIGHTEDBYE, SIMPLETHRESHOLD };
 
   /**
@@ -39,7 +39,7 @@ public:
                         hgc::HGCSimHitData& toa,
                         const hgc_digi::FEADCPulseShape& adcPulse,
                         CLHEP::HepRandomEngine* engine,
-                        float thrADC = 0.,
+                        uint32_t thrADC = 0.,
                         float lsbADC = -1,
                         uint32_t gainIdx = 0,
                         float gainVal = 0.,
@@ -48,16 +48,6 @@ public:
                         float tdcOnsetAuto = -1,
                         float noiseWidth = -1) {
     switch (fwVersion_) {
-    case NO: {
-        runNoShaper(dataFrame, chargeColl, thrADC, lsbADC, gainIdx, maxADC);
-        break;
-      }
-      
-    case MINI: {
-        runMinShaper(dataFrame, chargeColl, engine, thrADC, gainVal, maxADC, adcPulse);
-        break;
-      }  
-    
       case SIMPLE: {
         runSimpleShaper(dataFrame, chargeColl, thrADC, lsbADC, gainIdx, maxADC, adcPulse);
         break;
@@ -87,7 +77,7 @@ public:
                         hgc::HGCSimHitData& chargeColl,
                         hgc::HGCSimHitData& toa,
                         CLHEP::HepRandomEngine* engine,
-                        float thrADC = 0.,
+                        uint32_t thrADC = 0.,
                         float lsbADC = -1,
                         uint32_t gainIdx = 0,
                         float gainVal = 0.,
@@ -131,10 +121,6 @@ public:
   void runTrivialShaper(
       DFr& dataFrame, hgc::HGCSimHitData& chargeColl, uint32_t thrADC, float lsbADC, uint32_t gainIdx, float maxADC);
 
-
-void runNoShaper(
-      DFr& dataFrame, hgc::HGCSimHitData& chargeColl, uint32_t thrADC, float lsbADC, uint32_t gainIdx, float maxADC);
-
   /**
      @short applies a shape to each time sample and propagates the tails to the subsequent time samples
    */
@@ -149,20 +135,6 @@ void runNoShaper(
       DFr& dataFrame, hgc::HGCSimHitData& chargeColl, uint32_t thrADC, float lsbADC, uint32_t gainIdx, float maxADC) {
     runSimpleShaper(dataFrame, chargeColl, thrADC, lsbADC, gainIdx, maxADC, adcPulse_);
   }
-  
-  
-   void runMinShaper(DFr& dataFrame,
-                       hgc::HGCSimHitData& chargeColl,
-                       CLHEP::HepRandomEngine* engine,
-                       float thrADC,
-                       float gainVal,
-                       float maxADC,
-                       const hgc_digi::FEADCPulseShape& adcPulse);
-  void runMinShaper(
-      DFr& dataFrame, hgc::HGCSimHitData& chargeColl, CLHEP::HepRandomEngine* engine, float thrADC, float gainVal, float maxADC) {
-    runMinShaper(dataFrame, chargeColl, engine, thrADC, gainVal, maxADC, adcPulse_);
-  }
-  
 
   /**
      @short implements pulse shape and switch to time over threshold including deadtime

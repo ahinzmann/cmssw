@@ -7,8 +7,6 @@
 #include <string>
 #include <array>
 
-
-
 /**
    @class HGCalSciNoiseMap
    @short derives from HGCalRadiation map to parse fluence/dose parameters, provides Sci-specific functions
@@ -26,7 +24,12 @@
 class HGCalSciNoiseMap : public HGCalRadiationMap {
 public:
   enum TileType_t { CAST, MOULDED, TILETYPE_N };
-  enum GainRange_t { GAIN_2, GAIN_4, AUTO, GAINRANGE_N };  //roc gain for 2mm2 and 4mm2 // unused in the update of the digitiser
+  enum GainRange_t {
+    GAIN_2,
+    GAIN_4,
+    AUTO,
+    GAINRANGE_N
+  };  //roc gain for 2mm2 and 4mm2 // unused in the update of the digitiser
   enum NoiseMapAlgoBits_t {
     IGNORE_SIPMAREA,
     OVERRIDE_SIPMAREA,
@@ -51,7 +54,6 @@ public:
      @short returns the signal scaling and the noise
   */
   double scaleByTileArea(const HGCScintillatorDetId &, const double);
-  double LYByTileArea(const HGCScintillatorDetId &, const double, const long long int, const double); // updated function for the accurate LY extraction for a given tile id
   std::pair<double, GainRange_t> scaleBySipmArea(const HGCScintillatorDetId &, const double, const GainRange_t &);
   SiPMonTileCharacteristics scaleByDose(const HGCScintillatorDetId &,
                                         const double,
@@ -59,11 +61,11 @@ public:
                                         const GainRange_t gainPreChoice = GainRange_t::AUTO);
   static float lyVsize(int, int, float, float, float);
   SiPMonTileCharacteristics scaleByDoseLy(const HGCScintillatorDetId &,
-                                        const double,
-                                        const double,
-                                        const double,
-                                        const double,
-                                        const GainRange_t gainPreChoice = GainRange_t::AUTO);
+                                          const double,
+                                          const double,
+                                          const double,
+                                          const double,
+                                          const GainRange_t gainPreChoice = GainRange_t::AUTO);
 
   void setDoseMap(const std::string &, const unsigned int);
   void setSipmMap(const std::string &);

@@ -52,11 +52,11 @@ public:
       ddd_ = nullptr;
     return geom_ != nullptr;
   }
-  
-  float desat(double sig, double g, int m=39998) {
-	double n = sig/g;
-	double ans = -m/n*log(1-(n/m));
-	return ans;
+
+  float desat(double sig, double g, int m = 39998) {
+    double n = sig / g;
+    double ans = -m / n * log(1 - (n / m));
+    return ans;
   }
 
   /// Compute HGCUncalibratedRecHit from DataFrame
@@ -70,48 +70,47 @@ public:
     // Were digis done w/ the complete digitization and using signal shape?
     // (originally done only for the silicon, while for scitillator it was trivial. Fomr 11_ also scinti uses shape)
     if (isSiFESim_) {
-
       if (dataFrame.id().det() == DetId::HGCalHSc) {
-        double gain=fCPerMIP_[1];
-        double nTotalPx=fCPerMIP_[2];
+        double gain = fCPerMIP_[1];
+        double nTotalPx = fCPerMIP_[2];
         HGCScintillatorDetId scId(dataFrame.id().rawId());
-        if ((scId.layer()==7+4) || (scId.layer()==7+7) || (scId.layer()==7+8)) { // TESTBEAM
-          gain=1.84;
-          nTotalPx=8649;
+        if ((scId.layer() == 7 + 4) || (scId.layer() == 7 + 7) || (scId.layer() == 7 + 8)) {  // TESTBEAM
+          gain = 1.84;
+          nTotalPx = 8649;
         } else {
-          gain=1.47;
-          nTotalPx=17459;
+          gain = 1.47;
+          nTotalPx = 17459;
         }
-  	double edge = geom_->edge(scId);
+        double edge = geom_->edge(scId);
         double ly;
-        if ((scId.layer()==7+4) || (scId.layer()==7+7) || (scId.layer()==7+8)) // CERN stack FNAL layers with 2mm2
-          ly = HGCalSciNoiseMap::lyVsize(2,10,edge,2,4);
-        else if ((scId.layer()==7+9) && ((scId.ring()==16+3) || (scId.ring()==16+4))) // CERN stack cast tiles
-          ly = HGCalSciNoiseMap::lyVsize(1,10,edge,4,4);
+        if ((scId.layer() == 7 + 4) || (scId.layer() == 7 + 7) ||
+            (scId.layer() == 7 + 8))  // CERN stack FNAL layers with 2mm2
+          ly = HGCalSciNoiseMap::lyVsize(2, 10, edge, 2, 4);
+        else if ((scId.layer() == 7 + 9) &&
+                 ((scId.ring() == 16 + 3) || (scId.ring() == 16 + 4)))  // CERN stack cast tiles
+          ly = HGCalSciNoiseMap::lyVsize(1, 10, edge, 4, 4);
         else
-          ly = HGCalSciNoiseMap::lyVsize(2,10,edge,4,4);
-        double expadc=gain*ly;
-        double adcs=sample.data();
+          ly = HGCalSciNoiseMap::lyVsize(2, 10, edge, 4, 4);
+        double expadc = gain * ly;
+        double adcs = sample.data();
         if (sample.mode())
           adcs *= 2.5;
-        double satmipss = adcs/expadc;
-        amplitude_ = satmipss*desat(adcs, gain, nTotalPx);
+        double satmipss = adcs / expadc;
+        amplitude_ = satmipss * desat(adcs, gain, nTotalPx);
       } else {
-
-      // mode == true: TDC readout was activated and amplitude comes from TimeOverThreshold
-      if (sample.mode()) {
-        flag = !sample.threshold();  // raise flag if busy cell
-        // LG (23/06/2015):
-        // to get a continuous energy spectrum we must add here the maximum value in fC ever
-        // reported by the ADC. Namely: floor(tdcOnset/adcLSB_) * adcLSB_
-        // need to increment by one so TDC doesn't overlap with ADC last bin
-        // LG (11/04/2016):
-        // offset the TDC upwards to reflect the bin center
-        amplitude_ = (std::floor(tdcOnsetfC_ / adcLSB_) + 1.0) * adcLSB_ + (double(sample.data()) + 0.5) * tdcLSB_;
-      } else {
-        amplitude_ = double(sample.data()) * adcLSB_;  // why do we not have +0.5 here ?
-      }  //isSiFESim_
-      
+        // mode == true: TDC readout was activated and amplitude comes from TimeOverThreshold
+        if (sample.mode()) {
+          flag = !sample.threshold();  // raise flag if busy cell
+          // LG (23/06/2015):
+          // to get a continuous energy spectrum we must add here the maximum value in fC ever
+          // reported by the ADC. Namely: floor(tdcOnset/adcLSB_) * adcLSB_
+          // need to increment by one so TDC doesn't overlap with ADC last bin
+          // LG (11/04/2016):
+          // offset the TDC upwards to reflect the bin center
+          amplitude_ = (std::floor(tdcOnsetfC_ / adcLSB_) + 1.0) * adcLSB_ + (double(sample.data()) + 0.5) * tdcLSB_;
+        } else {
+          amplitude_ = double(sample.data()) * adcLSB_;  // why do we not have +0.5 here ?
+        }  //isSiFESim_
       }
     }  //mode()
 

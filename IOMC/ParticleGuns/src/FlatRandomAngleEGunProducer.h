@@ -35,10 +35,9 @@ namespace edm {
     double zpos_;  // Z position
 
     // Constants
-    static constexpr double mm2cm_ = 0.1;  // Conversion from mm to cm
+    static constexpr double mm2cm_ = 0.1;   // Conversion from mm to cm
     static constexpr double cm2mm_ = 10.0;  // Conversion from cm to mm
   };
 }  // namespace edm
 
 #endif
-

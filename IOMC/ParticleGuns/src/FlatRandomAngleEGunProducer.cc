@@ -19,24 +19,23 @@
 using namespace edm;
 using namespace std;
 
-FlatRandomAngleEGunProducer::FlatRandomAngleEGunProducer(const ParameterSet& pset) 
-    : BaseFlatGunProducer(pset) {
+FlatRandomAngleEGunProducer::FlatRandomAngleEGunProducer(const ParameterSet& pset) : BaseFlatGunProducer(pset) {
   ParameterSet defpset;
   ParameterSet pgun_params = pset.getParameter<ParameterSet>("PGunParameters");
 
   fMinE = pgun_params.getParameter<double>("MinE");
   fMaxE = pgun_params.getParameter<double>("MaxE");
 
-  fMinTheta = pgun_params.getParameter<double>("MinTheta"); // Cosmic muons
+  fMinTheta = pgun_params.getParameter<double>("MinTheta");  // Cosmic muons
   fMaxTheta = pgun_params.getParameter<double>("MaxTheta");
 
-  fMinPhi = pgun_params.getParameter<double>("MinPhi"); // Flat phi distribution
+  fMinPhi = pgun_params.getParameter<double>("MinPhi");  // Flat phi distribution
   fMaxPhi = pgun_params.getParameter<double>("MaxPhi");
 
-  fMinX = pgun_params.getParameter<double>("MinX"); // Flat x distribution
+  fMinX = pgun_params.getParameter<double>("MinX");  // Flat x distribution
   fMaxX = pgun_params.getParameter<double>("MaxX");
 
-  fMinY = pgun_params.getParameter<double>("MinY"); // Flat y distribution
+  fMinY = pgun_params.getParameter<double>("MinY");  // Flat y distribution
   fMaxY = pgun_params.getParameter<double>("MaxY");
 
   zpos_ = pgun_params.getParameter<double>("ZPosition");
@@ -63,8 +62,7 @@ void FlatRandomAngleEGunProducer::produce(Event& e, const EventSetup& es) {
   double y = CLHEP::RandFlat::shoot(engine, fMinY, fMaxY);
 
   // Assign coordinates for this event
-  HepMC::GenVertex* Vtx = new HepMC::GenVertex(
-      HepMC::FourVector(x * cm2mm_, y * cm2mm_, zpos_ * cm2mm_));
+  HepMC::GenVertex* Vtx = new HepMC::GenVertex(HepMC::FourVector(x * cm2mm_, y * cm2mm_, zpos_ * cm2mm_));
   std::cerr << y << std::endl;
   int barcode = 1;
   for (unsigned int ip = 0; ip < fPartIDs.size(); ip++) {
@@ -75,9 +73,9 @@ void FlatRandomAngleEGunProducer::produce(Event& e, const EventSetup& es) {
     double theta;
     bool accepted = false;
     while (!accepted) {
-      double draw = CLHEP::RandFlat::shoot(engine, 0.0, 1.0); // Acceptance criterion
-      theta = CLHEP::RandFlat::shoot(engine, fMinTheta, fMaxTheta); // Random theta
-      double prob = std::pow(std::cos(theta), 2); // Weight: cosÂ²(theta)
+      double draw = CLHEP::RandFlat::shoot(engine, 0.0, 1.0);        // Acceptance criterion
+      theta = CLHEP::RandFlat::shoot(engine, fMinTheta, fMaxTheta);  // Random theta
+      double prob = std::pow(std::cos(theta), 2);                    // Weight: cosÂ²(theta)
       if (prob > draw) {
         accepted = true;
       }
