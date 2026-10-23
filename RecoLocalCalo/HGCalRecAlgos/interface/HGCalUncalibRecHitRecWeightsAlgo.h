@@ -70,7 +70,35 @@ public:
     // Were digis done w/ the complete digitization and using signal shape?
     // (originally done only for the silicon, while for scitillator it was trivial. Fomr 11_ also scinti uses shape)
     if (isSiFESim_) {
-      if (dataFrame.id().det() == DetId::HGCalHSc) {
+      // mode == true: TDC readout was activated and amplitude comes from TimeOverThreshold
+      if (sample.mode()) {
+          flag = !sample.threshold();  // raise flag if busy cell
+          // LG (23/06/2015):
+          // to get a continuous energy spectrum we must add here the maximum value in fC ever
+          // reported by the ADC. Namely: floor(tdcOnset/adcLSB_) * adcLSB_
+          // need to increment by one so TDC doesn't overlap with ADC last bin
+          // LG (11/04/2016):
+          // offset the TDC upwards to reflect the bin center
+          amplitude_ = (std::floor(tdcOnsetfC_ / adcLSB_) + 1.0) * adcLSB_ + (double(sample.data()) + 0.5) * tdcLSB_;
+      } else {
+          amplitude_ = double(sample.data()) * adcLSB_;  // why do we not have +0.5 here ?
+      } //mode()
+    } //isSiFESim_
+
+    // trivial digitization, i.e. no signal shape
+    else {
+      amplitude_ = double(sample.data()) * adcLSB_;
+    }
+
+    if (sample.getToAValid()) {
+      const auto& dist2center = geom_ ? geom_->getPosition(dataFrame.id()).mag() : 0;
+      jitter_ = computeLocalTime ? double(sample.toa()) * toaLSBToNS_ - tofDelay_
+                                 : double(sample.toa()) * toaLSBToNS_ - dist2center / c_cm_ns - tofDelay_;
+    }
+
+    int thickness = (ddd_ != nullptr) ? ddd_->waferType(dataFrame.id(), false) : 0;
+
+    if (dataFrame.id().det() == DetId::HGCalHSc) {
         double gain = fCPerMIP_[1];
         double nTotalPx = fCPerMIP_[2];
         HGCScintillatorDetId scId(dataFrame.id().rawId());
@@ -92,42 +120,12 @@ public:
         else
           ly = HGCalSciNoiseMap::lyVsize(2, 10, edge, 4, 4);
         double expadc = gain * ly;
-        double adcs = sample.data();
-        if (sample.mode())
-          adcs *= 2.5;
-        double satmipss = adcs / expadc;
-        amplitude_ = satmipss * desat(adcs, gain, nTotalPx);
-      } else {
-        // mode == true: TDC readout was activated and amplitude comes from TimeOverThreshold
-        if (sample.mode()) {
-          flag = !sample.threshold();  // raise flag if busy cell
-          // LG (23/06/2015):
-          // to get a continuous energy spectrum we must add here the maximum value in fC ever
-          // reported by the ADC. Namely: floor(tdcOnset/adcLSB_) * adcLSB_
-          // need to increment by one so TDC doesn't overlap with ADC last bin
-          // LG (11/04/2016):
-          // offset the TDC upwards to reflect the bin center
-          amplitude_ = (std::floor(tdcOnsetfC_ / adcLSB_) + 1.0) * adcLSB_ + (double(sample.data()) + 0.5) * tdcLSB_;
-        } else {
-          amplitude_ = double(sample.data()) * adcLSB_;  // why do we not have +0.5 here ?
-        }  //isSiFESim_
-      }
-    }  //mode()
-
-    // trivial digitization, i.e. no signal shape
-    else {
-      amplitude_ = double(sample.data()) * adcLSB_;
+        double satmipss = amplitude_ / expadc;
+        amplitude_ = satmipss * desat(amplitude_, gain, nTotalPx);
+    } else {
+        amplitude_ = amplitude_ / fCPerMIP_[thickness];
     }
-
-    if (sample.getToAValid()) {
-      const auto& dist2center = geom_ ? geom_->getPosition(dataFrame.id()).mag() : 0;
-      jitter_ = computeLocalTime ? double(sample.toa()) * toaLSBToNS_ - tofDelay_
-                                 : double(sample.toa()) * toaLSBToNS_ - dist2center / c_cm_ns - tofDelay_;
-    }
-
-    int thickness = (ddd_ != nullptr) ? ddd_->waferType(dataFrame.id(), false) : 0;
-    amplitude_ = amplitude_ / fCPerMIP_[thickness];
-
+      
     LogDebug("HGCUncalibratedRecHit") << "isSiFESim_: " << isSiFESim_ << " ADC+: set the charge to: " << amplitude_
                                       << ' ' << sample.data() << ' ' << adcLSB_ << ' '
                                       << "               TDC+: set the ToA to: " << jitter_ << ' ' << sample.toa()

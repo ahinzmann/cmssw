@@ -152,12 +152,10 @@ hgchebackDigitizer = cms.PSet(
             adcPulse          = cms.vdouble(0.0, 0.0,   1.0,   0.0,  0.0,  0.0),
             ####
             adcNbits        = 10,      # standard ROC operations (was 2 bits more up to 11_0_0_pre12)
-            adcSaturation_fC = 68.75,  # keep the adc LSB the same (i.e. set saturation one quarter value of pre12)
-            tdcSaturation_fC  = 10000,  # allow up to 1000 MIPs as a max range, including ToA mode
-            targetMIPvalue_ADC   = 15, # to be used for HGCROC gain proposal # UPD: not used in the updated sci digitiser, incorrect assumption about the MIP equalisation
-            adcThreshold_fC = 0.5,     # unchanged with respect to pre12 # UPD: used as vanilla threshold in units of MIPs
-            tdcOnset_fC       = 55,    # turn on TDC when 80% of the ADC range is reached (one quarter of pre12
-            #                                        indicative at this point)
+            adcSaturation_fC = 1024,  # in unit of counts
+            tdcSaturation_fC  = 10000,  # in units of counts
+            adcThreshold_fC = 0.5,     # in units of MIPs
+            tdcOnset_fC       = 0,    # turn on TDC when 80% of the ADC range is reached
             tdcForToAOnset_fC = cms.vdouble(12., 12., 12.),  #turn ToA for 20% of the TDC threshold (indicative at this point)
             
         )
