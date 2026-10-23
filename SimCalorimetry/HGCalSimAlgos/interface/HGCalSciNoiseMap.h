@@ -24,12 +24,7 @@
 class HGCalSciNoiseMap : public HGCalRadiationMap {
 public:
   enum TileType_t { CAST, MOULDED, TILETYPE_N };
-  enum GainRange_t {
-    GAIN_2,
-    GAIN_4,
-    AUTO,
-    GAINRANGE_N
-  };  //roc gain for 2mm2 and 4mm2 // unused in the update of the digitiser
+  enum GainRange_t { GAIN_2, GAIN_4, AUTO, GAINRANGE_N }; //roc gain for 2mm2 and 4mm2
   enum NoiseMapAlgoBits_t {
     IGNORE_SIPMAREA,
     OVERRIDE_SIPMAREA,
@@ -42,8 +37,8 @@ public:
   };
 
   struct SiPMonTileCharacteristics {
-    SiPMonTileCharacteristics() : s(0.), lySF(0.), n(0.), xtalk(0), L(0.), gain(0), thrADC(0), ntotalPE(0) {}
-    float s, lySF, n, xtalk, L;
+    SiPMonTileCharacteristics() : s(0.), lySF(0.), n(0.), xtalk(0), gain(0), thrADC(0), ntotalPE(0) {}
+    float s, lySF, n, xtalk;
     unsigned short gain, thrADC, ntotalPE;
   };
 
