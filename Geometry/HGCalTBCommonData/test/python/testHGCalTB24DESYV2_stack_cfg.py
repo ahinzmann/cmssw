@@ -3,7 +3,7 @@ particleEnergy=20
 #particle="piminus"
 #particleEnergy=100
 
-pgun_pos="_cernstack_2026Oct16v2"
+pgun_pos="_cernstack_2026Oct16v6"
 
 #pgun_pos="_200events_x2_y160_z400_digitiser_mipthreshold_granularity30_adjusted"#####
 
@@ -397,6 +397,7 @@ process.mix.digitizers.hgcalHEback.digiCfg.feCfg.adcThreshold_fC=0.5 # MIP thres
 process.mix.digitizers.hgcalHEback.digiCfg.sigma=0.05 # sdPixels parameter name used instead of creating a new called sigma for simplicity TODO: fix
 process.mix.digitizers.hgcalHEback.digiCfg.gain=1.47 # Gain of 0.7 is for ConvGain 4, Overvoltage 2V. For testbeam 2mm^2 the gain should be 2.08. For testbeam 4mm^2 the gain should be 1.47
 process.mix.digitizers.hgcalHEback.digiCfg.nTotalPE=17500 #cms.double(39984), # UPD: number of pixels for 9 mm^2 SiPM, for 4 mm^2 SiPM 17500
+print(process.mix.digitizers.hgcalHEback.digiCfg)
 
 #process.mix.digitizers.hgcalHEback.digiCfg.feCfg.targetMIPvalue_ADC=15  #increase granularity of the digitiser 
 process.hgcalLayerClustersHSci.plugin.kappa=6 # disable clustering, by treating every hit as seed

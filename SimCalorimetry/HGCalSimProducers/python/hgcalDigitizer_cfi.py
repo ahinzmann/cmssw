@@ -147,15 +147,15 @@ hgchebackDigitizer = cms.PSet(
         sigma     = cms.double(1e-6), # sigma for light yield for new realistic sci digitizer
         thresholdFollowsMIP = cms.bool(thresholdTracksMIP),
         feCfg = hgcROCSettings.clone(
-            fwVersion         = cms.uint32(1),  # UPD: version 1 is Simple Shaper, but this parameter is not used at the moment and the shaper version is called explicitely in the code
+            fwVersion         = cms.uint32(2),  # version 1 is Simple Shaper, version 2 is shaper with TOT
             ### no shaping done for now, calculated ADC value fully placed in second sample 
-            adcPulse          = cms.vdouble(0.0, 0.0,   1.0,   0.0,  0.0,  0.0),
+            # adcPulse          = cms.vdouble(0.0, 0.0,   1.0,   0.0,  0.0,  0.0),
             ####
             adcNbits        = 10,      # standard ROC operations (was 2 bits more up to 11_0_0_pre12)
             adcSaturation_fC = 1024,  # in unit of counts
             tdcSaturation_fC  = 10000,  # in units of counts
             adcThreshold_fC = 0.5,     # in units of MIPs
-            tdcOnset_fC       = 0,    # turn on TDC when 80% of the ADC range is reached
+            tdcOnset_fC       = 819,    # turn on TOT at 80% of the ADC range
             tdcForToAOnset_fC = cms.vdouble(12., 12., 12.),  #turn ToA for 20% of the TDC threshold (indicative at this point)
             
         )
