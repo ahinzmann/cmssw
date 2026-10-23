@@ -387,13 +387,8 @@ void HGCHEbackDigitizer::runRealisticSciDigitizer(std::unique_ptr<HGCalDigiColle
 
     //init a new data frame and run shaper
     HGCalDataFrame newDataFrame(id);
-    //this->myFEelectronics_->runShaper(newDataFrame, chargeColl, toa, engine, thrADC, adcLsb, gainIdx, maxADC);  // for shaper with TOT
-    this->myFEelectronics_->runSimpleShaper(newDataFrame,
-                                            chargeColl,
-                                            thrADC,
-                                            adcLsb,
-                                            gainIdx,
-                                            maxADC);  // UPD: simple shaper created and used for updated functions
+    this->myFEelectronics_->runShaper(newDataFrame, chargeColl, toa, engine, thrADC, adcLsb, gainIdx, maxADC);
+
     //prepare the output
     this->updateOutput(digiColl, newDataFrame);
   }
