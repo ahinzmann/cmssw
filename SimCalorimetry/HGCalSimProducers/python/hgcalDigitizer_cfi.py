@@ -362,9 +362,9 @@ def HFNose_setRealisticNoiseSi(process,byDose=True,byDoseAlgo=0,byDoseMap=doseMa
 
 def HGCal_setRealisticNoiseSci(process,
                                byDose=True,
-                               byDoseAlgo=0, #2,
+                               byDoseAlgo=2,
                                byDoseMap=doseMap,
-                               byDoseSipmMap=cms.string("SimCalorimetry/HGCalSimProducers/data/sipmParams_geom-10.txt"),  #sipmParams_all4mm2.txt
+                               byDoseSipmMap=cms.string("SimCalorimetry/HGCalSimProducers/data/sipmParams_geom-10.txt"),
                                byDoseFactor=1,
                                referenceIdark=0.25,
                                referenceXtalk=-1):

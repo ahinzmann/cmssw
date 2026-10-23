@@ -161,7 +161,6 @@ void HGCFEElectronics<DFr>::runTrivialShaper(
   }
 }
 
-// ****************************************************************************************
 template <class DFr>
 void HGCFEElectronics<DFr>::runSimpleShaper(DFr& dataFrame,
                                             HGCSimHitData& chargeColl,
@@ -178,14 +177,12 @@ void HGCFEElectronics<DFr>::runSimpleShaper(DFr& dataFrame,
     if (charge == 0.f)
       continue;
 
-    /*
 #ifdef EDM_ML_DEBUG
     debug |= (charge > adcThreshold_fC_);
 #endif
-*/
 
-    //    if (debug)
-    //      edm::LogVerbatim("HGCFE") << "\t Redistributing SARS ADC" << charge << " @ " << it;
+    if (debug)
+      edm::LogVerbatim("HGCFE") << "\t Redistributing SARS ADC" << charge << " @ " << it;
 
     for (int ipulse = -2; ipulse < (int)(adcPulse.size()) - 2; ipulse++) {
       if (it + ipulse < 0)
@@ -209,6 +206,8 @@ void HGCFEElectronics<DFr>::runSimpleShaper(DFr& dataFrame,
       //brute force saturation, maybe could to better with an exponential like saturation
       const uint32_t tot = std::floor(std::min((newCharge_[it] - tdcOnset_fC_) / tdcLSB_fC_, float(pow(2,tdcNbits_))-1));
       newSample.set(true, true, gainIdx, 0, tot);
+      if (debug)
+        edm::LogVerbatim("HGCFE") << tot << " (" << (newCharge_[it] - tdcOnset_fC_) << "/" << tdcLSB_fC_ << " ) ";
     } else {
       //brute force saturation, maybe could to better with an exponential like saturation
       const uint32_t adc = std::floor(std::min(newCharge_[it], maxADC) / lsbADC);
