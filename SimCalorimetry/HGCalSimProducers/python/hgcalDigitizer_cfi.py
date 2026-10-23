@@ -320,7 +320,7 @@ def HGCal_useCaching(process):
     process=HGCal_setRealisticNoiseSci(process,byDose=True,byDoseAlgo=2)
     return process
 
-doseMap = cms.string("SimCalorimetry/HGCalSimProducers/data/doseParams_3000fb_fluka-6.2.0.1.txt")# SimCalorimetry/HGCalSimProducers/data/doseParams_3000fb_fluka-3.7.20.txt")
+doseMap = cms.string("SimCalorimetry/HGCalSimProducers/data/doseParams_3000fb_fluka-3.7.20.txt")
 
 def HGCal_setRealisticNoiseSi(process,byDose=True,byDoseAlgo=0,byDoseMap=doseMap,byDoseFactor=1):
     process.HGCAL_noise_fC = cms.PSet(

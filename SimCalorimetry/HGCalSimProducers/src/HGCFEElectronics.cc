@@ -224,7 +224,6 @@ void HGCFEElectronics<DFr>::runSimpleShaper(DFr& dataFrame,
     edm::LogVerbatim("HGCFE") << msg.str();
   }
 }
-// ****************************************************************************************
 
 //
 template <class DFr>
