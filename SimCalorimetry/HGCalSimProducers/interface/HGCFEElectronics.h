@@ -39,10 +39,9 @@ public:
                         hgc::HGCSimHitData& toa,
                         const hgc_digi::FEADCPulseShape& adcPulse,
                         CLHEP::HepRandomEngine* engine,
-                        uint32_t thrADC = 0.,
+                        uint32_t thrADC = 0,
                         float lsbADC = -1,
                         uint32_t gainIdx = 0,
-                        float gainVal = 0.,
                         float maxADC = -1,
                         int thickness = 1,
                         float tdcOnsetAuto = -1,
@@ -80,10 +79,9 @@ public:
                         uint32_t thrADC = 0.,
                         float lsbADC = -1,
                         uint32_t gainIdx = 0,
-                        float gainVal = 0.,
                         float maxADC = -1,
                         int thickness = 1) {
-    runShaper(dataFrame, chargeColl, toa, adcPulse_, engine, thrADC, lsbADC, gainVal, gainIdx, maxADC, thickness);
+    runShaper(dataFrame, chargeColl, toa, adcPulse_, engine, thrADC, lsbADC, gainIdx, maxADC, thickness);
   }
 
   void SetNoiseValues(const std::vector<float>& noise_fC) {
@@ -91,7 +89,8 @@ public:
   };
 
   void generateTimeOffset(CLHEP::HepRandomEngine* engine) {
-    for (int i = 0; i < 3; i++)
+    const size_t n = std::min(eventTimeOffset_ns_.size(), jitterConstant_ns_.size());
+    for (size_t i = 0; i < n; i++)
       eventTimeOffset_ns_[i] = CLHEP::RandGaussQ::shoot(engine, 0, jitterConstant_ns_[i]);
   };
 

@@ -296,7 +296,7 @@ def HGCal_ignoreNoise(process):
     include all effects except noise impact on leakage current and CCE, and scint
     (see also notes in HGCal_setRealisticStartupNoise)
     """
-    #process=HGCal_setRealisticNoiseSi(process,byDose=True,byDoseAlgo=4)
+    process=HGCal_setRealisticNoiseSi(process,byDose=True,byDoseAlgo=4)
     process=HGCal_setRealisticNoiseSci(process,byDose=True,byDoseAlgo=2+32)
     return process
 
