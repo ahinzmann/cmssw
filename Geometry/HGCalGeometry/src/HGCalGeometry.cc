@@ -22,7 +22,7 @@
 typedef CaloCellGeometry::Tr3D Tr3D;
 typedef std::vector<float> ParmVec;
 
-//#define EDM_ML_DEBUG
+#define EDM_ML_DEBUG
 
 const bool debugLocate = false;
 

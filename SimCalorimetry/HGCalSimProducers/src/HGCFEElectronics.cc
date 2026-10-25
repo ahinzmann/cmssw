@@ -204,7 +204,8 @@ void HGCFEElectronics<DFr>::runSimpleShaper(DFr& dataFrame,
     HGCSample newSample;
     if (newCharge_[it] >= maxADC) {
       //brute force saturation, maybe could to better with an exponential like saturation
-      const uint32_t tot = std::floor(std::min((newCharge_[it] - tdcOnset_fC_) / tdcLSB_fC_, float(pow(2,tdcNbits_))-1));
+      const uint32_t tot =
+          std::floor(std::min((newCharge_[it] - tdcOnset_fC_) / tdcLSB_fC_, float(pow(2, tdcNbits_)) - 1));
       newSample.set(true, true, gainIdx, 0, tot);
       if (debug)
         edm::LogVerbatim("HGCFE") << tot << " (" << (newCharge_[it] - tdcOnset_fC_) << "/" << tdcLSB_fC_ << " ) ";

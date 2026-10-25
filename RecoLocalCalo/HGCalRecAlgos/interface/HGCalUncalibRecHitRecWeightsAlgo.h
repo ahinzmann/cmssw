@@ -72,18 +72,18 @@ public:
     if (isSiFESim_) {
       // mode == true: TDC readout was activated and amplitude comes from TimeOverThreshold
       if (sample.mode()) {
-          flag = !sample.threshold();  // raise flag if busy cell
-          // LG (23/06/2015):
-          // to get a continuous energy spectrum we must add here the maximum value in fC ever
-          // reported by the ADC. Namely: floor(tdcOnset/adcLSB_) * adcLSB_
-          // need to increment by one so TDC doesn't overlap with ADC last bin
-          // LG (11/04/2016):
-          // offset the TDC upwards to reflect the bin center
-          amplitude_ = (std::floor(tdcOnsetfC_ / adcLSB_) + 1.0) * adcLSB_ + (double(sample.data()) + 0.5) * tdcLSB_;
+        flag = !sample.threshold();  // raise flag if busy cell
+        // LG (23/06/2015):
+        // to get a continuous energy spectrum we must add here the maximum value in fC ever
+        // reported by the ADC. Namely: floor(tdcOnset/adcLSB_) * adcLSB_
+        // need to increment by one so TDC doesn't overlap with ADC last bin
+        // LG (11/04/2016):
+        // offset the TDC upwards to reflect the bin center
+        amplitude_ = (std::floor(tdcOnsetfC_ / adcLSB_) + 1.0) * adcLSB_ + (double(sample.data()) + 0.5) * tdcLSB_;
       } else {
-          amplitude_ = double(sample.data()) * adcLSB_;  // why do we not have +0.5 here ?
-      } //mode()
-    } //isSiFESim_
+        amplitude_ = double(sample.data()) * adcLSB_;  // why do we not have +0.5 here ?
+      }  //mode()
+    }  //isSiFESim_
 
     // trivial digitization, i.e. no signal shape
     else {
@@ -99,33 +99,33 @@ public:
     int thickness = (ddd_ != nullptr) ? ddd_->waferType(dataFrame.id(), false) : 0;
 
     if (dataFrame.id().det() == DetId::HGCalHSc) {
-        double gain = fCPerMIP_[1];
-        double nTotalPx = fCPerMIP_[2];
-        HGCScintillatorDetId scId(dataFrame.id().rawId());
-        if ((scId.layer() == 7 + 4) || (scId.layer() == 7 + 7) || (scId.layer() == 7 + 8)) {  // TESTBEAM
-          gain = 1.84;
-          nTotalPx = 8649;
-        } else {
-          gain = 1.47;
-          nTotalPx = 17459;
-        }
-        double edge = geom_->edge(scId);
-        double ly;
-        if ((scId.layer() == 7 + 4) || (scId.layer() == 7 + 7) ||
-            (scId.layer() == 7 + 8))  // CERN stack FNAL layers with 2mm2
-          ly = HGCalSciNoiseMap::lyVsize(2, 10, edge, 2, 4);
-        else if ((scId.layer() == 7 + 9) &&
-                 ((scId.ring() == 16 + 3) || (scId.ring() == 16 + 4)))  // CERN stack cast tiles
-          ly = HGCalSciNoiseMap::lyVsize(1, 10, edge, 4, 4);
-        else
-          ly = HGCalSciNoiseMap::lyVsize(2, 10, edge, 4, 4);
-        double expadc = gain * ly;
-        double satmipss = amplitude_ / expadc;
-        amplitude_ = satmipss * desat(amplitude_, gain, nTotalPx);
+      double gain = fCPerMIP_[1];
+      double nTotalPx = fCPerMIP_[2];
+      HGCScintillatorDetId scId(dataFrame.id().rawId());
+      if ((scId.layer() == 7 + 4) || (scId.layer() == 7 + 7) || (scId.layer() == 7 + 8)) {  // TESTBEAM
+        gain = 1.84;
+        nTotalPx = 8649;
+      } else {
+        gain = 1.47;
+        nTotalPx = 17459;
+      }
+      double edge = geom_->edge(scId);
+      double ly;
+      if ((scId.layer() == 7 + 4) || (scId.layer() == 7 + 7) ||
+          (scId.layer() == 7 + 8))  // CERN stack FNAL layers with 2mm2
+        ly = HGCalSciNoiseMap::lyVsize(2, 10, edge, 2, 4);
+      else if ((scId.layer() == 7 + 9) &&
+               ((scId.ring() == 16 + 3) || (scId.ring() == 16 + 4)))  // CERN stack cast tiles
+        ly = HGCalSciNoiseMap::lyVsize(1, 10, edge, 4, 4);
+      else
+        ly = HGCalSciNoiseMap::lyVsize(2, 10, edge, 4, 4);
+      double expadc = gain * ly;
+      double satmipss = amplitude_ / expadc;
+      amplitude_ = satmipss * desat(amplitude_, gain, nTotalPx);
     } else {
-        amplitude_ = amplitude_ / fCPerMIP_[thickness];
+      amplitude_ = amplitude_ / fCPerMIP_[thickness];
     }
-      
+
     LogDebug("HGCUncalibratedRecHit") << "isSiFESim_: " << isSiFESim_ << " ADC+: set the charge to: " << amplitude_
                                       << ' ' << sample.data() << ' ' << adcLSB_ << ' '
                                       << "               TDC+: set the ToA to: " << jitter_ << ' ' << sample.toa()

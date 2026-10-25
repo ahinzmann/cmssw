@@ -24,7 +24,7 @@
 class HGCalSciNoiseMap : public HGCalRadiationMap {
 public:
   enum TileType_t { CAST, MOULDED, TILETYPE_N };
-  enum GainRange_t { GAIN_2, GAIN_4, AUTO, GAINRANGE_N }; //roc gain for 2mm2 and 4mm2
+  enum GainRange_t { GAIN_2, GAIN_4, AUTO, GAINRANGE_N };  //roc gain for 2mm2 and 4mm2
   enum NoiseMapAlgoBits_t {
     IGNORE_SIPMAREA,
     OVERRIDE_SIPMAREA,

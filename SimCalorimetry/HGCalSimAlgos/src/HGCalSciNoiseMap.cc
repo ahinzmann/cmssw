@@ -300,7 +300,7 @@ float HGCalSciNoiseMap::lyVsize(int type, int phase, float edge, float sipm = 4.
   //phase = 10 = pre-series, 0 = production // Daria's addition to create a single map for the function parameters
 
   // Values A and C parameters for LY function for production tiles if 2 and 1, 12 and 11 if pre-series (by adding 10):
-  const std::map<int, std::vector<float>> & LY_params{
+  const std::map<int, std::vector<float>>& LY_params{
       {2, {2066.53, -7.6}}, {1, {1378.53, 32.34}}, {12, {1854.5, -6.52}}, {11, {1110.5, 54.8}}};
 
   float LYi, sipmfactor, ovfactor, A, C;
