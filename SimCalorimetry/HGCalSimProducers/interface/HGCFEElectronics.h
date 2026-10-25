@@ -76,7 +76,7 @@ public:
                         hgc::HGCSimHitData& chargeColl,
                         hgc::HGCSimHitData& toa,
                         CLHEP::HepRandomEngine* engine,
-                        uint32_t thrADC = 0.,
+                        uint32_t thrADC = 0,
                         float lsbADC = -1,
                         uint32_t gainIdx = 0,
                         float maxADC = -1,

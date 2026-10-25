@@ -282,7 +282,7 @@ void HGCHEbackDigitizer::runRealisticSciDigitizer(std::unique_ptr<HGCalDigiColle
   scal_.setGeometry(theGeom);  // unused at the moment, untested (10/2026)
 
   float scaledLYPerMip = -98.8;
-  float tunedNoise = nPEperMIP_ * noise_MIP_;  // flat noise case // UPD: outdated/unused at the mement (10/2026)
+  //float tunedNoise = nPEperMIP_ * noise_MIP_;  // flat noise case // UPD: outdated/unused at the mement (10/2026)
   float vanillaADCThr = this->myFEelectronics_->getADCThreshold();  // vanilla thrs in MIPs
 
   float adcLsb(1);   // UPD: Set to 1 to pass the ADC value to the shaper to form digis (not charge)
@@ -317,7 +317,7 @@ void HGCHEbackDigitizer::runRealisticSciDigitizer(std::unique_ptr<HGCalDigiColle
     double edge(static_cast<const HGCalGeometry*>(theGeom)->edge(scId));
     auto opChar = scal_.scaleByDoseLy(scId, radius, edge, id.rawId(), sigma_);  // using new for digitiser update
     scaledLYPerMip = opChar.lySF;
-    tunedNoise = opChar.n;
+    //tunedNoise = opChar.n;
     gainIdx = opChar.gain;
     thrADC = std::floor(vanillaADCThr * scaledLYPerMip);
     adcLsb = 1;
@@ -333,7 +333,7 @@ void HGCHEbackDigitizer::runRealisticSciDigitizer(std::unique_ptr<HGCalDigiColle
     //} // ----------------------------------------------------------------------------------------------------------------------------------
 
     //set mean for poissonian noise // UPD: untested, unused at the moment (10/2026)
-    float meanN = std::pow(tunedNoise, 2);
+    // float meanN = std::pow(tunedNoise, 2);
 
     for (size_t i = 0; i < cell.hit_info[0].size(); ++i) {
       //convert total energy keV->MIP, since converted to keV in accumulator
