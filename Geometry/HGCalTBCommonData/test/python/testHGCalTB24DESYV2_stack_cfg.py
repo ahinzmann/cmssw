@@ -1,9 +1,9 @@
 particle="electron"
 particleEnergy=100
-particle="piminus"
-particleEnergy=50
+#particle="piminus"
+#particleEnergy=50
 
-pgun_pos="_cernstack_2026Oct16v6"
+pgun_pos="_cernstack_2026Oct29"
 
 #pgun_pos="_200events_x2_y160_z400_digitiser_mipthreshold_granularity30_adjusted"#####
 
@@ -29,10 +29,10 @@ options.parseArguments()
 #process.mix.digitizers.hgchebackDigitizer.digiCfg.algo=0
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 1
-process.MessageLogger.cerr.threshold = cms.untracked.string('INFO')
-process.MessageLogger.cerr.INFO = cms.untracked.PSet(
-    limit = cms.untracked.int32(-1)
-)
+#process.MessageLogger.cerr.threshold = cms.untracked.string('INFO')
+#process.MessageLogger.cerr.INFO = cms.untracked.PSet(
+#    limit = cms.untracked.int32(-1)
+#)
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('SimGeneral.HepPDTESSource.pythiapdt_cfi')
 process.load('Configuration.EventContent.EventContent_cff')

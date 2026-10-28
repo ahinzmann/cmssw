@@ -271,6 +271,7 @@ void HGCHEbackDigitizer::runRealisticSciDigitizer(std::unique_ptr<HGCalDigiColle
   constexpr bool debug(false);
   constexpr bool doSaturation(true);  // flag to perform emulation of saturation of SiPM pixels
   constexpr bool doSmearing(true);    // flag to perform emulation of statistical fluctiations of n of fired pixels
+  constexpr bool doNoise(true);       // flag to add noise
 
   HGCSimHitData chargeColl, toa;
   // this represents a cell with no signal charge
@@ -282,19 +283,15 @@ void HGCHEbackDigitizer::runRealisticSciDigitizer(std::unique_ptr<HGCalDigiColle
   scal_.setGeometry(theGeom);  // unused at the moment, untested (10/2026)
 
   float scaledLYPerMip = -98.8;
-  //float tunedNoise = nPEperMIP_ * noise_MIP_;  // flat noise case // UPD: outdated/unused at the mement (10/2026)
+  float tunedNoise = nPEperMIP_ * noise_MIP_;  // flat noise case // UPD: outdated at the mement (10/2026)
   float vanillaADCThr = this->myFEelectronics_->getADCThreshold();  // vanilla thrs in MIPs
 
-  float adcLsb(1);   // UPD: Set to 1 to pass the ADC value to the shaper to form digis (not charge)
   float maxADC(-1);  //vanilla will rely on what has been configured by default
   float gainValue(gainValue_);
 
   // threshold calcuilated based on the expected ADC for ope MIP * the vanilla threshold in MIPs:
-  uint32_t thrADC(
-      thresholdFollowsMIP_
-          ? std::floor(vanillaADCThr * scaledLYPerMip * gainValue)
-          : std::floor(vanillaADCThr /
-                       adcLsb));  // UPD: TODO check if this ever happens, could be wrong for the updated digitisation
+  uint32_t thrADC(thresholdFollowsMIP_ ? std::floor(vanillaADCThr * scaledLYPerMip * gainValue)
+                                       : std::floor(vanillaADCThr));
   float nTotalPx(nTotalPE_);
   //float xTalk(xTalk_);
   int gainIdx(0);  // UPD: unused, incorrect assumption about channel equalisation
@@ -317,10 +314,10 @@ void HGCHEbackDigitizer::runRealisticSciDigitizer(std::unique_ptr<HGCalDigiColle
     double edge(static_cast<const HGCalGeometry*>(theGeom)->edge(scId));
     auto opChar = scal_.scaleByDoseLy(scId, radius, edge, id.rawId(), sigma_);  // using new for digitiser update
     scaledLYPerMip = opChar.lySF;
-    //tunedNoise = opChar.n;
+    tunedNoise = opChar.n;
     gainIdx = opChar.gain;
     thrADC = std::floor(vanillaADCThr * scaledLYPerMip);
-    adcLsb = 1;
+    float adcLsb = 1;
     maxADC = 1024 - pedestal;  // UPD: max ADC not 1024, since some of it will be taken by the pedestal, recalculating.
     if ((scId.layer() == 7 + 4) || (scId.layer() == 7 + 7) || (scId.layer() == 7 + 8)) {  // TESTBEAM
       gainValue = 1.84;
@@ -333,7 +330,7 @@ void HGCHEbackDigitizer::runRealisticSciDigitizer(std::unique_ptr<HGCalDigiColle
     //} // ----------------------------------------------------------------------------------------------------------------------------------
 
     //set mean for poissonian noise // UPD: untested, unused at the moment (10/2026)
-    // float meanN = std::pow(tunedNoise, 2);
+    float meanN = std::pow(tunedNoise, 2);
 
     for (size_t i = 0; i < cell.hit_info[0].size(); ++i) {
       //convert total energy keV->MIP, since converted to keV in accumulator
@@ -348,6 +345,11 @@ void HGCHEbackDigitizer::runRealisticSciDigitizer(std::unique_ptr<HGCalDigiColle
         if (doSmearing) {
           float prob = nPixels_sat / nTotalPx;
           nPixels_sat_smear = std::floor(CLHEP::RandBinomial::shoot(engine, nTotalPx, prob));
+          if (doNoise) {
+            //generate the noise associated to the dark current
+            const uint32_t npeN = std::floor(CLHEP::RandPoissonQ::shoot(engine, meanN) + 0.5);
+            nPixels_sat_smear += npeN;
+          }
           if (nPixels_sat_smear > 0) {
             simHitADC = nPixels_sat_smear * gainValue;
           } else {
