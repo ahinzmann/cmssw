@@ -271,7 +271,7 @@ void HGCHEbackDigitizer::runRealisticSciDigitizer(std::unique_ptr<HGCalDigiColle
   constexpr bool debug(false);
   constexpr bool doSaturation(true);  // flag to perform emulation of saturation of SiPM pixels
   constexpr bool doSmearing(true);    // flag to perform emulation of statistical fluctiations of n of fired pixels
-  constexpr bool doNoise(true);       // flag to add noise
+  constexpr bool doNoise(false);       // flag to add noise
 
   HGCSimHitData chargeColl, toa;
   // this represents a cell with no signal charge
@@ -314,7 +314,7 @@ void HGCHEbackDigitizer::runRealisticSciDigitizer(std::unique_ptr<HGCalDigiColle
     double edge(static_cast<const HGCalGeometry*>(theGeom)->edge(scId));
     auto opChar = scal_.scaleByDoseLy(scId, radius, edge, id.rawId(), sigma_);  // using new for digitiser update
     scaledLYPerMip = opChar.lySF;
-    tunedNoise = opChar.n;
+    tunedNoise = opChar.n / nPEperMIP_ * scaledLYPerMip;
     gainIdx = opChar.gain;
     thrADC = std::floor(vanillaADCThr * scaledLYPerMip);
     float adcLsb = 1;
@@ -329,7 +329,7 @@ void HGCHEbackDigitizer::runRealisticSciDigitizer(std::unique_ptr<HGCalDigiColle
 
     //} // ----------------------------------------------------------------------------------------------------------------------------------
 
-    //set mean for poissonian noise // UPD: untested, unused at the moment (10/2026)
+    //set mean for poissonian noise
     float meanN = std::pow(tunedNoise, 2);
 
     for (size_t i = 0; i < cell.hit_info[0].size(); ++i) {
