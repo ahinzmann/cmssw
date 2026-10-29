@@ -47,8 +47,8 @@ HGCalUncalibRecHit = HGCalUncalibRecHitProducer.clone(
         #tdc information
         tdcNbits      = hgchebackDigitizer.digiCfg.feCfg.tdcNbits,
         tdcSaturation = hgchebackDigitizer.digiCfg.feCfg.tdcSaturation_fC,
-        tdcOnset      = cms.double(0), # no addition of adc counts up to Onset in TOT mode when using fwVersion=1
-        #tdcOnset      = hgchebackDigitizer.digiCfg.feCfg.tdcOnset_fC,
+        #tdcOnset      = cms.double(0), # no addition of adc counts up to Onset in TOT mode when using fwVersion=1
+        tdcOnset      = hgchebackDigitizer.digiCfg.feCfg.tdcOnset_fC,
         toaLSB_ns     = hgchebackDigitizer.digiCfg.feCfg.toaLSB_ns,
         tofDelay      = hgchebackDigitizer.tofDelay,
         fCPerMIP      = cms.vdouble(1.0,

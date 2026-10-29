@@ -271,7 +271,7 @@ void HGCHEbackDigitizer::runRealisticSciDigitizer(std::unique_ptr<HGCalDigiColle
   constexpr bool debug(false);
   constexpr bool doSaturation(true);  // flag to perform emulation of saturation of SiPM pixels
   constexpr bool doSmearing(true);    // flag to perform emulation of statistical fluctiations of n of fired pixels
-  constexpr bool doNoise(false);       // flag to add noise
+  constexpr bool doNoise(false);      // flag to add noise
 
   HGCSimHitData chargeColl, toa;
   // this represents a cell with no signal charge

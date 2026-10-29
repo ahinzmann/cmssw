@@ -3,7 +3,7 @@ particleEnergy=100
 particle="piminus"
 particleEnergy=100
 
-pgun_pos="_cernstack_2026Oct28v1"
+pgun_pos="_cernstack_2026Oct28v4"
 
 #pgun_pos="_200events_x2_y160_z400_digitiser_mipthreshold_granularity30_adjusted"#####
 
