@@ -1,9 +1,11 @@
 particle="electron"
-particleEnergy=100
-particle="piminus"
-particleEnergy=100
+particleEnergy=20
+#particle="piminus"
+#particleEnergy=100
+#particle="muon"
+#particleEnergy=200
 
-pgun_pos="_cernstack_2026Oct28v4"
+pgun_pos="_cernstack_2026Nov7"
 
 #pgun_pos="_200events_x2_y160_z400_digitiser_mipthreshold_granularity30_adjusted"#####
 
@@ -21,8 +23,22 @@ options.register ('seed',
 				  VarParsing.multiplicity.singleton,
 				  VarParsing.varType.float,
 				  "Random seed")
-options.parseArguments()                                  
-                                  
+options.register ('particle',
+				  "electron",
+				  VarParsing.multiplicity.singleton,
+				  VarParsing.varType.string,
+				  "Random seed")
+options.register ('particleEnergy',
+				  20,
+				  VarParsing.multiplicity.singleton,
+				  VarParsing.varType.int,
+				  "Random seed")
+options.parseArguments()
+if options.particle!="electron":
+  particle=options.particle
+if options.particleEnergy!=20:
+  particleEnergy=options.particleEnergy
+print(particle,particleEnergy)              
 
 # import of standard configurations
 
@@ -236,10 +252,10 @@ process.generator = cms.EDProducer("FlatRandomAngleEGunProducer",
         MaxPhi = cms.double(0.0),
         #XCoordinates = cms.vdouble(2.0),  # X positions, old interface
         #YCoordinates = cms.vdouble(160.0),  # Y positions, old interface
-        MinX = cms.double(1.8), # new interface
-        MaxX = cms.double(2.2), # new interface
+        MinX = cms.double(1.9), # new interface
+        MaxX = cms.double(2.1), # new interface
         MinY = cms.double(158), # new interface
-        MaxY = cms.double(162), # new interface
+        MaxY = cms.double(160), # new interface
         #ParticlesPerPosition = cms.int32(500),  # Number of particles at each position
         ZPosition = cms.double(400.0),
         PartID = cms.vint32((-211 if particle == "piminus" else (13 if particle == "muon" else 11)))  # Particle ID

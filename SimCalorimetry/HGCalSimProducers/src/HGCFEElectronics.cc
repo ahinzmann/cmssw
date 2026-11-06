@@ -204,11 +204,10 @@ void HGCFEElectronics<DFr>::runSimpleShaper(DFr& dataFrame,
     HGCSample newSample;
     if (newCharge_[it] >= maxADC) {
       //brute force saturation, maybe could to better with an exponential like saturation
-      const uint32_t tot = std::floor(std::min(newCharge_[it], tdcSaturation_fC_) / tdcLSB_fC_);
+      const uint32_t tot = std::floor(std::min(newCharge_[it], float(tdcSaturation_fC_ - 1e-5)) / tdcLSB_fC_);
       newSample.set(true, true, gainIdx, 0, tot);
       if (debug)
-        edm::LogVerbatim("HGCFE") << tot << " (" << std::min(newCharge_[it], tdcSaturation_fC_) << "/" << tdcLSB_fC_
-                                  << " ) ";
+        edm::LogVerbatim("HGCFE") << tot << " (" << std::min(newCharge_[it], float(tdcSaturation_fC_ - 1e-5)) << "/" << tdcLSB_fC_ << " ) ";
     } else {
       //brute force saturation, maybe could to better with an exponential like saturation
       const uint32_t adc = std::floor(std::min(newCharge_[it], maxADC) / lsbADC);
@@ -492,7 +491,7 @@ void HGCFEElectronics<DFr>::runShaperWithToT(DFr& dataFrame,
     if (totFlags_[it] || busyFlags_[it]) {
       if (totFlags_[it]) {
         //brute force saturation, maybe could to better with an exponential like saturation
-        const float saturatedCharge(std::min(newCharge_[it], tdcSaturation_fC_));
+        const float saturatedCharge(std::min(newCharge_[it], float(tdcSaturation_fC_ - 1e-5)));
         //working version for in-time PU and signal
         newSample.set(
             true, true, gainIdx, (uint16_t)(timeToA / toaLSB_ns_), (uint16_t)(std::floor(saturatedCharge / tdcLSB_fC_)));
