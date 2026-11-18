@@ -258,8 +258,8 @@ process.generator = cms.EDProducer("FlatRandomAngleEGunProducer",
         #MaxY = cms.double(160), # new interface
         MinX = cms.double(1.855), # 0.05mm shift from Jia-Hao, increase width from 2->3 mm
         MaxX = cms.double(2.155), # 
-        MinY = cms.double(165.862), # shift by two tile distances 71.62mm, and 2mm shift from Jia-Hao, reduce width 2->1mm 
-        MaxY = cms.double(166.862), # 
+        MinY = cms.double(165.362), # shift by two tile distances 71.62mm, and 2mm shift from Jia-Hao
+        MaxY = cms.double(167.362), # 
         #ParticlesPerPosition = cms.int32(500),  # Number of particles at each position
         ZPosition = cms.double(400.0),
         PartID = cms.vint32((-211 if particle == "piminus" else (13 if particle == "muon" else 11)))  # Particle ID
