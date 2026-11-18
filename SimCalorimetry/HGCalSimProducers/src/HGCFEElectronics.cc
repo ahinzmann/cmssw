@@ -203,6 +203,8 @@ void HGCFEElectronics<DFr>::runSimpleShaper(DFr& dataFrame,
   for (int it = 0; it < (int)(newCharge_.size()); it++) {
     HGCSample newSample;
     if (newCharge_[it] >= maxADC) {
+      tdcSaturation_fC_ = 7500.; // TESTBEAM Issue with HGCROC-3a with cd=0 staturating at 2500 counts https://indico.cern.ch/event/1629310/contributions/7375618/attachments/3383988/6077871/D8_ROC3A_FNAL_InjConv.pdf
+      
       //brute force saturation, maybe could to better with an exponential like saturation
       const uint32_t tot = std::floor(std::min(newCharge_[it], float(tdcSaturation_fC_ - 1e-5)) / tdcLSB_fC_);
       newSample.set(true, true, gainIdx, 0, tot);
