@@ -259,7 +259,7 @@ HGCalSciNoiseMap::SiPMonTileCharacteristics HGCalSciNoiseMap::scaleByDoseLy(cons
       (cellId.layer() == 7 + 8))  // CERN stack FNAL layers with 2mm2
     ly = lyVsize(2, 10, edge, 2, 4);
   else if ((cellId.layer() == 7 + 9) &&
-           ((cellId.ring() == 16 + 3) || (cellId.ring() == 16 + 4)))  // CERN stack cast tiles
+           ((cellId.ring() == 18 + 3) || (cellId.ring() == 18 + 4)))  // CERN stack cast tiles
     ly = lyVsize(1, 10, edge, 4, 4);
   else
     ly = lyVsize(2, 10, edge, 4, 4);

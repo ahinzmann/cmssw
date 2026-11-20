@@ -115,7 +115,7 @@ public:
           (scId.layer() == 7 + 8))  // CERN stack FNAL layers with 2mm2
         ly = HGCalSciNoiseMap::lyVsize(2, 10, edge, 2, 4);
       else if ((scId.layer() == 7 + 9) &&
-               ((scId.ring() == 16 + 3) || (scId.ring() == 16 + 4)))  // CERN stack cast tiles
+               ((scId.ring() == 18 + 3) || (scId.ring() == 18 + 4)))  // CERN stack cast tiles
         ly = HGCalSciNoiseMap::lyVsize(1, 10, edge, 4, 4);
       else
         ly = HGCalSciNoiseMap::lyVsize(2, 10, edge, 4, 4);
