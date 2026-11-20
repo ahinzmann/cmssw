@@ -5,7 +5,7 @@ particleEnergy=20
 #particle="muon"
 #particleEnergy=200
 
-pgun_pos="_cernstack_2026Nov20"
+pgun_pos="_cernstack_2026Nov20v2"
 
 #pgun_pos="_200events_x2_y160_z400_digitiser_mipthreshold_granularity30_adjusted"#####
 

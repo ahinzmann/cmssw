@@ -2,6 +2,7 @@
 #include "SimCalorimetry/HGCalSimProducers/interface/HGCFEElectronics.h"
 #include "DataFormats/HGCDigi/interface/HGCDigiCollections.h"
 #include "FWCore/Utilities/interface/transform.h"
+#include "DataFormats/ForwardDetId/interface/HGCScintillatorDetId.h"
 
 #include "vdt/vdtMath.h"
 #include <cassert>
@@ -203,13 +204,32 @@ void HGCFEElectronics<DFr>::runSimpleShaper(DFr& dataFrame,
   for (int it = 0; it < (int)(newCharge_.size()); it++) {
     HGCSample newSample;
     if (newCharge_[it] >= maxADC) {
-      tdcSaturation_fC_ = 7500.; // TESTBEAM Issue with HGCROC-3a with cd=0 staturating at 2500 counts https://indico.cern.ch/event/1629310/contributions/7375618/attachments/3383988/6077871/D8_ROC3A_FNAL_InjConv.pdf
+      float tdcSaturation_fC(tdcSaturation_fC_);
+      // TESTBEAM Issue with HGCROC-3a with cd=0 staturating at about 2500 counts https://indico.cern.ch/event/1629310/contributions/7375618/attachments/3383988/6077871/D8_ROC3A_FNAL_InjConv.pdf
+      if (dataFrame.id().det() == DetId::HGCalHSc) {
+        HGCScintillatorDetId scId(dataFrame.id().rawId());
+        if (scId.layer() == 7 + 1) tdcSaturation_fC = tdcLSB_fC_*2250.;
+        if (scId.layer() == 7 + 2) tdcSaturation_fC = tdcLSB_fC_*2250.;
+        if (scId.layer() == 7 + 3) tdcSaturation_fC = tdcLSB_fC_*2300.;
+        if (scId.layer() == 7 + 4) tdcSaturation_fC = tdcLSB_fC_*2500.;
+        if (scId.layer() == 7 + 5) tdcSaturation_fC = tdcLSB_fC_*2500.;
+        if (scId.layer() == 7 + 6) tdcSaturation_fC = tdcLSB_fC_*2550.;
+        if (scId.layer() == 7 + 7) tdcSaturation_fC = tdcLSB_fC_*2250.;
+        if (scId.layer() == 7 + 8) tdcSaturation_fC = tdcLSB_fC_*2250.;
+        if (scId.layer() == 7 + 9) tdcSaturation_fC = tdcLSB_fC_*2750.;
+        if (scId.layer() == 7 + 10) tdcSaturation_fC = tdcLSB_fC_*2400.;
+        if (scId.layer() == 7 + 11) tdcSaturation_fC = tdcLSB_fC_*2300.;
+        if (scId.layer() == 7 + 12) tdcSaturation_fC = tdcLSB_fC_*2250.;
+        if (scId.layer() == 7 + 13) tdcSaturation_fC = tdcLSB_fC_*2200.;
+        if (scId.layer() == 7 + 14) tdcSaturation_fC = tdcLSB_fC_*2200.;
+        if (scId.layer() == 7 + 15) tdcSaturation_fC = tdcLSB_fC_*2200.;
+      }
       
       //brute force saturation, maybe could to better with an exponential like saturation
-      const uint32_t tot = std::floor(std::min(newCharge_[it], float(tdcSaturation_fC_ - 1e-5)) / tdcLSB_fC_);
+      const uint32_t tot = std::floor(std::min(newCharge_[it], float(tdcSaturation_fC - 1e-5)) / tdcLSB_fC_);
       newSample.set(true, true, gainIdx, 0, tot);
       if (debug)
-        edm::LogVerbatim("HGCFE") << tot << " (" << std::min(newCharge_[it], float(tdcSaturation_fC_ - 1e-5)) << "/" << tdcLSB_fC_ << " ) ";
+        edm::LogVerbatim("HGCFE") << tot << " (" << std::min(newCharge_[it], float(tdcSaturation_fC - 1e-5)) << "/" << tdcLSB_fC_ << " ) ";
     } else {
       //brute force saturation, maybe could to better with an exponential like saturation
       const uint32_t adc = std::floor(std::min(newCharge_[it], maxADC) / lsbADC);
