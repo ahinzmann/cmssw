@@ -53,12 +53,6 @@ public:
     return geom_ != nullptr;
   }
 
-  float desat(double sig, double g, int m = 39998) {
-    double n = sig / g;
-    double ans = -m / n * log(1 - (n / m));
-    return ans;
-  }
-
   /// Compute HGCUncalibratedRecHit from DataFrame
   virtual HGCUncalibratedRecHit makeRecHit(const C& dataFrame, const bool computeLocalTime) {
     double amplitude_(-1.), pedestal_(-1.), jitter_(-99.), chi2_(-1.);
@@ -104,9 +98,7 @@ public:
       HGCScintillatorDetId scId(dataFrame.id().rawId());
       double edge = geom_->edge(scId);
       double ly(HGCalSciNoiseMap::lyVsize(scId.type(), 0, edge, 9, 2));
-      double expadc = gain * ly;
-      double satmipss = amplitude_ / expadc;
-      amplitude_ = satmipss * desat(amplitude_, gain, nTotalPx);
+      amplitude_ = -nTotalPx * log(1 - ((amplitude_ / gain) / nTotalPx)) / ly;
     } else {
       amplitude_ = amplitude_ / fCPerMIP_[thickness];
     }

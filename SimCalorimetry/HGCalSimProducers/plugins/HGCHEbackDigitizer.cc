@@ -304,7 +304,7 @@ void HGCHEbackDigitizer::runRealisticSciDigitizer(std::unique_ptr<HGCalDigiColle
     int nPixels_sat_smear = -88;
     double radius;  //, x, y, z;
     //double tileE, tileA;
-    int pedestal = 150;  // value of the expected position of the pedestal determined for the runs
+    float pedestal(150);  // value of the expected position of the pedestal determined for the runs
 
     HGCScintillatorDetId scId(id.rawId());
     radius = static_cast<const HGCalGeometry*>(theGeom)->getPosition(scId).perp();
@@ -315,10 +315,16 @@ void HGCHEbackDigitizer::runRealisticSciDigitizer(std::unique_ptr<HGCalDigiColle
     gainIdx = opChar.gain;
     thrADC = std::floor(vanillaADCThr * scaledLYPerMip);
     float adcLsb = 1;
-    maxADC = 1024 - pedestal;  // UPD: max ADC not 1024, since some of it will be taken by the pedestal, recalculating.
 
     //set mean for poissonian noise
     float meanN = std::pow(tunedNoise, 2);
+    if (scaleByDose_ && doNoise) {
+        pedestal=meanN;
+        if (scal_.ignoreAutoPedestalSubtraction())
+          pedestal = 0.f;
+    }
+
+    maxADC = 1024 - pedestal;
 
     for (size_t i = 0; i < cell.hit_info[0].size(); ++i) {
       //convert total energy keV->MIP, since converted to keV in accumulator
@@ -336,7 +342,7 @@ void HGCHEbackDigitizer::runRealisticSciDigitizer(std::unique_ptr<HGCalDigiColle
           if (doNoise) {
             //generate the noise associated to the dark current
             const uint32_t npeN = std::floor(CLHEP::RandPoissonQ::shoot(engine, meanN) + 0.5);
-            nPixels_sat_smear += npeN;
+            nPixels_sat_smear += std::max(0.f,npeN - pedestal);
           }
           if (nPixels_sat_smear > 0) {
             simHitADC = nPixels_sat_smear * gainValue;
@@ -344,7 +350,7 @@ void HGCHEbackDigitizer::runRealisticSciDigitizer(std::unique_ptr<HGCalDigiColle
             simHitADC = 0.;
           }
         } else {
-          simHitADC = nPixels * gainValue;
+          simHitADC = nPixels_sat * gainValue;
         }
       } else {
         simHitADC = nPixels * gainValue;

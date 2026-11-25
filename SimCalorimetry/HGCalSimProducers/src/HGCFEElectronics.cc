@@ -172,6 +172,8 @@ void HGCFEElectronics<DFr>::runSimpleShaper(DFr& dataFrame,
                                             const hgc_digi::FEADCPulseShape& adcPulse) {
   //convolute with pulse shape to compute new ADCs
   newCharge_.fill(0.f);
+  if (maxADC < 0)
+    maxADC = adcSaturation_fC_;
   bool debug(false);
   for (int it = 0; it < (int)(chargeColl.size()); it++) {
     const float charge(chargeColl[it]);
@@ -205,10 +207,10 @@ void HGCFEElectronics<DFr>::runSimpleShaper(DFr& dataFrame,
     HGCSample newSample;
     if (newCharge_[it] >= maxADC) {
       //brute force saturation, maybe could to better with an exponential like saturation
-      const uint32_t tot = std::floor(std::min(newCharge_[it], float(tdcSaturation_fC_ - 1e-5)) / tdcLSB_fC_);
+      const uint32_t tot = std::floor(std::min(newCharge_[it], float(tdcSaturation_fC_)) / tdcLSB_fC_);
       newSample.set(true, true, gainIdx, 0, tot);
       if (debug)
-        edm::LogVerbatim("HGCFE") << tot << " (" << std::min(newCharge_[it], float(tdcSaturation_fC_ - 1e-5)) << "/"
+        edm::LogVerbatim("HGCFE") << tot << " (" << std::min(newCharge_[it], tdcSaturation_fC_) << "/"
                                   << tdcLSB_fC_ << " ) ";
     } else {
       //brute force saturation, maybe could to better with an exponential like saturation
