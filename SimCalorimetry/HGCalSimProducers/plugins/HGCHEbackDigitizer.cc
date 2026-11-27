@@ -317,7 +317,7 @@ void HGCHEbackDigitizer::runRealisticSciDigitizer(std::unique_ptr<HGCalDigiColle
     scaledLYPerMip = opChar.lySF;
     tunedNoise = opChar.n / nPEperMIP_ * scaledLYPerMip;
     gainIdx = opChar.gain;
-    thrADC = std::floor(vanillaADCThr * scaledLYPerMip);
+    thrADC = std::floor(vanillaADCThr * scaledLYPerMip * gainValue);
     float adcLsb = 1;
     maxADC = 1024 - pedestal;  // UPD: max ADC not 1024, since some of it will be taken by the pedestal, recalculating.
     if ((scId.layer() == 7 + 4) || (scId.layer() == 7 + 7) || (scId.layer() == 7 + 8)) {  // TESTBEAM
