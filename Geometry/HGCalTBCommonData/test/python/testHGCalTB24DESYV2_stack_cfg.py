@@ -5,7 +5,7 @@ particleEnergy=20
 #particle="muon"
 #particleEnergy=200
 
-pgun_pos="_cernstack_2026Nov25_reality"
+pgun_pos="_cernstack_2026Nov27_reality"
 
 #pgun_pos="_200events_x2_y160_z400_digitiser_mipthreshold_granularity30_adjusted"#####
 
@@ -250,10 +250,10 @@ process.generator = cms.EDProducer("FlatRandomAngleEGunProducer",
 
         MinPhi = cms.double(0.0),
         MaxPhi = cms.double(0.0),
-        MinX = cms.double(1.655-0.25 if particleEnergy==100 else 1.755-0.25), # making beam 2.5mm wider
-        MaxX = cms.double(1.855+0.25 if particleEnergy==100 else 1.955+0.25), # making beam 2.5mm wider
-        MinY = cms.double(165.062-0.25 if particleEnergy==100 else 164.662-0.25), # making beam 2.5mm wider
-        MaxY = cms.double(167.062+0.25 if particleEnergy==100 else 166.662+0.25), # making beam 2.5mm wider
+        MinX = cms.double(1.455-0.25-0.5 if particleEnergy==100 else 1.655-0.25-0.3), # making beam 2.5mm wider
+        MaxX = cms.double(1.655+0.25+0.5 if particleEnergy==100 else 1.855+0.25+0.3), # making beam 2.5mm wider
+        MinY = cms.double(165.062-0.25-0.3 if particleEnergy==100 else 164.562-0.25-0.1), # making beam 2.5mm wider
+        MaxY = cms.double(167.062+0.25+0.3 if particleEnergy==100 else 166.562+0.25+0.1), # making beam 2.5mm wider
         #ParticlesPerPosition = cms.int32(500),  # Number of particles at each position
         ZPosition = cms.double(400.0),
         PartID = cms.vint32((-211 if particle == "piminus" else (13 if particle == "muon" else 11)))  # Particle ID

@@ -311,7 +311,8 @@ void HGCHEbackDigitizer::runRealisticSciDigitizer(std::unique_ptr<HGCalDigiColle
 
     HGCScintillatorDetId scId(id.rawId());
     radius = static_cast<const HGCalGeometry*>(theGeom)->getPosition(scId).perp();
-    double edge(static_cast<const HGCalGeometry*>(theGeom)->edge(scId));
+    //double edge(static_cast<const HGCalGeometry*>(theGeom)->edge(scId));
+    double edge(pow(static_cast<const HGCalGeometry*>(theGeom)->getArea(scId),0.5));
     auto opChar = scal_.scaleByDoseLy(scId, radius, edge, id.rawId(), sigma_);  // using new for digitiser update
     scaledLYPerMip = opChar.lySF;
     tunedNoise = opChar.n / nPEperMIP_ * scaledLYPerMip;

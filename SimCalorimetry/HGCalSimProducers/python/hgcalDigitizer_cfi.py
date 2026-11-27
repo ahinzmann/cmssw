@@ -143,11 +143,12 @@ hgchebackDigitizer = cms.PSet(
         doTimeSamples = cms.bool(False),
         nPEperMIP = cms.double(80.0), # reference light yield (is scaled depending on tile type and size)
         nTotalPE  = cms.double(39770), # 39770 is number of pixels for 9 mm^2 SiPM (for 4 mm^2 SiPM it is 17459, for 2 mm^2 SiPM it is 8649)
-        gain      = cms.double(0.7), # SiPM gain in ADC; Gain of 0.7 is for ConvGain 4, Overvoltage 2V
+        gain      = cms.double(0.35), # SiPM gain in ADC; Gain of 0.35 is for ConvGain 2, Overvoltage 2V
         sigma     = cms.double(1e-6), # sigma for light yield for new realistic sci digitizer
         thresholdFollowsMIP = cms.bool(thresholdTracksMIP),
         feCfg = hgcROCSettings.clone(
             fwVersion         = cms.uint32(1),  # version 1 is Simple Shaper, version 2 is shaper with TOT
+            #fwVersion         = cms.uint32(2),  # version 1 is Simple Shaper, version 2 is shaper with TOT
             ### no shaping done for now, calculated ADC value fully placed in second sample 
             #adcPulse          = cms.vdouble(0.0, 0.0,   1.0,   0.0,  0.0,  0.0),
             ####

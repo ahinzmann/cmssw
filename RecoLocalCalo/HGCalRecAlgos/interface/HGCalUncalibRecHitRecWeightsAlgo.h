@@ -109,7 +109,8 @@ public:
         gain = 1.47;
         nTotalPx = 17459;
       }
-      double edge = geom_->edge(scId);
+      //double edge = geom_->edge(scId);
+      double edge = pow(geom_->getArea(scId),0.5);
       double ly;
       if ((scId.layer() == 7 + 4) || (scId.layer() == 7 + 7) ||
           (scId.layer() == 7 + 8))  // CERN stack FNAL layers with 2mm2
@@ -119,9 +120,10 @@ public:
         ly = HGCalSciNoiseMap::lyVsize(1, 10, edge, 4, 4);
       else
         ly = HGCalSciNoiseMap::lyVsize(2, 10, edge, 4, 4);
-      double expadc = gain * ly;
-      double satmipss = amplitude_ / expadc;
-      amplitude_ = satmipss * desat(amplitude_, gain, nTotalPx);
+      //double expadc = gain * ly;
+      //double satmipss = amplitude_ / expadc;
+      //amplitude_ = satmipss * desat(amplitude_, gain, nTotalPx);
+      amplitude_ = -nTotalPx * log(1 - ((amplitude_ / gain) / nTotalPx)) / ly;
     } else {
       amplitude_ = amplitude_ / fCPerMIP_[thickness];
     }
